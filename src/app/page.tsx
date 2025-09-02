@@ -17,10 +17,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
               <div className="flex flex-col justify-center space-y-4">
-                <h1 className="font-headline text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl">
+                <h1 className="font-headline text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl">
                   상상이 자산이 되는 곳, <br className="hidden md:block" /> prmart
                 </h1>
-                <p className="max-w-[600px] text-muted-foreground md:text-2xl">
+                <p className="max-w-[600px] text-muted-foreground text-xl md:text-2xl">
                   Where Imagination Becomes an Asset. 검증된 지식과 경험을 발견하고, 당신의 창의력을 수익으로 전환하세요.
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -51,7 +51,7 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <h2 className="text-4xl font-bold font-headline tracking-tighter sm:text-5xl md:text-6xl">카테고리 쇼케이스</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-2xl/relaxed lg:text-xl/relaxed xl:text-2xl/relaxed">
+              <p className="max-w-[900px] text-muted-foreground text-xl md:text-2xl/relaxed">
                 개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.
               </p>
             </div>
@@ -76,7 +76,7 @@ export default function Home() {
             <p className="mx-auto max-w-[900px] text-muted-foreground md:text-2xl/relaxed text-center mt-4">
               prmart 전문가들이 엄선한 인기 상품들을 만나보세요.
             </p>
-            <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {FEATURED_PROMPTS.map((prompt) => (
                 <PromptCard key={prompt.id} prompt={prompt} />
               ))}
