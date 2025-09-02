@@ -17,21 +17,21 @@ export function Footer() {
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Quick Links</h4>
+            <h4 className="font-semibold">바로가기</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">Prompts</a></li>
-              <li><a href="#" className="hover:text-primary">Discover</a></li>
-              <li><a href="#" className="hover:text-primary">Idea Requests</a></li>
-              <li><a href="/seller/dashboard" className="hover:text-primary">Become a Seller</a></li>
+              <li><a href="#" className="hover:text-primary">상품</a></li>
+              <li><a href="#" className="hover:text-primary">둘러보기</a></li>
+              <li><a href="#" className="hover:text-primary">아이디어 요청</a></li>
+              <li><a href="/seller/dashboard" className="hover:text-primary">판매자 되기</a></li>
             </ul>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Support</h4>
+            <h4 className="font-semibold">고객지원</h4>
             <ul className="space-y-1 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">Help Center</a></li>
-              <li><a href="#" className="hover:text-primary">Terms of Service</a></li>
-              <li><a href="#" className="hover_text-primary">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-primary">고객센터</a></li>
+              <li><a href="#" className="hover:text-primary">이용약관</a></li>
+              <li><a href="#" className="hover:text-primary">개인정보처리방침</a></li>
             </ul>
           </div>
 

@@ -19,11 +19,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Bot, CheckCircle, Loader2, Sparkles, Terminal, XCircle } from "lucide-react";
 
 const productSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters long."),
-  description: z.string().min(20, "Description must be at least 20 characters long."),
-  category: z.string().min(1, "Please select a category."),
-  tags: z.string().min(1, "Please enter at least one tag."),
-  price: z.coerce.number().min(0, "Price must be a positive number."),
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
+  price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -38,7 +38,7 @@ function SubmitButton() {
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-      Submit for Quality Review
+      품질 검수 제출
     </Button>
   );
 }
@@ -66,13 +66,13 @@ export function ProductRegistrationForm() {
     if (formState.message) {
       if (formState.success) {
         toast({
-          title: "Success!",
+          title: "성공!",
           description: formState.message,
         });
         if(formRef.current) formRef.current.reset();
       } else {
          toast({
-          title: "Submission Status",
+          title: "제출 상태",
           description: formState.message,
           variant: "destructive",
         });
@@ -83,8 +83,8 @@ export function ProductRegistrationForm() {
   const handleGenerateDescription = async () => {
     if (!titleValue || titleValue.trim().length < 5) {
       toast({
-        title: "Error",
-        description: "Please enter a valid title (at least 5 characters) to generate a description.",
+        title: "오류",
+        description: "설명을 생성하려면 5자 이상의 유효한 제목을 입력해주세요.",
         variant: "destructive",
       });
       return;
@@ -95,12 +95,12 @@ export function ProductRegistrationForm() {
     if (result.description) {
       setValue("description", result.description, { shouldValidate: true });
       toast({
-        title: "Description Generated!",
-        description: "The AI has generated a product description for you.",
+        title: "설명 생성 완료!",
+        description: "AI가 상품 설명을 생성했습니다.",
       });
     } else {
       toast({
-        title: "Error",
+        title: "오류",
         description: result.error,
         variant: "destructive",
       });
@@ -111,30 +111,30 @@ export function ProductRegistrationForm() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2">
-          <Bot /> AI Seller Assistant
+          <Bot /> AI 판매 도우미
         </CardTitle>
-        <CardDescription>Register your new product. Our AI will help you along the way.</CardDescription>
+        <CardDescription>새 상품을 등록하세요. AI가 단계별로 도와드립니다.</CardDescription>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={formAction} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">Product Title</Label>
-            <Input id="title" name="title" placeholder="e.g., Ultimate Productivity Planner Template" {...register("title")} />
+            <Label htmlFor="title">상품 제목</Label>
+            <Input id="title" name="title" placeholder="예: 최고의 생산성 플래너 템플릿" {...register("title")} />
             {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Label htmlFor="description">Product Description</Label>
+              <Label htmlFor="description">상품 설명</Label>
               <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
                 {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                Generate with AI
+                AI로 생성하기
               </Button>
             </div>
             <Textarea
               id="description"
               name="description"
-              placeholder="Describe your product, its features, and who it's for."
+              placeholder="상품, 기능, 그리고 대상 고객에 대해 설명해주세요."
               className="min-h-[120px]"
               {...register("description")}
             />
@@ -143,10 +143,10 @@ export function ProductRegistrationForm() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">카테고리</Label>
               <Select name="category" onValueChange={(value) => setValue('category', value, {shouldValidate: true})}>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select a category" />
+                  <SelectValue placeholder="카테고리 선택" />
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map(cat => (
@@ -157,16 +157,16 @@ export function ProductRegistrationForm() {
                {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">Price (₩)</Label>
-              <Input id="price" name="price" type="number" placeholder="e.g., 10000" {...register("price")} />
+              <Label htmlFor="price">가격 (₩)</Label>
+              <Input id="price" name="price" type="number" placeholder="예: 10000" {...register("price")} />
               {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">Tags</Label>
-            <Input id="tags" name="tags" placeholder="e.g., productivity, notion, template" {...register("tags")} />
-            <p className="text-xs text-muted-foreground">Separate tags with commas.</p>
+            <Label htmlFor="tags">태그</Label>
+            <Input id="tags" name="tags" placeholder="예: 생산성, 노션, 템플릿" {...register("tags")} />
+            <p className="text-xs text-muted-foreground">태그는 쉼표로 구분해주세요.</p>
             {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
           </div>
 
@@ -176,7 +176,7 @@ export function ProductRegistrationForm() {
         {formState.issues && formState.issues.length > 0 && (
           <Alert variant="destructive" className="mt-4">
             <Terminal className="h-4 w-4" />
-            <AlertTitle>Form Errors</AlertTitle>
+            <AlertTitle>폼 오류</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pl-5">
                 {formState.issues.map((issue, index) => (
@@ -190,11 +190,11 @@ export function ProductRegistrationForm() {
         {formState.qualityResult && (
           <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
              {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-            <AlertTitle>AI Quality Control Result</AlertTitle>
+            <AlertTitle>AI 품질 검수 결과</AlertTitle>
             <AlertDescription>
-              <p><strong>Score:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
-              <p><strong>Status:</strong> {formState.qualityResult.isApproved ? "Approved" : "Sent for Manual Review"}</p>
-              <p><strong>Reason:</strong> {formState.qualityResult.reason}</p>
+              <p><strong>점수:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
+              <p><strong>상태:</strong> {formState.qualityResult.isApproved ? "승인됨" : "수동 검토 대기"}</p>
+              <p><strong>사유:</strong> {formState.qualityResult.reason}</p>
             </AlertDescription>
           </Alert>
         )}

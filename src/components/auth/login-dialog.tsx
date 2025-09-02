@@ -32,34 +32,34 @@ export function LoginDialog({ onLoginSuccess }: LoginDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Log In</Button>
+        <Button variant="outline">로그인</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle className="font-headline">Welcome back</DialogTitle>
+          <DialogTitle className="font-headline">다시 오신 것을 환영합니다</DialogTitle>
           <DialogDescription>
-            Log in to access your dashboard and purchases.
+            대시보드와 구매 내역에 접근하려면 로그인하세요.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleLogin}>
           <div className="grid gap-4 py-4">
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">이메일</Label>
               <Input type="email" id="email" placeholder="project@prmart.ai" required />
             </div>
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">비밀번호</Label>
               <Input type="password" id="password" placeholder="••••••••" required />
             </div>
           </div>
           <DialogFooter className="sm:flex-col sm:space-y-2">
             <Button type="submit" className="w-full">
               <LogIn className="mr-2 h-4 w-4" />
-              Log In
+              로그인
             </Button>
              <Button variant="outline" className="w-full">
               <Chrome className="mr-2 h-4 w-4" />
-              Continue with Google
+              Google 계정으로 계속하기
             </Button>
           </DialogFooter>
         </form>

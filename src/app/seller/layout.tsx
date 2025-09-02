@@ -33,34 +33,34 @@ export default function SellerLayout({
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Dashboard">
+                <SidebarMenuButton asChild tooltip="대시보드">
                   <Link href="/seller/dashboard">
                     <LayoutDashboard />
-                    <span>Dashboard</span>
+                    <span>대시보드</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Products">
+                <SidebarMenuButton asChild tooltip="상품">
                   <Link href="#">
                     <Package />
-                    <span>Products</span>
+                    <span>상품</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Analytics">
+                <SidebarMenuButton asChild tooltip="분석">
                   <Link href="#">
                     <BarChart3 />
-                    <span>Analytics</span>
+                    <span>분석</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Settings">
+                <SidebarMenuButton asChild tooltip="설정">
                   <Link href="#">
                     <Settings />
-                    <span>Settings</span>
+                    <span>설정</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -69,18 +69,18 @@ export default function SellerLayout({
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Help">
+                <SidebarMenuButton asChild tooltip="도움말">
                   <Link href="#">
                     <LifeBuoy />
-                    <span>Help</span>
+                    <span>도움말</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Account">
+                <SidebarMenuButton asChild tooltip="계정">
                   <Link href="#">
                     <UserCircle />
-                    <span>Account</span>
+                    <span>계정</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

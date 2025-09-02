@@ -4,8 +4,8 @@ export default function SellerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight font-headline">Seller Dashboard</h1>
-        <p className="text-muted-foreground">Manage your products and view your sales performance.</p>
+        <h1 className="text-2xl font-bold tracking-tight font-headline">판매자 대시보드</h1>
+        <p className="text-muted-foreground">상품을 관리하고 판매 실적을 확인하세요.</p>
       </div>
 
       <ProductRegistrationForm />

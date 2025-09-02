@@ -13,13 +13,13 @@ export function Header() {
         </Link>
         <nav className="hidden md:flex gap-6 items-center">
           <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-            Prompts
+            상품
           </Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-            Discover
+            둘러보기
           </Link>
           <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
-            Requests
+            아이디어 요청
           </Link>
         </nav>
         <div className="flex items-center gap-4">

@@ -26,7 +26,7 @@ export function AuthButtons() {
   ) : (
     <div className="flex items-center gap-2">
       <LoginDialog onLoginSuccess={handleLogin} />
-      <Button variant="default">Sign Up</Button>
+      <Button variant="default">회원가입</Button>
     </div>
   );
 }

@@ -41,17 +41,17 @@ export function UserMenu({ onLogout }: UserMenuProps) {
         <DropdownMenuItem asChild>
           <Link href="/seller/dashboard">
             <LayoutDashboard className="mr-2 h-4 w-4" />
-            <span>Dashboard</span>
+            <span>대시보드</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
           <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <span>설정</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={onLogout}>
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <span>로그아웃</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
