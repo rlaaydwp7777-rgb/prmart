@@ -69,7 +69,14 @@ export function ProductRegistrationForm() {
           title: "성공!",
           description: formState.message,
         });
-        if(formRef.current) formRef.current.reset();
+        if(formRef.current) {
+            formRef.current.reset();
+            setValue("title", "");
+            setValue("description", "");
+            setValue("category", "");
+            setValue("tags", "");
+            setValue("price", 0);
+        }
       } else {
          toast({
           title: "제출 상태",
@@ -78,7 +85,7 @@ export function ProductRegistrationForm() {
         });
       }
     }
-  }, [formState, toast]);
+  }, [formState, toast, setValue]);
 
   const handleGenerateDescription = async () => {
     if (!titleValue || titleValue.trim().length < 5) {
@@ -106,6 +113,11 @@ export function ProductRegistrationForm() {
       });
     }
   };
+  
+  const { ref: titleRef, ...titleRest } = register("title");
+  const { ref: descriptionRef, ...descriptionRest } = register("description");
+  const { ref: priceRef, ...priceRest } = register("price");
+  const { ref: tagsRef, ...tagsRest } = register("tags");
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -119,7 +131,7 @@ export function ProductRegistrationForm() {
         <form ref={formRef} action={formAction} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">상품 제목</Label>
-            <Input id="title" name="title" placeholder="예: 최고의 생산성 플래너 템플릿" {...register("title")} />
+            <Input id="title" placeholder="예: 최고의 생산성 플래너 템플릿" {...titleRest} ref={titleRef} />
             {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
           </div>
 
@@ -133,10 +145,10 @@ export function ProductRegistrationForm() {
             </div>
             <Textarea
               id="description"
-              name="description"
               placeholder="상품, 기능, 그리고 대상 고객에 대해 설명해주세요."
               className="min-h-[120px]"
-              {...register("description")}
+              {...descriptionRest}
+              ref={descriptionRef}
             />
             {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
           </div>
@@ -158,14 +170,14 @@ export function ProductRegistrationForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">가격 (₩)</Label>
-              <Input id="price" name="price" type="number" placeholder="예: 10000" {...register("price")} />
+              <Input id="price" type="number" placeholder="예: 10000" {...priceRest} ref={priceRef} />
               {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="tags">태그</Label>
-            <Input id="tags" name="tags" placeholder="예: 생산성, 노션, 템플릿" {...register("tags")} />
+            <Input id="tags" placeholder="예: 생산성, 노션, 템플릿" {...tagsRest} ref={tagsRef} />
             <p className="text-xs text-muted-foreground">태그는 쉼표로 구분해주세요.</p>
             {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
           </div>

@@ -39,7 +39,10 @@ export async function generateDescriptionAction(title: string): Promise<{descrip
 }
 
 export async function registerProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
-  const rawData = Object.fromEntries(formData.entries());
+  const rawData: {[k: string]: any} = {};
+    formData.forEach((value, key) => {
+        rawData[key] = value;
+    });
   
   const validatedFields = productSchema.safeParse({
     title: rawData.title,
