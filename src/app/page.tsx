@@ -17,10 +17,10 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
               <div className="flex flex-col justify-center space-y-4">
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
+                <h1 className="font-headline text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl">
                   상상이 자산이 되는 곳, <br className="hidden md:block" /> prmart
                 </h1>
-                <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                <p className="max-w-[600px] text-muted-foreground md:text-2xl">
                   Where Imagination Becomes an Asset. 검증된 지식과 경험을 발견하고, 당신의 창의력을 수익으로 전환하세요.
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -50,8 +50,8 @@ export default function Home() {
         <section id="categories" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl md:text-5xl">카테고리 쇼케이스</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              <h2 className="text-4xl font-bold font-headline tracking-tighter sm:text-5xl md:text-6xl">카테고리 쇼케이스</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-2xl/relaxed lg:text-xl/relaxed xl:text-2xl/relaxed">
                 개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.
               </p>
             </div>
@@ -62,7 +62,7 @@ export default function Home() {
                     <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                       <category.icon className="h-8 w-8" />
                     </div>
-                    <span className="font-semibold text-center">{category.name}</span>
+                    <span className="font-semibold text-center text-lg">{category.name}</span>
                   </Card>
                 </a>
               ))}
@@ -72,8 +72,8 @@ export default function Home() {
 
         <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold font-headline tracking-tighter text-center sm:text-4xl md:text-5xl">추천 상품</h2>
-            <p className="mx-auto max-w-[900px] text-muted-foreground md:text-xl/relaxed text-center mt-4">
+            <h2 className="text-4xl font-bold font-headline tracking-tighter text-center sm:text-5xl md:text-6xl">추천 상품</h2>
+            <p className="mx-auto max-w-[900px] text-muted-foreground md:text-2xl/relaxed text-center mt-4">
               prmart 전문가들이 엄선한 인기 상품들을 만나보세요.
             </p>
             <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -87,10 +87,10 @@ export default function Home() {
         <section className="w-full py-12 md:py-20 lg:py-24 bg-primary text-primary-foreground">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
-              <h2 className="text-3xl font-bold font-headline tracking-tighter md:text-4xl/tight">
+              <h2 className="text-4xl font-bold font-headline tracking-tighter md:text-5xl/tight">
                 당신의 지식을 자산으로 만들 시간
               </h2>
-              <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl/relaxed">
+              <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-2xl/relaxed">
                 지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.
               </p>
             </div>

@@ -122,7 +122,7 @@ export function ProductRegistrationForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="font-headline text-2xl flex items-center gap-2">
+        <CardTitle className="font-headline text-3xl flex items-center gap-2">
           <Bot /> AI 판매 도우미
         </CardTitle>
         <CardDescription>새 상품을 등록하세요. AI가 단계별로 도와드립니다.</CardDescription>
@@ -132,7 +132,7 @@ export function ProductRegistrationForm() {
           <div className="space-y-2">
             <Label htmlFor="title">상품 제목</Label>
             <Input id="title" placeholder="예: 최고의 생산성 플래너 템플릿" {...titleRest} ref={titleRef} />
-            {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
+            {errors.title && <p className="text-base text-destructive">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -150,7 +150,7 @@ export function ProductRegistrationForm() {
               {...descriptionRest}
               ref={descriptionRef}
             />
-            {errors.description && <p className="text-sm text-destructive">{errors.description.message}</p>}
+            {errors.description && <p className="text-base text-destructive">{errors.description.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -166,20 +166,20 @@ export function ProductRegistrationForm() {
                   ))}
                 </SelectContent>
               </Select>
-               {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
+               {errors.category && <p className="text-base text-destructive">{errors.category.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">가격 (₩)</Label>
               <Input id="price" type="number" placeholder="예: 10000" {...priceRest} ref={priceRef} />
-              {errors.price && <p className="text-sm text-destructive">{errors.price.message}</p>}
+              {errors.price && <p className="text-base text-destructive">{errors.price.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="tags">태그</Label>
             <Input id="tags" placeholder="예: 생산성, 노션, 템플릿" {...tagsRest} ref={tagsRef} />
-            <p className="text-xs text-muted-foreground">태그는 쉼표로 구분해주세요.</p>
-            {errors.tags && <p className="text-sm text-destructive">{errors.tags.message}</p>}
+            <p className="text-sm text-muted-foreground">태그는 쉼표로 구분해주세요.</p>
+            {errors.tags && <p className="text-base text-destructive">{errors.tags.message}</p>}
           </div>
 
           <SubmitButton />

@@ -9,16 +9,16 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
+          <span className="font-bold text-2xl font-headline tracking-tight">prmart</span>
         </Link>
-        <nav className="hidden md:flex gap-6 items-center">
-          <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+        <nav className="hidden md:flex gap-6 items-center text-base">
+          <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
             상품
           </Link>
-          <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+          <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
             둘러보기
           </Link>
-          <Link href="#" className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary">
+          <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
             아이디어 요청
           </Link>
         </nav>

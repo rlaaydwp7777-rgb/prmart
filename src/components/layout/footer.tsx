@@ -9,16 +9,16 @@ export function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
               <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-bold font-headline text-xl">prmart</span>
+              <span className="font-bold font-headline text-2xl">prmart</span>
             </Link>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-base text-muted-foreground">
               상상이 자산이 되는 곳.
             </p>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">바로가기</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground">
+            <h4 className="font-semibold text-lg">바로가기</h4>
+            <ul className="space-y-1 text-base text-muted-foreground">
               <li><a href="#" className="hover:text-primary">상품</a></li>
               <li><a href="#" className="hover:text-primary">둘러보기</a></li>
               <li><a href="#" className="hover:text-primary">아이디어 요청</a></li>
@@ -27,8 +27,8 @@ export function Footer() {
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">고객지원</h4>
-            <ul className="space-y-1 text-sm text-muted-foreground">
+            <h4 className="font-semibold text-lg">고객지원</h4>
+            <ul className="space-y-1 text-base text-muted-foreground">
               <li><a href="#" className="hover:text-primary">고객센터</a></li>
               <li><a href="#" className="hover:text-primary">이용약관</a></li>
               <li><a href="#" className="hover:text-primary">개인정보처리방침</a></li>
@@ -36,8 +36,8 @@ export function Footer() {
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Legal</h4>
-            <div className="text-sm text-muted-foreground space-y-1">
+            <h4 className="font-semibold text-lg">Legal</h4>
+            <div className="text-base text-muted-foreground space-y-1">
                 <p><strong>상호:</strong> 프마트(prmart)</p>
                 <p><strong>대표:</strong> 김명제</p>
                 <p><strong>사업자등록번호:</strong> 102-34-63631</p>
@@ -47,7 +47,7 @@ export function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t pt-4 text-center text-sm text-muted-foreground">
+        <div className="mt-8 border-t pt-4 text-center text-base text-muted-foreground">
           © {new Date().getFullYear()} prmart. All Rights Reserved.
         </div>
       </div>

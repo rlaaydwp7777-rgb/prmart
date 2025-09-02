@@ -26,15 +26,15 @@ export function PromptCard({ prompt }: PromptCardProps) {
             <Badge variant="secondary" className="absolute top-3 right-3">{prompt.category}</Badge>
           </div>
           <div className="p-4 space-y-2">
-            <h3 className="font-semibold text-lg truncate font-headline">{prompt.title}</h3>
-            <p className="text-sm text-muted-foreground">By {prompt.author}</p>
+            <h3 className="font-semibold text-xl truncate font-headline">{prompt.title}</h3>
+            <p className="text-base text-muted-foreground">By {prompt.author}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                <span className="text-sm font-medium">{prompt.rating.toFixed(1)}</span>
-                <span className="text-sm text-muted-foreground">({prompt.reviews} reviews)</span>
+                <span className="text-base font-medium">{prompt.rating.toFixed(1)}</span>
+                <span className="text-base text-muted-foreground">({prompt.reviews} reviews)</span>
               </div>
-              <span className="font-semibold text-lg text-primary">₩{prompt.price.toLocaleString()}</span>
+              <span className="font-semibold text-xl text-primary">₩{prompt.price.toLocaleString()}</span>
             </div>
           </div>
         </CardContent>

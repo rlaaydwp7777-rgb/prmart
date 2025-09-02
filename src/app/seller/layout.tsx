@@ -27,7 +27,7 @@ export default function SellerLayout({
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-sidebar-primary" />
-              <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
+              <span className="font-bold text-2xl font-headline tracking-tight">prmart</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
