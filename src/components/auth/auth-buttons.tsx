@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BUTTONS } from "@/lib/string-constants";
 
 export function AuthButtons() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -26,7 +27,7 @@ export function AuthButtons() {
   ) : (
     <div className="flex items-center gap-2">
       <LoginDialog onLoginSuccess={handleLogin} />
-      <Button variant="default">회원가입</Button>
+      <Button variant="default">{BUTTONS.SIGNUP}</Button>
     </div>
   );
 }

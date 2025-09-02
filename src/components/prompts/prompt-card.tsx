@@ -4,6 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
 import type { Prompt } from "@/lib/types";
+import { PROMPT_CARD_STRINGS } from "@/lib/string-constants";
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -23,18 +24,18 @@ export function PromptCard({ prompt }: PromptCardProps) {
               className="object-cover w-full aspect-video"
               data-ai-hint={prompt.aiHint}
             />
-            <Badge variant="secondary" className="absolute top-3 right-3 text-base">{prompt.category}</Badge>
+            <Badge variant="secondary" className="absolute top-3 right-3">{prompt.category}</Badge>
           </div>
           <div className="p-4 space-y-2">
-            <h3 className="font-semibold text-2xl truncate font-headline">{prompt.title}</h3>
-            <p className="text-lg text-muted-foreground">By {prompt.author}</p>
+            <h3 className="font-semibold text-lg truncate font-headline">{prompt.title}</h3>
+            <p className="text-muted-foreground">{PROMPT_CARD_STRINGS.BY} {prompt.author}</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-1">
                 <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                <span className="text-lg font-medium">{prompt.rating.toFixed(1)}</span>
-                <span className="text-lg text-muted-foreground">({prompt.reviews} reviews)</span>
+                <span className="font-medium">{prompt.rating.toFixed(1)}</span>
+                <span className="text-muted-foreground">({prompt.reviews} {PROMPT_CARD_STRINGS.REVIEWS})</span>
               </div>
-              <span className="font-semibold text-2xl text-primary">₩{prompt.price.toLocaleString()}</span>
+              <span className="font-semibold text-lg text-primary">₩{prompt.price.toLocaleString()}</span>
             </div>
           </div>
         </CardContent>

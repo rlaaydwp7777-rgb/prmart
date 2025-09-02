@@ -1,12 +1,13 @@
 import type { Category, Prompt } from "./types";
 import { Bot, Code, Mail, Palette, Search } from "lucide-react";
+import { BUTTONS, CATEGORY_NAMES, PROMPT_CARD_STRINGS, HOME_STRINGS } from "./string-constants";
 
 export const CATEGORIES: Category[] = [
-  { name: "Development", icon: Code },
-  { name: "Design", icon: Palette },
-  { name: "Marketing", icon: Mail },
-  { name: "SEO", icon: Search },
-  { name: "AI Prompts", icon: Bot },
+  { name: CATEGORY_NAMES.DEVELOPMENT, icon: Code },
+  { name: CATEGORY_NAMES.DESIGN, icon: Palette },
+  { name: CATEGORY_NAMES.MARKETING, icon: Mail },
+  { name: CATEGORY_NAMES.SEO, icon: Search },
+  { name: CATEGORY_NAMES.AI_PROMPTS, icon: Bot },
 ];
 
 export const FEATURED_PROMPTS: Prompt[] = [
@@ -14,7 +15,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "1",
     title: "Next.js 14 Boilerplate",
     author: "DevMaster",
-    category: "Development",
+    category: CATEGORY_NAMES.DEVELOPMENT,
     price: 25000,
     rating: 4.9,
     reviews: 120,
@@ -25,7 +26,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "2",
     title: "Minimalist UI Kit",
     author: "PixelPerfect",
-    category: "Design",
+    category: CATEGORY_NAMES.DESIGN,
     price: 35000,
     rating: 4.8,
     reviews: 95,
@@ -36,7 +37,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "3",
     title: "Email Marketing Sequences",
     author: "GrowthHacker",
-    category: "Marketing",
+    category: CATEGORY_NAMES.MARKETING,
     price: 18000,
     rating: 4.9,
     reviews: 210,
@@ -47,7 +48,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "4",
     title: "SEO Audit Checklist",
     author: "SEOGuru",
-    category: "SEO",
+    category: CATEGORY_NAMES.SEO,
     price: 12000,
     rating: 5.0,
     reviews: 78,

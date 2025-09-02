@@ -2,14 +2,15 @@ import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
+import { META } from '@/lib/string-constants';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
 
 export const metadata: Metadata = {
-  title: 'prmart - Where Imagination Becomes an Asset',
-  description: 'A marketplace for verified knowledge, templates, and digital assets, powered by AI and human expertise.',
-  icons: [{ rel: "icon", url: "✨" }]
+  title: META.TITLE,
+  description: META.DESCRIPTION,
+  icons: [{ rel: "icon", url: META.ICON_URL }]
 };
 
 export default function RootLayout({
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="ko" className="dark">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

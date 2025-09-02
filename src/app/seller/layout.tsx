@@ -14,6 +14,7 @@ import {
   SidebarTrigger
 } from "@/components/ui/sidebar";
 import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy } from "lucide-react";
+import { SIDEBAR_STRINGS } from "@/lib/string-constants";
 
 export default function SellerLayout({
   children,
@@ -27,40 +28,40 @@ export default function SellerLayout({
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-sidebar-primary" />
-              <span className="font-bold text-2xl font-headline tracking-tight">prmart</span>
+              <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
             </Link>
           </SidebarHeader>
           <SidebarContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="대시보드">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.DASHBOARD}>
                   <Link href="/seller/dashboard">
                     <LayoutDashboard />
-                    <span>대시보드</span>
+                    <span>{SIDEBAR_STRINGS.DASHBOARD}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="상품">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PRODUCTS}>
                   <Link href="#">
                     <Package />
-                    <span>상품</span>
+                    <span>{SIDEBAR_STRINGS.PRODUCTS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="분석">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
                   <Link href="#">
                     <BarChart3 />
-                    <span>분석</span>
+                    <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="설정">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.SETTINGS}>
                   <Link href="#">
                     <Settings />
-                    <span>설정</span>
+                    <span>{SIDEBAR_STRINGS.SETTINGS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -69,18 +70,18 @@ export default function SellerLayout({
           <SidebarFooter>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="도움말">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.HELP}>
                   <Link href="#">
                     <LifeBuoy />
-                    <span>도움말</span>
+                    <span>{SIDEBAR_STRINGS.HELP}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="계정">
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ACCOUNT}>
                   <Link href="#">
                     <UserCircle />
-                    <span>계정</span>
+                    <span>{SIDEBAR_STRINGS.ACCOUNT}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

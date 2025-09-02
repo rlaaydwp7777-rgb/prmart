@@ -1,5 +1,6 @@
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import { FOOTER_STRINGS } from "@/lib/string-constants";
 
 export function Footer() {
   return (
@@ -9,46 +10,46 @@ export function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
               <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-bold font-headline text-2xl">prmart</span>
+              <span className="font-bold font-headline text-xl">prmart</span>
             </Link>
-            <p className="text-base text-muted-foreground">
-              상상이 자산이 되는 곳.
+            <p className="text-muted-foreground">
+              {FOOTER_STRINGS.SLOGAN}
             </p>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold text-lg">바로가기</h4>
-            <ul className="space-y-1 text-base text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">상품</a></li>
-              <li><a href="#" className="hover:text-primary">둘러보기</a></li>
-              <li><a href="#" className="hover:text-primary">아이디어 요청</a></li>
-              <li><a href="/seller/dashboard" className="hover:text-primary">판매자 되기</a></li>
+            <h4 className="font-semibold">{FOOTER_STRINGS.QUICK_LINKS}</h4>
+            <ul className="space-y-1 text-muted-foreground">
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</a></li>
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</a></li>
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</a></li>
+              <li><a href="/seller/dashboard" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</a></li>
             </ul>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold text-lg">고객지원</h4>
-            <ul className="space-y-1 text-base text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">고객센터</a></li>
-              <li><a href="#" className="hover:text-primary">이용약관</a></li>
-              <li><a href="#" className="hover:text-primary">개인정보처리방침</a></li>
+            <h4 className="font-semibold">{FOOTER_STRINGS.SUPPORT}</h4>
+            <ul className="space-y-1 text-muted-foreground">
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.SUPPORT_CENTER}</a></li>
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.TERMS}</a></li>
+              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.PRIVACY_POLICY}</a></li>
             </ul>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold text-lg">Legal</h4>
-            <div className="text-base text-muted-foreground space-y-1">
-                <p><strong>상호:</strong> 프마트(prmart)</p>
-                <p><strong>대표:</strong> 김명제</p>
-                <p><strong>사업자등록번호:</strong> 102-34-63631</p>
-                <p><strong>통신판매업신고번호:</strong> 2024-부산기장-0000</p>
-                <p><strong>주소:</strong> 부산광역시 기장군 일광읍 삼성2길 6, 5층 2호</p>
-                <p><strong>이메일:</strong> prmart7777@gmail.com</p>
+            <h4 className="font-semibold">{FOOTER_STRINGS.LEGAL}</h4>
+            <div className="text-muted-foreground space-y-1">
+                <p><strong>{FOOTER_STRINGS.COMPANY_NAME}:</strong> 프마트(prmart)</p>
+                <p><strong>{FOOTER_STRINGS.CEO}:</strong> 김명제</p>
+                <p><strong>{FOOTER_STRINGS.BUSINESS_NUMBER}:</strong> 102-34-63631</p>
+                <p><strong>{FOOTER_STRINGS.ECOMMERCE_NUMBER}:</strong> 2024-부산기장-0000</p>
+                <p><strong>{FOOTER_STRINGS.ADDRESS}:</strong> 부산광역시 기장군 일광읍 삼성2길 6, 5층 2호</p>
+                <p><strong>{FOOTER_STRINGS.EMAIL}:</strong> prmart7777@gmail.com</p>
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t pt-4 text-center text-base text-muted-foreground">
-          © {new Date().getFullYear()} prmart. All Rights Reserved.
+        <div className="mt-8 border-t pt-4 text-center text-muted-foreground">
+          {FOOTER_STRINGS.COPYRIGHT}
         </div>
       </div>
     </footer>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
+import { HEADER_LINKS } from "@/lib/string-constants";
 
 export function Header() {
   return (
@@ -9,17 +10,17 @@ export function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-primary" />
-          <span className="font-bold text-2xl font-headline tracking-tight">prmart</span>
+          <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
         </Link>
-        <nav className="hidden md:flex gap-6 items-center text-base">
+        <nav className="hidden md:flex gap-6 items-center">
           <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
-            상품
+            {HEADER_LINKS.PRODUCTS}
           </Link>
           <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
-            둘러보기
+            {HEADER_LINKS.BROWSE}
           </Link>
           <Link href="#" className="font-medium text-muted-foreground transition-colors hover:text-primary">
-            아이디어 요청
+            {HEADER_LINKS.REQUEST_IDEA}
           </Link>
         </nav>
         <div className="flex items-center gap-4">

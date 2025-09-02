@@ -17,6 +17,7 @@ import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Bot, CheckCircle, Loader2, Sparkles, Terminal, XCircle } from "lucide-react";
+import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -38,7 +39,7 @@ function SubmitButton() {
   return (
     <Button type="submit" disabled={pending} className="w-full">
       {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-      품질 검수 제출
+      {BUTTONS.SUBMIT_FOR_REVIEW}
     </Button>
   );
 }
@@ -90,8 +91,8 @@ export function ProductRegistrationForm() {
   const handleGenerateDescription = async () => {
     if (!titleValue || titleValue.trim().length < 5) {
       toast({
-        title: "오류",
-        description: "설명을 생성하려면 5자 이상의 유효한 제목을 입력해주세요.",
+        title: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR,
+        description: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR_DESC_NO_TITLE,
         variant: "destructive",
       });
       return;
@@ -102,12 +103,12 @@ export function ProductRegistrationForm() {
     if (result.description) {
       setValue("description", result.description, { shouldValidate: true });
       toast({
-        title: "설명 생성 완료!",
-        description: "AI가 상품 설명을 생성했습니다.",
+        title: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE,
+        description: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE_DESC,
       });
     } else {
       toast({
-        title: "오류",
+        title: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR,
         description: result.error,
         variant: "destructive",
       });
@@ -122,43 +123,43 @@ export function ProductRegistrationForm() {
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle className="font-headline text-3xl flex items-center gap-2">
-          <Bot /> AI 판매 도우미
+        <CardTitle className="font-headline text-2xl flex items-center gap-2">
+          <Bot /> {SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_TITLE}
         </CardTitle>
-        <CardDescription>새 상품을 등록하세요. AI가 단계별로 도와드립니다.</CardDescription>
+        <CardDescription>{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={formAction} className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title">상품 제목</Label>
-            <Input id="title" placeholder="예: 최고의 생산성 플래너 템플릿" {...titleRest} ref={titleRef} />
-            {errors.title && <p className="text-base text-destructive">{errors.title.message}</p>}
+            <Label htmlFor="title">{SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_LABEL}</Label>
+            <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...titleRest} ref={titleRef} />
+            {errors.title && <p className="text-destructive">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <Label htmlFor="description">상품 설명</Label>
+              <Label htmlFor="description">{SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
               <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
                 {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                AI로 생성하기
+                {BUTTONS.GENERATE_WITH_AI}
               </Button>
             </div>
             <Textarea
               id="description"
-              placeholder="상품, 기능, 그리고 대상 고객에 대해 설명해주세요."
+              placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
               className="min-h-[120px]"
               {...descriptionRest}
               ref={descriptionRef}
             />
-            {errors.description && <p className="text-base text-destructive">{errors.description.message}</p>}
+            {errors.description && <p className="text-destructive">{errors.description.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="category">카테고리</Label>
+              <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
               <Select name="category" onValueChange={(value) => setValue('category', value, {shouldValidate: true})}>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="카테고리 선택" />
+                  <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORIES.map(cat => (
@@ -166,20 +167,20 @@ export function ProductRegistrationForm() {
                   ))}
                 </SelectContent>
               </Select>
-               {errors.category && <p className="text-base text-destructive">{errors.category.message}</p>}
+               {errors.category && <p className="text-destructive">{errors.category.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="price">가격 (₩)</Label>
-              <Input id="price" type="number" placeholder="예: 10000" {...priceRest} ref={priceRef} />
-              {errors.price && <p className="text-base text-destructive">{errors.price.message}</p>}
+              <Label htmlFor="price">{SELLER_DASHBOARD_STRINGS.PRICE_LABEL}</Label>
+              <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...priceRest} ref={priceRef} />
+              {errors.price && <p className="text-destructive">{errors.price.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags">태그</Label>
-            <Input id="tags" placeholder="예: 생산성, 노션, 템플릿" {...tagsRest} ref={tagsRef} />
-            <p className="text-sm text-muted-foreground">태그는 쉼표로 구분해주세요.</p>
-            {errors.tags && <p className="text-base text-destructive">{errors.tags.message}</p>}
+            <Label htmlFor="tags">{SELLER_DASHBOARD_STRINGS.TAGS_LABEL}</Label>
+            <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...tagsRest} ref={tagsRef} />
+            <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
+            {errors.tags && <p className="text-destructive">{errors.tags.message}</p>}
           </div>
 
           <SubmitButton />
@@ -188,7 +189,7 @@ export function ProductRegistrationForm() {
         {formState.issues && formState.issues.length > 0 && (
           <Alert variant="destructive" className="mt-4">
             <Terminal className="h-4 w-4" />
-            <AlertTitle>폼 오류</AlertTitle>
+            <AlertTitle>{SELLER_DASHBOARD_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
             <AlertDescription>
               <ul className="list-disc pl-5">
                 {formState.issues.map((issue, index) => (
@@ -202,11 +203,11 @@ export function ProductRegistrationForm() {
         {formState.qualityResult && (
           <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
              {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-            <AlertTitle>AI 품질 검수 결과</AlertTitle>
+            <AlertTitle>{SELLER_DASHBOARD_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
             <AlertDescription>
-              <p><strong>점수:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
-              <p><strong>상태:</strong> {formState.qualityResult.isApproved ? "승인됨" : "수동 검토 대기"}</p>
-              <p><strong>사유:</strong> {formState.qualityResult.reason}</p>
+              <p><strong>{SELLER_DASHBOARD_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
+              <p><strong>{SELLER_DASHBOARD_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_DASHBOARD_STRINGS.APPROVED : SELLER_DASHBOARD_STRINGS.PENDING_REVIEW}</p>
+              <p><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
             </AlertDescription>
           </Alert>
         )}
