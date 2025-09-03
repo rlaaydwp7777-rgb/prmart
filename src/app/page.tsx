@@ -35,7 +35,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-1 pt-32">
+      <main className="flex-1 pt-16">
         {/* Hero Section */}
         <section className="relative w-full pt-12 pb-12 md:pt-16 md:pb-20">
            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-background to-background -z-10"></div>
@@ -44,6 +44,7 @@ export default async function Home() {
                 <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                   {content.headline}
                 </h1>
+                <p className="max-w-[700px] text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
                 <div className="max-w-2xl w-full">
                   <div className="relative">
                     <Input
@@ -58,10 +59,10 @@ export default async function Home() {
                     </Button>
                   </div>
                    <div className="flex justify-center gap-2 mt-4">
-                     <Button asChild size="sm" variant="link" className="text-lg">
+                     <Button asChild size="sm" variant="outline">
                         <a href="/seller/dashboard">아이디어 판매하기</a>
                       </Button>
-                      <Button asChild size="sm" variant="link" className="text-lg">
+                      <Button asChild size="sm" variant="secondary">
                         <a href="#featured-prompts">아이디어 둘러보기 <ArrowRight className="ml-1 h-5 w-5" /></a>
                       </Button>
                     </div>
@@ -73,6 +74,10 @@ export default async function Home() {
         {/* Category Navigation */}
          <section id="categories" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
+             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.categoriesHeadline}</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.categoriesSubheadline}</p>
+            </div>
             <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
               {CATEGORIES.map((category) => (
                 <Link href="#" key={category.name} className="group">
@@ -91,7 +96,10 @@ export default async function Home() {
         {/* Curation Section */}
         <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter text-center">{content.featuredPromptsHeadline}</h2>
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.featuredPromptsHeadline}</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.featuredPromptsSubheadline}</p>
+            </div>
             <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {FEATURED_PROMPTS.map((prompt) => (
                 <PromptCard key={prompt.id} prompt={prompt} />
@@ -122,3 +130,5 @@ export default async function Home() {
     </div>
   );
 }
+
+    

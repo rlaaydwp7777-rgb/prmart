@@ -124,7 +124,7 @@ export function ProductRegistrationForm() {
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2">
-          <Bot /> {SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_TITLE}
+          새 아이디어 등록
         </CardTitle>
         <CardDescription>{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
       </CardHeader>
@@ -215,3 +215,5 @@ export function ProductRegistrationForm() {
     </Card>
   );
 }
+
+    

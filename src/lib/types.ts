@@ -19,7 +19,6 @@ export interface Category {
 
 export interface HomePageContent {
   headline: string;
-  headlineAccent: string;
   subheadline: string;
   categoriesHeadline: string;
   categoriesSubheadline: string;
@@ -28,3 +27,5 @@ export interface HomePageContent {
   ctaHeadline: string;
   ctaSubheadline: string;
 }
+
+    
