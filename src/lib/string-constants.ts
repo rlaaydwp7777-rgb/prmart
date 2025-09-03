@@ -16,7 +16,7 @@ export const BUTTONS = {
 
 export const PROMPT_CARD_STRINGS = {
     BY: "By",
-    REVIEWS: "reviews",
+    REVIEWS: "리뷰",
 }
 
 export const CATEGORY_NAMES = {

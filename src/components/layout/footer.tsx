@@ -38,17 +38,17 @@ export function Footer() {
 
           <div className="space-y-2">
             <h4 className="font-semibold">{FOOTER_STRINGS.LEGAL}</h4>
-            <div className="text-muted-foreground space-y-1">
+            <div className="text-muted-foreground space-y-1 text-sm">
                 <p><strong>{FOOTER_STRINGS.COMPANY_NAME}:</strong> 프마트(prmart)</p>
-                <p><strong>{FOOTER_STRINGS.CEO}:</strong> 김명제</p>
-                <p><strong>{FOOTER_STRINGS.BUSINESS_NUMBER}:</strong> 102-34-63631</p>
-                <p><strong>{FOOTER_STRINGS.ECOMMERCE_NUMBER}:</strong> 2024-부산기장-0000</p>
-                <p><strong>{FOOTER_STRINGS.ADDRESS}:</strong> 부산광역시 기장군 일광읍 삼성2길 6, 5층 2호</p>
-                <p><strong>{FOOTER_STRINGS.EMAIL}:</strong> prmart7777@gmail.com</p>
+                <p><strong>{FOOTER_STRINGS.CEO}:</strong> 김대표</p>
+                <p><strong>{FOOTER_STRINGS.BUSINESS_NUMBER}:</strong> 100-00-00000</p>
+                <p><strong>{FOOTER_STRINGS.ECOMMERCE_NUMBER}:</strong> 2024-부산-0000</p>
+                <p><strong>{FOOTER_STRINGS.ADDRESS}:</strong> 부산광역시 해운대구</p>
+                <p><strong>{FOOTER_STRINGS.EMAIL}:</strong> contact@prmart.ai</p>
             </div>
           </div>
         </div>
-        <div className="mt-8 border-t pt-4 text-center text-muted-foreground">
+        <div className="mt-8 border-t pt-4 text-center text-sm text-muted-foreground">
           {FOOTER_STRINGS.COPYRIGHT}
         </div>
       </div>

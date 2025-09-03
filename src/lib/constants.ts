@@ -39,7 +39,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "3",
     title: "Email Marketing Sequences",
     author: "GrowthHacker",
-    category: "마케팅",
+    category: CATEGORY_NAMES.LIFE_KNOWHOW,
     price: 18000,
     rating: 4.9,
     reviews: 210,
