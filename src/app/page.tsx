@@ -37,7 +37,7 @@ export default async function Home() {
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
                 <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                  {content.headline}
+                  당신의 아이디어가 자산이 되는 곳, <span className="text-primary">prmart</span>
                 </h1>
                 <p className="max-w-[700px] text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
