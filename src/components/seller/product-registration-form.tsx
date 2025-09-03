@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useFormState, useFormStatus } from "react-dom";
@@ -136,96 +137,88 @@ export function ProductRegistrationForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle className="font-headline text-2xl flex items-center gap-2">
-          {SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_TITLE}
-        </CardTitle>
-        <CardDescription>{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form ref={formRef} action={formAction} className="space-y-6">
+    <>
+      <form ref={formRef} action={formAction} className="space-y-6">
+        <div className="space-y-2">
+          <Label htmlFor="title">{SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_LABEL}</Label>
+          <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
+          {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="description">{SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
+            <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
+              {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {BUTTONS.GENERATE_WITH_AI}
+            </Button>
+          </div>
+          <Textarea
+            id="description"
+            placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
+            className="min-h-[120px]"
+            {...register("description")}
+          />
+          {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="title">{SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_LABEL}</Label>
-            <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
-            {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <div className="flex justify-between items-center">
-              <Label htmlFor="description">{SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
-              <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
-                {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                {BUTTONS.GENERATE_WITH_AI}
-              </Button>
-            </div>
-            <Textarea
-              id="description"
-              placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
-              className="min-h-[120px]"
-              {...register("description")}
-            />
-            {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
-              <Select name="category" value={categoryValue} onValueChange={handleCategoryChange}>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map(cat => (
-                    <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-               {errors.category && <p className="text-destructive text-sm">{errors.category.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="price">{SELLER_DASHBOARD_STRINGS.PRICE_LABEL}</Label>
-              <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...register("price")} />
-              {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="tags">{SELLER_DASHBOARD_STRINGS.TAGS_LABEL}</Label>
-            <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
-            <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
-            {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
-          </div>
-
-          <SubmitButton />
-        </form>
-
-        {formState?.issues && formState.issues.length > 0 && (
-          <Alert variant="destructive" className="mt-4">
-            <Terminal className="h-4 w-4" />
-            <AlertTitle>{SELLER_DASHBOARD_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
-            <AlertDescription>
-              <ul className="list-disc pl-5">
-                {formState.issues.map((issue, index) => (
-                  <li key={index}>{issue}</li>
+            <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
+            <Select name="category" value={categoryValue} onValueChange={handleCategoryChange}>
+              <SelectTrigger id="category">
+                <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map(cat => (
+                  <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
                 ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
+              </SelectContent>
+            </Select>
+              {errors.category && <p className="text-destructive text-sm">{errors.category.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="price">{SELLER_DASHBOARD_STRINGS.PRICE_LABEL}</Label>
+            <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...register("price")} />
+            {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
+          </div>
+        </div>
 
-        {formState?.qualityResult && (
-          <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
-             {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-            <AlertTitle>{SELLER_DASHBOARD_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
-            <AlertDescription>
-              <p><strong>{SELLER_DASHBOARD_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
-              <p><strong>{SELLER_DASHBOARD_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_DASHBOARD_STRINGS.APPROVED : SELLER_DASHBOARD_STRINGS.PENDING_REVIEW}</p>
-              <p className="mt-2"><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
-            </AlertDescription>
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
+        <div className="space-y-2">
+          <Label htmlFor="tags">{SELLER_DASHBOARD_STRINGS.TAGS_LABEL}</Label>
+          <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
+          <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
+          {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
+        </div>
+
+        <SubmitButton />
+      </form>
+
+      {formState?.issues && formState.issues.length > 0 && (
+        <Alert variant="destructive" className="mt-4">
+          <Terminal className="h-4 w-4" />
+          <AlertTitle>{SELLER_DASHBOARD_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
+          <AlertDescription>
+            <ul className="list-disc pl-5">
+              {formState.issues.map((issue, index) => (
+                <li key={index}>{issue}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {formState?.qualityResult && (
+        <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
+            {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+          <AlertTitle>{SELLER_DASHBOARD_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
+          <AlertDescription>
+            <p><strong>{SELLER_DASHBOARD_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
+            <p><strong>{SELLER_DASHBOARD_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_DASHBOARD_STRINGS.APPROVED : SELLER_DASHBOARD_STRINGS.PENDING_REVIEW}</p>
+            <p className="mt-2"><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
+          </AlertDescription>
+        </Alert>
+      )}
+    </>
   );
 }
