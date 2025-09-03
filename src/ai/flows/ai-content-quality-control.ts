@@ -45,21 +45,21 @@ const prompt = ai.definePrompt({
   name: 'assessContentQualityPrompt',
   input: {schema: AssessContentQualityInputSchema},
   output: {schema: AssessContentQualityOutputSchema},
-  prompt: `You are an AI content quality control expert for prmart, a digital marketplace.
+  prompt: `You are an AI content quality control expert for prmart, a digital marketplace for AI prompts, templates, and know-how.
 
-  Your task is to assess the quality of user-submitted content based on its title, description, category, and tags.
-  Provide a quality score between 0 and 1, where 1 represents the highest quality.
-  Also, determine whether the content is approved based on a quality score threshold of 0.7.
-  Explain the reasoning behind your approval or rejection.
+Your task is to assess the quality of user-submitted content based on its title, description, category, and tags. The content should be clear, appealing, and well-structured for sale.
 
-  Here are the details of the content:
-  Title: {{{title}}}
-  Description: {{{description}}}
-  Category: {{{category}}}
-  Tags: {{#each tags}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
-  \n\
-  Respond in JSON format.
-  `,
+- **Quality Score**: Provide a quality score between 0 and 1.
+- **Approval Decision**: The content is approved if the quality score is 0.7 or higher.
+- **Reasoning**: Provide a concise, constructive reason for your decision. If it's rejected, suggest specific improvements (e.g., "The description is too short, please add more detail about key features."). If approved, briefly state its strengths (e.g., "Clear title and detailed, compelling description.").
+
+Here are the details of the content to review:
+- Title: {{{title}}}
+- Description: {{{description}}}
+- Category: {{{category}}}
+- Tags: {{#each tags}}{{{this}}}{{#unless @last}}, {{/unless}}{{/each}}
+
+Respond in the required JSON format.`,
 });
 
 const assessContentQualityFlow = ai.defineFlow(
@@ -70,6 +70,11 @@ const assessContentQualityFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('AI failed to generate a quality assessment.');
+    }
+    // Ensure the isApproved logic is consistent with the threshold.
+    output.isApproved = output.qualityScore >= 0.7;
+    return output;
   }
 );

@@ -1,16 +1,16 @@
 "use server";
 
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
-import { assessContentQuality } from "@/ai/flows/ai-content-quality-control";
+import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
 const productSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters long."),
-  description: z.string().min(20, "Description must be at least 20 characters long."),
-  category: z.string().min(1, "Please select a category."),
-  tags: z.string().min(1, "Please enter at least one tag."),
-  price: z.coerce.number().min(0, "Price must be a positive number."),
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
+  price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
 });
 
 export type FormState = {
@@ -18,31 +18,24 @@ export type FormState = {
   success: boolean;
   fields?: Record<string, string>;
   issues?: string[];
-  qualityResult?: {
-    isApproved: boolean;
-    reason: string;
-    qualityScore: number;
-  }
+  qualityResult?: AssessContentQualityOutput;
 };
 
 export async function generateDescriptionAction(title: string): Promise<{data: GenerateProductDescriptionOutput | null; error: string | null}> {
   if (!title || title.trim().length < 5) {
-    return { data: null, error: "Please enter a valid title (at least 5 characters)." };
+    return { data: null, error: "유효한 제목을 5자 이상 입력해주세요." };
   }
   try {
     const result = await generateProductDescription({ productTitle: title });
     return { data: result, error: null };
   } catch (error) {
     console.error("Error generating description:", error);
-    return { data: null, error: "Failed to generate description. Please try again." };
+    return { data: null, error: "AI 설명 생성에 실패했습니다. 다시 시도해주세요." };
   }
 }
 
 export async function registerProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
-  const rawData: {[k: string]: any} = {};
-    formData.forEach((value, key) => {
-        rawData[key] = value;
-    });
+  const rawData = Object.fromEntries(formData.entries());
   
   const validatedFields = productSchema.safeParse({
     title: rawData.title,
@@ -53,12 +46,11 @@ export async function registerProductAction(prevState: FormState, formData: Form
   });
 
   if (!validatedFields.success) {
-    const errorData = validatedFields.error.flatten();
     return {
       success: false,
-      message: "Form validation failed.",
+      message: "입력 값을 다시 확인해주세요.",
       fields: Object.fromEntries(Object.entries(rawData).map(([key, value]) => [key, String(value)])),
-      issues: errorData.fieldErrors ? Object.values(errorData.fieldErrors).flat() : ["Invalid data"],
+      issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : ["유효성 검사에 실패했습니다."],
     };
   }
 
@@ -77,7 +69,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
         revalidatePath('/seller/dashboard'); // To clear cache and show updated product list
         return { 
             success: true,
-            message: "Product submitted and approved successfully!",
+            message: "상품이 성공적으로 제출되어 승인되었습니다!",
             qualityResult: qualityResult,
         };
     } else {
@@ -85,15 +77,17 @@ export async function registerProductAction(prevState: FormState, formData: Form
         console.log("Product not approved, sending to review queue:", validatedFields.data);
         return { 
             success: false,
-            message: `Product did not meet quality standards and has been sent for manual review.`,
+            message: `콘텐츠 품질 기준을 충족하지 못해 수동 검토 대기열로 전송되었습니다.`,
             qualityResult: qualityResult,
+            fields: validatedFields.data
         };
     }
   } catch (error) {
     console.error("Error assessing content quality:", error);
     return {
       success: false,
-      message: "An unexpected error occurred while processing your submission. Please try again.",
+      message: "AI 품질 검수 중 오류가 발생했습니다. 다시 시도해주세요.",
+      fields: validatedFields.data
     };
   }
 }

@@ -16,8 +16,9 @@ import { CATEGORIES } from "@/lib/constants";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Bot, CheckCircle, Loader2, Sparkles, Terminal, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, Sparkles, Terminal, XCircle } from "lucide-react";
 import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
+import { cn } from "@/lib/utils";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -49,9 +50,8 @@ export function ProductRegistrationForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
-
-  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProductFormData>({
+  
+  const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       title: "",
@@ -66,34 +66,38 @@ export function ProductRegistrationForm() {
   const categoryValue = watch("category");
 
   useEffect(() => {
-    setSelectedCategory(categoryValue);
-  }, [categoryValue]);
+    if (!formState) return;
 
-  useEffect(() => {
     if (formState.message) {
-      if (formState.success) {
-        toast({
-          title: "성공!",
-          description: formState.message,
-        });
-        if(formRef.current) {
-            formRef.current.reset();
-            setValue("title", "");
-            setValue("description", "");
-            setValue("category", "", { shouldValidate: true });
-            setValue("tags", "");
-            setValue("price", 0);
-            setSelectedCategory(undefined);
-        }
-      } else {
-         toast({
-          title: "제출 상태",
-          description: formState.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: formState.success ? "성공" : "오류",
+        description: formState.message,
+        variant: formState.success ? "default" : "destructive",
+      });
     }
-  }, [formState, toast, setValue]);
+
+    if (formState.success) {
+      if(formRef.current) formRef.current.reset();
+      reset({
+        title: "",
+        description: "",
+        category: "",
+        tags: "",
+        price: 0
+      });
+    } else if (formState.fields) {
+      // Re-populate form with previous data on server-side validation failure
+      const { title, description, category, tags, price } = formState.fields;
+      reset({ 
+        title, 
+        description, 
+        category, 
+        tags, 
+        price: Number(price) || 0 
+      });
+    }
+  }, [formState, toast, reset]);
+
 
   const handleGenerateDescription = async () => {
     if (!titleValue || titleValue.trim().length < 5) {
@@ -107,13 +111,13 @@ export function ProductRegistrationForm() {
     setIsGenerating(true);
     const result = await generateDescriptionAction(titleValue);
     setIsGenerating(false);
+
     if (result.data) {
       const { productDescription, category, tags, price } = result.data;
       setValue("description", productDescription, { shouldValidate: true });
       setValue("category", category, { shouldValidate: true });
       setValue("tags", tags.join(', '), { shouldValidate: true });
       setValue("price", price, { shouldValidate: true });
-      setSelectedCategory(category);
       toast({
         title: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE,
         description: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE_DESC,
@@ -129,14 +133,13 @@ export function ProductRegistrationForm() {
   
   const handleCategoryChange = (value: string) => {
     setValue('category', value, {shouldValidate: true});
-    setSelectedCategory(value);
   }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="font-headline text-2xl flex items-center gap-2">
-          새 아이디어 등록
+          {SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_TITLE}
         </CardTitle>
         <CardDescription>{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
       </CardHeader>
@@ -168,7 +171,7 @@ export function ProductRegistrationForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
-              <Select name="category" value={selectedCategory} onValueChange={handleCategoryChange}>
+              <Select name="category" value={categoryValue} onValueChange={handleCategoryChange}>
                 <SelectTrigger id="category">
                   <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
                 </SelectTrigger>
@@ -197,7 +200,7 @@ export function ProductRegistrationForm() {
           <SubmitButton />
         </form>
 
-        {formState.issues && formState.issues.length > 0 && (
+        {formState?.issues && formState.issues.length > 0 && (
           <Alert variant="destructive" className="mt-4">
             <Terminal className="h-4 w-4" />
             <AlertTitle>{SELLER_DASHBOARD_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
@@ -211,14 +214,14 @@ export function ProductRegistrationForm() {
           </Alert>
         )}
 
-        {formState.qualityResult && (
+        {formState?.qualityResult && (
           <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
              {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
             <AlertTitle>{SELLER_DASHBOARD_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
             <AlertDescription>
               <p><strong>{SELLER_DASHBOARD_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
               <p><strong>{SELLER_DASHBOARD_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_DASHBOARD_STRINGS.APPROVED : SELLER_DASHBOARD_STRINGS.PENDING_REVIEW}</p>
-              <p><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
+              <p className="mt-2"><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
             </AlertDescription>
           </Alert>
         )}
