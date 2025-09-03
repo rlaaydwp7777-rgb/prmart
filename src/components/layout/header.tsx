@@ -22,11 +22,13 @@ export function Header() {
               <span className="font-bold text-lg font-headline tracking-tight">prmart</span>
             </Link>
             <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
+               <Link href="/browse" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+                 {HEADER_LINKS.VIEW_ALL}
+              </Link>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="font-medium text-muted-foreground hover:text-primary p-0">
-                    {HEADER_LINKS.VIEW_ALL}
-                    <ChevronDown className="relative top-[1px] ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180" />
+                  <Button variant="ghost" className="font-medium text-muted-foreground hover:text-primary p-0 h-auto">
+                    <ChevronDown className="relative top-[1px] h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
