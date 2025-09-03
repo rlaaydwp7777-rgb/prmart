@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
@@ -10,6 +10,7 @@ import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -72,6 +73,27 @@ const recentActivities = [
         user: "SEOGuru",
         price: null,
     }
+];
+
+const testimonials = [
+  {
+    quote: "이 템플릿 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요. 다음 프로젝트에도 무조건 재구매각입니다.",
+    author: "김지훈",
+    role: "풀스택 개발자",
+    avatar: "https://picsum.photos/100/100?random=10"
+  },
+  {
+    quote: "prmart에서 판매를 시작하고 월급만큼의 부수입을 얻고 있어요. 제 노하우가 다른 사람에게 도움이 된다는 사실이 정말 뿌듯합니다.",
+    author: "박서연",
+    role: "마케팅 전문가",
+    avatar: "https://picsum.photos/100/100?random=11"
+  },
+  {
+    quote: "디자인 리소스 찾느라 시간 낭비할 필요가 없어졌어요. prmart에는 퀄리티 높은 자료가 넘쳐나서 작업 효율이 극대화되었습니다.",
+    author: "최민준",
+    role: "UI/UX 디자이너",
+    avatar: "https://picsum.photos/100/100?random=12"
+  },
 ];
 
 
@@ -175,8 +197,48 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Trust & Proof Section */}
+        <section id="trust-and-proof" className="w-full py-12 md:py-20 lg:py-24">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">신뢰할 수 있는 prmart</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl">수천 명의 크리에이터와 구매자가 prmart와 함께 성장하고 있습니다.</p>
+                </div>
+                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {testimonials.map((testimonial, index) => (
+                        <Card key={index} className="bg-muted/30">
+                            <CardContent className="p-6">
+                                <Quote className="w-8 h-8 text-primary/50 mb-4" />
+                                <p className="mb-4 text-foreground/80">"{testimonial.quote}"</p>
+                                <div className="flex items-center gap-4">
+                                    <Avatar>
+                                        <AvatarImage src={testimonial.avatar} alt={testimonial.author} data-ai-hint="person face" />
+                                        <AvatarFallback>{testimonial.author.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <p className="font-semibold">{testimonial.author}</p>
+                                        <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+                <div className="mt-16 flex flex-wrap justify-center items-center gap-x-8 gap-y-4 text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-5 h-5 text-primary" />
+                        <span className="font-semibold">안전 결제 시스템</span>
+                    </div>
+                    <span className="text-xl font-light text-border">|</span>
+                    <span className="font-semibold">Stripe</span>
+                    <span className="font-semibold">Visa</span>
+                    <span className="font-semibold">Mastercard</span>
+                </div>
+            </div>
+        </section>
+
         {/* How-to Section */}
-        <section id="how-to" className="w-full py-12 md:py-20 lg:py-24">
+        <section id="how-to" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">prmart, 이렇게 이용하세요</h2>
@@ -184,7 +246,7 @@ export default async function Home() {
                 </div>
                 <div className="mx-auto grid gap-6 md:grid-cols-3">
                     {howToSteps.map((step) => (
-                        <Card key={step.title} className="flex flex-col items-center p-8 text-center">
+                        <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-background">
                            <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                             <step.icon className="h-10 w-10" />
                             </div>
@@ -197,7 +259,7 @@ export default async function Home() {
         </section>
 
         {/* Live Activity Feed Section */}
-        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
+        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">실시간 prmart</h2>
@@ -248,5 +310,3 @@ export default async function Home() {
     </div>
   );
 }
-
-    
