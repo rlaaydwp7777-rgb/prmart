@@ -6,6 +6,7 @@ import { LoginDialog } from "@/components/auth/login-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BUTTONS } from "@/lib/string-constants";
+import Link from "next/link";
 
 export function AuthButtons() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -27,7 +28,9 @@ export function AuthButtons() {
   ) : (
     <div className="flex items-center gap-2">
       <LoginDialog onLoginSuccess={handleLogin} />
-      <Button variant="default">{BUTTONS.SIGNUP}</Button>
+      <Button asChild>
+        <Link href="#">{BUTTONS.SIGNUP}</Link>
+      </Button>
     </div>
   );
 }
