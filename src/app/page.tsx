@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Search, Download, Upload, Wallet, Bell } from "lucide-react";
+import { ArrowRight, Star, Search, Download, Upload, Wallet, Bell as BellIcon, ShoppingCart } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
@@ -93,17 +93,6 @@ export default async function Home() {
                     {content.headline}
                     </h1>
                     <p className="max-w-[700px] mx-auto text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
-                </div>
-
-                <div className="w-full max-w-2xl">
-                    <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                        <Input
-                        type="search"
-                        placeholder="필요한 아이디어를 검색해보세요 (예: 인스타그램 마케팅 템플릿)"
-                        className="h-14 w-full rounded-full bg-background/80 border-2 border-primary/20 pl-12 pr-4 text-lg backdrop-blur-sm"
-                        />
-                    </div>
                 </div>
 
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -220,7 +209,7 @@ export default async function Home() {
                         {recentActivities.map((activity, index) => (
                             <div key={index} className="flex items-start gap-4">
                                 <div className="p-2 bg-primary/10 rounded-full">
-                                    <Bell className="h-5 w-5 text-primary"/>
+                                    <BellIcon className="h-5 w-5 text-primary"/>
                                 </div>
                                 <div className="flex-1">
                                     <div className="font-medium">
