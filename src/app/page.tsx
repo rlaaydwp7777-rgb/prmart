@@ -1,8 +1,9 @@
 
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck, Search } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
@@ -12,12 +13,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
   return {
     headline: "당신의 아이디어가 자산이 되는 곳, prmart",
-    subheadline: "prmart는 검증된 노하우, 템플릿, 그리고 AI 프롬프트를 통해 당신의 아이디어가 실질적인 가치로 전환되는 생태계입니다.",
+    subheadline: "prmart는 검증된 노하우, 템플릿, 그리고 AI 프롬프트를 통해 당신의 아이디어가 실질적인 가치로 전환되는<br/>생태계입니다.",
     categoriesHeadline: "카테고리 쇼케이스",
     categoriesSubheadline: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
     featuredPromptsHeadline: "지금 뜨는 아이디어",
@@ -113,7 +115,10 @@ export default async function Home() {
                     <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                     {content.headline}
                     </h1>
-                    <p className="max-w-[700px] mx-auto text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
+                    <p 
+                      className="max-w-[700px] mx-auto text-muted-foreground text-lg md:text-xl lg:text-2xl"
+                      dangerouslySetInnerHTML={{ __html: content.subheadline }}
+                    />
                 </div>
 
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
@@ -126,6 +131,13 @@ export default async function Home() {
                   <Button asChild size="lg" variant="outline">
                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
                   </Button>
+                </div>
+
+                <div className="w-full max-w-2xl pt-4">
+                  <div className="relative">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg" />
+                  </div>
                 </div>
             </div>
           </div>
