@@ -51,7 +51,7 @@ export function Header() {
             <AuthButtons />
           </div>
         </div>
-        <div className="flex h-16 items-center gap-4">
+        <div className="flex h-16 items-center gap-4 border-b">
             <div className="relative w-full">
                <Input
                 type="search"
@@ -64,6 +64,14 @@ export function Header() {
                 <Search className="h-5 w-5 md:mr-2"/>
                 <span className="hidden md:inline">검색</span>
             </Button>
+        </div>
+        <div className="flex h-16 items-center gap-2 overflow-x-auto">
+          {CATEGORIES.map((category) => (
+            <Button variant="ghost" key={category.name} className="shrink-0">
+              <category.icon className="mr-2 h-4 w-4" />
+              {category.name}
+            </Button>
+          ))}
         </div>
       </div>
     </header>
