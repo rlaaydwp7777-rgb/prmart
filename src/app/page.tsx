@@ -50,21 +50,21 @@ export default async function Home() {
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input
                         type="search"
-                        placeholder="어떤 아이디어를 찾고 계신가요?"
+                        placeholder="필요한 아이디어를 검색해보세요 (예: 인스타그램 마케팅 템플릿)"
                         className="h-14 w-full rounded-full bg-background/80 border-2 border-primary/20 pl-12 pr-4 text-lg backdrop-blur-sm"
                         />
                     </div>
                 </div>
 
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
-                  </Button>
                   <Button asChild size="lg">
                     <Link href="#featured-prompts">
                       {BUTTONS.START_EXPLORING}
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
                   </Button>
                 </div>
             </div>
