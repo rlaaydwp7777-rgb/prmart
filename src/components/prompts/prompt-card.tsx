@@ -35,7 +35,7 @@ const RankBadge = ({ rank }: { rank: number }) => {
 export function PromptCard({ prompt }: PromptCardProps) {
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300">
-      <Link href={`/prompts/${prompt.id}`} className="block">
+      <Link href={`/p/${prompt.id}`} className="block">
         <CardContent className="p-0">
           <div className="relative">
             <Image
