@@ -97,11 +97,12 @@ const testimonials = [
   },
 ];
 
-export default function Home() {
-  const content = getHomePageContent();
+export default async function Home() {
+  const content = await getHomePageContent();
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <Header />
       <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full pt-20 pb-20 md:pt-28 md:pb-28">
@@ -139,7 +140,7 @@ export default function Home() {
               </div>
               <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category) => (
-                      <Link key={category.name} href="#" className="group">
+                      <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
                           <Card className="flex flex-col items-center justify-center p-6 gap-4 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                                   <category.icon className="h-8 w-8" />
@@ -305,6 +306,7 @@ export default function Home() {
           </div>
         </section>
       </main>
+      <Footer />
     </div>
   );
 }
