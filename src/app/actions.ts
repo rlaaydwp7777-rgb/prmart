@@ -1,6 +1,6 @@
 "use server";
 
-import { generateProductDescription } from "@/ai/flows/generate-product-description";
+import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
 import { assessContentQuality } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
@@ -25,16 +25,16 @@ export type FormState = {
   }
 };
 
-export async function generateDescriptionAction(title: string): Promise<{description: string | null; error: string | null}> {
+export async function generateDescriptionAction(title: string): Promise<{data: GenerateProductDescriptionOutput | null; error: string | null}> {
   if (!title || title.trim().length < 5) {
-    return { description: null, error: "Please enter a valid title (at least 5 characters)." };
+    return { data: null, error: "Please enter a valid title (at least 5 characters)." };
   }
   try {
     const result = await generateProductDescription({ productTitle: title });
-    return { description: result.productDescription, error: null };
+    return { data: result, error: null };
   } catch (error) {
     console.error("Error generating description:", error);
-    return { description: null, error: "Failed to generate description. Please try again." };
+    return { data: null, error: "Failed to generate description. Please try again." };
   }
 }
 

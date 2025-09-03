@@ -49,6 +49,7 @@ export function ProductRegistrationForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string | undefined>(undefined);
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -62,6 +63,11 @@ export function ProductRegistrationForm() {
   });
   
   const titleValue = watch("title");
+  const categoryValue = watch("category");
+
+  useEffect(() => {
+    setSelectedCategory(categoryValue);
+  }, [categoryValue]);
 
   useEffect(() => {
     if (formState.message) {
@@ -74,9 +80,10 @@ export function ProductRegistrationForm() {
             formRef.current.reset();
             setValue("title", "");
             setValue("description", "");
-            setValue("category", "");
+            setValue("category", "", { shouldValidate: true });
             setValue("tags", "");
             setValue("price", 0);
+            setSelectedCategory(undefined);
         }
       } else {
          toast({
@@ -100,8 +107,13 @@ export function ProductRegistrationForm() {
     setIsGenerating(true);
     const result = await generateDescriptionAction(titleValue);
     setIsGenerating(false);
-    if (result.description) {
-      setValue("description", result.description, { shouldValidate: true });
+    if (result.data) {
+      const { productDescription, category, tags, price } = result.data;
+      setValue("description", productDescription, { shouldValidate: true });
+      setValue("category", category, { shouldValidate: true });
+      setValue("tags", tags.join(', '), { shouldValidate: true });
+      setValue("price", price, { shouldValidate: true });
+      setSelectedCategory(category);
       toast({
         title: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE,
         description: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE_DESC,
@@ -115,10 +127,10 @@ export function ProductRegistrationForm() {
     }
   };
   
-  const { ref: titleRef, ...titleRest } = register("title");
-  const { ref: descriptionRef, ...descriptionRest } = register("description");
-  const { ref: priceRef, ...priceRest } = register("price");
-  const { ref: tagsRef, ...tagsRest } = register("tags");
+  const handleCategoryChange = (value: string) => {
+    setValue('category', value, {shouldValidate: true});
+    setSelectedCategory(value);
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -132,8 +144,8 @@ export function ProductRegistrationForm() {
         <form ref={formRef} action={formAction} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">{SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_LABEL}</Label>
-            <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...titleRest} ref={titleRef} />
-            {errors.title && <p className="text-destructive">{errors.title.message}</p>}
+            <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
+            {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
           </div>
 
           <div className="space-y-2">
@@ -148,16 +160,15 @@ export function ProductRegistrationForm() {
               id="description"
               placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
               className="min-h-[120px]"
-              {...descriptionRest}
-              ref={descriptionRef}
+              {...register("description")}
             />
-            {errors.description && <p className="text-destructive">{errors.description.message}</p>}
+            {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
-              <Select name="category" onValueChange={(value) => setValue('category', value, {shouldValidate: true})}>
+              <Select name="category" value={selectedCategory} onValueChange={handleCategoryChange}>
                 <SelectTrigger id="category">
                   <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
                 </SelectTrigger>
@@ -167,20 +178,20 @@ export function ProductRegistrationForm() {
                   ))}
                 </SelectContent>
               </Select>
-               {errors.category && <p className="text-destructive">{errors.category.message}</p>}
+               {errors.category && <p className="text-destructive text-sm">{errors.category.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="price">{SELLER_DASHBOARD_STRINGS.PRICE_LABEL}</Label>
-              <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...priceRest} ref={priceRef} />
-              {errors.price && <p className="text-destructive">{errors.price.message}</p>}
+              <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...register("price")} />
+              {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
             </div>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="tags">{SELLER_DASHBOARD_STRINGS.TAGS_LABEL}</Label>
-            <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...tagsRest} ref={tagsRef} />
+            <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
             <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
-            {errors.tags && <p className="text-destructive">{errors.tags.message}</p>}
+            {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
           </div>
 
           <SubmitButton />
