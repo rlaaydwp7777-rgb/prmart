@@ -18,14 +18,15 @@ export default function Home() {
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
               <div className="flex flex-col justify-center space-y-4">
-                <h1 className="font-headline text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl whitespace-pre-wrap">
-                  {HOME_STRINGS.HEADLINE}
+                <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
+                  {HOME_STRINGS.HEADLINE_PART_1}
+                  <span className="text-primary">{HOME_STRINGS.HEADLINE_PART_2}</span>
                 </h1>
-                <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                <p className="max-w-[600px] text-muted-foreground text-xl md:text-2xl">
                   {HOME_STRINGS.SUBHEADLINE}
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg">
+                  <Button asChild size="lg" className="text-lg">
                     <a href="#featured-prompts">{BUTTONS.START_EXPLORING} <ArrowRight className="ml-2 h-5 w-5" /></a>
                   </Button>
                 </div>
@@ -51,8 +52,8 @@ export default function Home() {
         <section id="categories" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <h2 className="text-3xl font-bold font-headline tracking-tighter sm:text-4xl md:text-5xl">{HOME_STRINGS.CATEGORIES_HEADLINE}</h2>
-              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed">
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{HOME_STRINGS.CATEGORIES_HEADLINE}</h2>
+              <p className="max-w-[900px] text-muted-foreground text-xl md:text-2xl">
                 {HOME_STRINGS.CATEGORIES_SUBHEADLINE}
               </p>
             </div>
@@ -61,9 +62,9 @@ export default function Home() {
                 <a key={category.name} href="#" className="group">
                   <Card className="flex flex-col items-center justify-center p-6 gap-4 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
                     <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                      <category.icon className="h-8 w-8" />
+                      <category.icon className="h-10 w-10" />
                     </div>
-                    <span className="font-semibold text-center">{category.name}</span>
+                    <span className="font-semibold text-xl text-center">{category.name}</span>
                   </Card>
                 </a>
               ))}
@@ -73,8 +74,8 @@ export default function Home() {
 
         <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24">
           <div className="container px-4 md:px-6">
-            <h2 className="text-3xl font-bold font-headline tracking-tighter text-center sm:text-4xl md:text-5xl">{HOME_STRINGS.FEATURED_PROMPTS_HEADLINE}</h2>
-            <p className="mx-auto max-w-[900px] text-muted-foreground md:text-xl/relaxed text-center mt-4">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter text-center">{HOME_STRINGS.FEATURED_PROMPTS_HEADLINE}</h2>
+            <p className="mx-auto max-w-[900px] text-muted-foreground md:text-2xl text-center mt-4">
               {HOME_STRINGS.FEATURED_PROMPTS_SUBHEADLINE}
             </p>
             <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -88,15 +89,15 @@ export default function Home() {
         <section className="w-full py-12 md:py-20 lg:py-24 bg-primary text-primary-foreground">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
-              <h2 className="text-3xl font-bold font-headline tracking-tighter md:text-4xl/tight">
+              <h2 className="text-4xl md:text-5xl font-bold font-headline tracking-tighter">
                 {HOME_STRINGS.CTA_HEADLINE}
               </h2>
-              <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl/relaxed">
+              <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl">
                 {HOME_STRINGS.CTA_SUBHEADLINE}
               </p>
             </div>
             <div className="mx-auto w-full max-w-sm space-x-2">
-              <Button asChild size="lg" variant="secondary">
+              <Button asChild size="lg" variant="secondary" className="text-lg">
                 <a href="/seller/dashboard">{BUTTONS.START_SELLING}</a>
               </Button>
             </div>
