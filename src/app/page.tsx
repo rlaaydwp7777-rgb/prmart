@@ -1,14 +1,13 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Search, Download, Upload, Wallet, Bell as BellIcon, ShoppingCart } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
 import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -249,3 +248,5 @@ export default async function Home() {
     </div>
   );
 }
+
+    
