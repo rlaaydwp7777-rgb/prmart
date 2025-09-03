@@ -1,13 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star } from "lucide-react";
+import { ArrowRight, Star, Search } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { FEATURED_PROMPTS } from "@/lib/constants";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
 import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -30,16 +32,30 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 pt-32">
+      <main className="flex-1 pt-16">
         {/* Hero Section */}
-        <section className="relative w-full pt-12 pb-12 md:pt-16 md:pb-20">
+        <section className="relative w-full pt-20 pb-20 md:pt-28 md:pb-28">
            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-background to-background -z-10"></div>
           <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center text-center space-y-6">
-                <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                  당신의 아이디어가 자산이 되는 곳, <span className="text-primary">prmart</span>
-                </h1>
-                <p className="max-w-[700px] text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
+            <div className="flex flex-col items-center justify-center text-center space-y-8">
+                <div className="space-y-4">
+                    <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
+                    {content.headline}
+                    </h1>
+                    <p className="max-w-[700px] mx-auto text-muted-foreground text-lg md:text-xl lg:text-2xl">{content.subheadline}</p>
+                </div>
+
+                <div className="w-full max-w-2xl">
+                    <div className="relative">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                        <Input
+                        type="search"
+                        placeholder="어떤 아이디어를 찾고 계신가요?"
+                        className="h-14 w-full rounded-full bg-background/80 border-2 border-primary/20 pl-12 pr-4 text-lg backdrop-blur-sm"
+                        />
+                    </div>
+                </div>
+
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg" variant="outline">
                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
@@ -55,8 +71,31 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Curation Section */}
-        <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24">
+        {/* Categories Section */}
+        <section id="categories" className="w-full py-12 md:py-20 lg:py-24">
+          <div className="container px-4 md:px-6">
+              <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.categoriesHeadline}</h2>
+                  <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.categoriesSubheadline}</p>
+              </div>
+              <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
+                  {CATEGORIES.map((category) => (
+                      <Link key={category.name} href="#" className="group">
+                          <Card className="flex flex-col items-center justify-center p-6 gap-4 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
+                              <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                                  <category.icon className="h-8 w-8" />
+                              </div>
+                              <span className="font-semibold text-lg text-center">{category.name}</span>
+                          </Card>
+                      </Link>
+                  ))}
+              </div>
+          </div>
+        </section>
+
+
+        {/* Featured Prompts Section */}
+        <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.featuredPromptsHeadline}</h2>
