@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { List, Download, Star, Heart, User, Cog } from "lucide-react";
+import { List, Download, Star, Heart, Cog } from "lucide-react";
 import { ACCOUNT_STRINGS } from "@/lib/string-constants";
 
 
@@ -64,7 +64,7 @@ export default function AccountLayout({ children }: SettingsLayoutProps) {
                   className={cn(
                     "w-full justify-start",
                      // Note: using startsWith to handle nested routes like /account/orders/[id]
-                    (pathname === item.href || (item.href !== '/account' && pathname.startsWith(item.href)))
+                    (item.href === '/account' ? pathname === item.href : pathname.startsWith(item.href))
                       ? "bg-muted hover:bg-muted"
                       : "hover:bg-transparent hover:underline"
                   )}
