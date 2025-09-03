@@ -107,7 +107,7 @@ export default async function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative w-full pt-20 pb-20 md:pt-28 md:pb-28">
+        <section className="relative w-full pt-20 pb-12 md:pt-28 md:pb-16">
            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-background to-background -z-10"></div>
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center text-center space-y-8">
@@ -132,39 +132,37 @@ export default async function Home() {
                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
                   </Button>
                 </div>
-
-                <div className="w-full max-w-2xl pt-4">
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg" />
-                  </div>
-                </div>
             </div>
           </div>
         </section>
-
-        {/* Categories Section */}
-        <section id="categories" className="w-full py-12 md:py-20 lg:py-24">
-          <div className="container px-4 md:px-6">
-              <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                  <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.categoriesHeadline}</h2>
-                  <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.categoriesSubheadline}</p>
-              </div>
-              <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
+        
+        {/* Search & Categories Section */}
+        <section id="search-and-categories" className="w-full pb-12 md:pb-20 lg:pb-24">
+            <div className="container px-4 md:px-6">
+                <div className="w-full max-w-2xl mx-auto">
+                  <div className="relative flex gap-2">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg flex-1" />
+                    <Button size="lg" className="rounded-full h-14 w-14 p-0">
+                      <Search className="h-6 w-6"/>
+                      <span className="sr-only">Search</span>
+                    </Button>
+                  </div>
+                </div>
+                 <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5 pt-8">
                   {CATEGORIES.map((category) => (
                       <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
-                          <Card className="flex flex-col items-center justify-center p-6 gap-4 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
+                          <Card className="flex flex-col items-center justify-center p-4 gap-2 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                                  <category.icon className="h-8 w-8" />
+                                  <category.icon className="h-6 w-6" />
                               </div>
-                              <span className="font-semibold text-lg text-center">{category.name}</span>
+                              <span className="font-semibold text-sm text-center">{category.name}</span>
                           </Card>
                       </Link>
                   ))}
               </div>
-          </div>
+            </div>
         </section>
-
 
         {/* Featured Prompts Section */}
         <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
