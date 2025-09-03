@@ -2,13 +2,14 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
 import Image from "next/image";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import type { HomePageContent } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 
 // This is a placeholder function. In a real application, this would fetch data from a CMS or a database like Firestore.
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -39,8 +40,8 @@ export default async function Home() {
         <section className="relative w-full pt-24 pb-12 md:pt-32 md:pb-20 lg:pt-40 lg:pb-28">
            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-background to-background -z-10"></div>
           <div className="container px-4 md:px-6">
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16">
-              <div className="flex flex-col justify-center space-y-4">
+            <div className="grid gap-8 lg:grid-cols-2 lg:gap-12 xl:gap-16">
+              <div className="flex flex-col justify-center space-y-6">
                 <h1 className="font-headline text-4xl md:text-5xl lg:text-6xl font-bold tracking-tighter whitespace-pre-wrap">
                   {content.headline}
                   <span className="text-primary">{content.headlineAccent}</span>
@@ -48,6 +49,14 @@ export default async function Home() {
                 <p className="max-w-[600px] text-muted-foreground text-lg md:text-xl lg:text-2xl">
                   {content.subheadline}
                 </p>
+                 <div className="relative w-full max-w-lg">
+                  <Input
+                    type="search"
+                    placeholder="어떤 노하우를 찾고 계신가요?"
+                    className="h-14 pl-12 text-lg border-2 border-primary/20 focus-visible:ring-primary/50"
+                  />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground" />
+                </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg" className="text-lg">
                     <a href="#featured-prompts">{BUTTONS.START_EXPLORING} <ArrowRight className="ml-2 h-5 w-5" /></a>
