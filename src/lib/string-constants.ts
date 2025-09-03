@@ -1,12 +1,12 @@
 export const META = {
-    TITLE: "prmart - 상상이 자산이 되는 곳",
-    DESCRIPTION: "AI와 인간 전문가의 검증된 지식, 템플릿, 디지털 자산을 거래하는 마켓플레이스.",
+    TITLE: "prmart - 당신의 아이디어가 자산이 되는 곳",
+    DESCRIPTION: "흩어진 지식을 연결하여 새로운 가치를 조립하세요. prmart는 AI 프롬프트, 개발 소스코드, 디자인 템플릿, 업무 자동화, 투자 전략 등 모든 종류의 디지털 자산을 거래하는 마이크로콘텐츠 마켓플레이스입니다.",
     ICON_URL: "✨"
 }
 
 export const BUTTONS = {
-    START_EXPLORING: "탐색 시작하기",
-    START_SELLING: "판매 시작하기",
+    START_EXPLORING: "아이디어 둘러보기",
+    START_SELLING: "아이디어 판매하기",
     LOGIN: "로그인",
     SIGNUP: "회원가입",
     CONTINUE_WITH_GOOGLE: "Google 계정으로 계속하기",
@@ -20,15 +20,15 @@ export const PROMPT_CARD_STRINGS = {
 }
 
 export const CATEGORY_NAMES = {
-    DEVELOPMENT: "개발",
-    DESIGN: "디자인",
-    MARKETING: "마케팅",
-    SEO: "SEO",
-    AI_PROMPTS: "AI 프롬프트",
+    AI_CREATION: "AI 크리에이션",
+    DEVELOPMENT_AUTOMATION: "개발 · 자동화",
+    INVESTMENT_FINTECH: "투자 · 재테크",
+    LIFE_KNOWHOW: "라이프 · 노하우",
+    DESIGN_MEDIA: "디자인 · 미디어",
 }
 
 export const FOOTER_STRINGS = {
-    SLOGAN: "상상이 자산이 되는 곳.",
+    SLOGAN: "흩어진 지식을 연결하여 새로운 가치를 조립하다.",
     QUICK_LINKS: "바로가기",
     SUPPORT: "고객지원",
     LEGAL: "Legal",

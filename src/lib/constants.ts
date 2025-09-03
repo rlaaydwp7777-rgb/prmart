@@ -1,13 +1,13 @@
 import type { Category, Prompt } from "./types";
-import { Bot, Code, Mail, Palette, Search } from "lucide-react";
-import { BUTTONS, CATEGORY_NAMES, PROMPT_CARD_STRINGS, HOME_STRINGS } from "./string-constants";
+import { Bot, Code, LineChart, VenetianMask, Film, Palette } from "lucide-react";
+import { CATEGORY_NAMES } from "./string-constants";
 
 export const CATEGORIES: Category[] = [
-  { name: CATEGORY_NAMES.DEVELOPMENT, icon: Code },
-  { name: CATEGORY_NAMES.DESIGN, icon: Palette },
-  { name: CATEGORY_NAMES.MARKETING, icon: Mail },
-  { name: CATEGORY_NAMES.SEO, icon: Search },
-  { name: CATEGORY_NAMES.AI_PROMPTS, icon: Bot },
+  { name: CATEGORY_NAMES.AI_CREATION, icon: Bot },
+  { name: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, icon: Code },
+  { name: CATEGORY_NAMES.INVESTMENT_FINTECH, icon: LineChart },
+  { name: CATEGORY_NAMES.LIFE_KNOWHOW, icon: VenetianMask },
+  { name: CATEGORY_NAMES.DESIGN_MEDIA, icon: Palette },
 ];
 
 export const FEATURED_PROMPTS: Prompt[] = [
@@ -15,7 +15,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "1",
     title: "Next.js 14 Boilerplate",
     author: "DevMaster",
-    category: CATEGORY_NAMES.DEVELOPMENT,
+    category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION,
     price: 25000,
     rating: 4.9,
     reviews: 120,
@@ -26,7 +26,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "2",
     title: "Minimalist UI Kit",
     author: "PixelPerfect",
-    category: CATEGORY_NAMES.DESIGN,
+    category: CATEGORY_NAMES.DESIGN_MEDIA,
     price: 35000,
     rating: 4.8,
     reviews: 95,
@@ -37,7 +37,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "3",
     title: "Email Marketing Sequences",
     author: "GrowthHacker",
-    category: CATEGORY_NAMES.MARKETING,
+    category: "마케팅",
     price: 18000,
     rating: 4.9,
     reviews: 210,
@@ -46,13 +46,13 @@ export const FEATURED_PROMPTS: Prompt[] = [
   },
   {
     id: "4",
-    title: "SEO Audit Checklist",
+    title: "분기별 주식 투자 리포트",
     author: "SEOGuru",
-    category: CATEGORY_NAMES.SEO,
+    category: CATEGORY_NAMES.INVESTMENT_FINTECH,
     price: 12000,
     rating: 5.0,
     reviews: 78,
     image: "https://picsum.photos/400/300?random=4",
-    aiHint: "search analysis"
+    aiHint: "stock chart"
   }
 ];
