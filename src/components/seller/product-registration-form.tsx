@@ -215,5 +215,3 @@ export function ProductRegistrationForm() {
     </Card>
   );
 }
-
-    
