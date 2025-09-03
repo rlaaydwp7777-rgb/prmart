@@ -14,18 +14,6 @@ export const BUTTONS = {
     SUBMIT_FOR_REVIEW: "품질 검수 제출",
 }
 
-export const HOME_STRINGS = {
-    HEADLINE_PART_1: "당신의 상상과 지식이 ",
-    HEADLINE_PART_2: "최고의 자산이 되는 곳",
-    SUBHEADLINE: "prmart는 검증된 노하우, 템플릿, 그리고 AI 프롬프트를 통해 당신의 아이디어가 실질적인 가치로 전환되는 생태계입니다.",
-    CATEGORIES_HEADLINE: "카테고리 쇼케이스",
-    CATEGORIES_SUBHEADLINE: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
-    FEATURED_PROMPTS_HEADLINE: "추천 상품",
-    FEATURED_PROMPTS_SUBHEADLINE: "prmart 전문가들이 엄선한 인기 상품들을 만나보세요.",
-    CTA_HEADLINE: "당신의 지식을 자산으로 만들 시간",
-    CTA_SUBHEADLINE: "지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.",
-}
-
 export const PROMPT_CARD_STRINGS = {
     BY: "By",
     REVIEWS: "reviews",
