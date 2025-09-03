@@ -1,7 +1,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Star, Search } from "lucide-react";
+import { ArrowRight, Star, Search, Download, Upload, Wallet, Bell } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
@@ -9,7 +9,8 @@ import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -24,6 +25,55 @@ async function getHomePageContent(): Promise<HomePageContent> {
     ctaSubheadline: "지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.",
   };
 }
+
+const howToSteps = [
+    {
+      icon: Upload,
+      title: "1. 아이디어 등록",
+      description: "당신의 노하우, 템플릿, 프롬프트를 손쉽게 등록하고 판매를 시작하세요.",
+    },
+    {
+      icon: Wallet,
+      title: "2. 간편 결제",
+      description: "구매자는 안전한 결제 시스템을 통해 원하는 아이디어를 즉시 구매할 수 있습니다.",
+    },
+    {
+      icon: Download,
+      title: "3. 즉시 다운로드/사용",
+      description: "구매한 디지털 자산은 마이페이지에서 언제든지 다운로드하고 활용할 수 있습니다.",
+    },
+];
+
+const recentActivities = [
+    {
+      action: "판매",
+      item: "Next.js 14 Boilerplate",
+      time: "방금 전",
+      user: "DevMaster",
+      price: 25000,
+    },
+    {
+      action: "등록",
+      item: "Minimalist UI Kit",
+      time: "2분 전",
+      user: "PixelPerfect",
+      price: null,
+    },
+    {
+      action: "판매",
+      item: "Email Marketing Sequences",
+      time: "5분 전",
+      user: "GrowthHacker",
+      price: 18000,
+    },
+    {
+        action: "리뷰",
+        item: "분기별 주식 투자 리포트",
+        time: "10분 전",
+        user: "SEOGuru",
+        price: null,
+    }
+];
 
 
 export default async function Home() {
@@ -136,6 +186,57 @@ export default async function Home() {
             </Tabs>
           </div>
         </section>
+
+        {/* How-to Section */}
+        <section id="how-to" className="w-full py-12 md:py-20 lg:py-24">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">prmart, 이렇게 이용하세요</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl">단 3단계로 당신의 아이디어를 거래하고 가치를 창출하세요.</p>
+                </div>
+                <div className="mx-auto grid gap-6 md:grid-cols-3">
+                    {howToSteps.map((step) => (
+                        <Card key={step.title} className="flex flex-col items-center p-8 text-center">
+                           <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
+                            <step.icon className="h-10 w-10" />
+                            </div>
+                            <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
+                            <CardDescription>{step.description}</CardDescription>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+
+        {/* Live Activity Feed Section */}
+        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
+            <div className="container px-4 md:px-6">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">실시간 prmart</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl">지금 prmart에서는 무슨 일이 일어나고 있을까요?</p>
+                </div>
+                <Card className="max-w-2xl mx-auto">
+                    <CardContent className="p-6 space-y-4">
+                        {recentActivities.map((activity, index) => (
+                            <div key={index} className="flex items-start gap-4">
+                                <div className="p-2 bg-primary/10 rounded-full">
+                                    <Bell className="h-5 w-5 text-primary"/>
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-medium">
+                                        <span className="font-bold text-primary">{activity.user}</span>님이 
+                                        <span className="font-bold"> {activity.item}</span>을(를) {activity.action}했습니다.
+                                        {activity.price && <Badge variant="outline" className="ml-2">₩{activity.price.toLocaleString()}</Badge>}
+                                    </p>
+                                    <p className="text-sm text-muted-foreground">{activity.time}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+
 
         <section className="w-full py-12 md:py-20 lg:py-24 bg-primary text-primary-foreground">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
