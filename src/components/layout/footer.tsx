@@ -10,7 +10,7 @@ export function Footer() {
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-2">
               <Sparkles className="h-6 w-6 text-primary" />
-              <span className="font-bold font-headline text-xl">prmart</span>
+              <span className="font-bold font-headline text-xl">{FOOTER_STRINGS.COMPANY_NAME_KO}</span>
             </Link>
             <p className="text-muted-foreground">
               {FOOTER_STRINGS.SLOGAN}
@@ -21,7 +21,7 @@ export function Footer() {
             <h4 className="font-semibold">{FOOTER_STRINGS.QUICK_LINKS}</h4>
             <ul className="space-y-1 text-muted-foreground">
               <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</a></li>
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</a></li>
+              <li><a href="/browse" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</a></li>
               <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</a></li>
               <li><a href="/seller/dashboard" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</a></li>
             </ul>
@@ -39,12 +39,12 @@ export function Footer() {
           <div className="space-y-2">
             <h4 className="font-semibold">{FOOTER_STRINGS.LEGAL}</h4>
             <div className="text-muted-foreground space-y-1 text-sm">
-                <p><strong>{FOOTER_STRINGS.COMPANY_NAME}:</strong> 프마트(prmart)</p>
-                <p><strong>{FOOTER_STRINGS.CEO}:</strong> 김대표</p>
-                <p><strong>{FOOTER_STRINGS.BUSINESS_NUMBER}:</strong> 100-00-00000</p>
-                <p><strong>{FOOTER_STRINGS.ECOMMERCE_NUMBER}:</strong> 2024-부산-0000</p>
-                <p><strong>{FOOTER_STRINGS.ADDRESS}:</strong> 부산광역시 해운대구</p>
-                <p><strong>{FOOTER_STRINGS.EMAIL}:</strong> contact@prmart.ai</p>
+                <p><strong>{FOOTER_STRINGS.COMPANY_NAME}:</strong> {FOOTER_STRINGS.COMPANY_NAME_KO} ({FOOTER_STRINGS.COMPANY_NAME_EN})</p>
+                <p><strong>{FOOTER_STRINGS.CEO}:</strong> {FOOTER_STRINGS.CEO_NAME}</p>
+                <p><strong>{FOOTER_STRINGS.BUSINESS_NUMBER}:</strong> {FOOTER_STRINGS.BUSINESS_NUMBER_VALUE}</p>
+                <p><strong>{FOOTER_STRINGS.ECOMMERCE_NUMBER}:</strong> {FOOTER_STRINGS.ECOMMERCE_NUMBER_VALUE}</p>
+                <p><strong>{FOOTER_STRINGS.ADDRESS}:</strong> {FOOTER_STRINGS.ADDRESS_VALUE}</p>
+                <p><strong>{FOOTER_STRINGS.EMAIL}:</strong> {FOOTER_STRINGS.EMAIL_VALUE}</p>
             </div>
           </div>
         </div>

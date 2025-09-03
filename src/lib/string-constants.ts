@@ -41,11 +41,18 @@ export const FOOTER_STRINGS = {
     TERMS: "이용약관",
     PRIVACY_POLICY: "개인정보처리방침",
     COMPANY_NAME: "상호",
+    COMPANY_NAME_KO: "프마트",
+    COMPANY_NAME_EN: "prmart",
     CEO: "대표",
+    CEO_NAME: "김대표",
     BUSINESS_NUMBER: "사업자등록번호",
+    BUSINESS_NUMBER_VALUE: "100-00-00000",
     ECOMMERCE_NUMBER: "통신판매업신고번호",
+    ECOMMERCE_NUMBER_VALUE: "2024-부산-0000",
     ADDRESS: "주소",
+    ADDRESS_VALUE: "부산광역시 해운대구",
     EMAIL: "이메일",
+    EMAIL_VALUE: "contact@prmart.ai",
     COPYRIGHT: `© ${new Date().getFullYear()} prmart. All Rights Reserved.`,
 }
 
