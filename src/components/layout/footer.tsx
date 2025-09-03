@@ -4,7 +4,7 @@ import { FOOTER_STRINGS } from "@/lib/string-constants";
 
 export function Footer() {
   return (
-    <footer className="border-t bg-muted/30">
+    <footer className="border-t bg-background">
       <div className="container py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
