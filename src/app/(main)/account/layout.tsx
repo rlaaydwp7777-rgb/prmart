@@ -12,7 +12,7 @@ import { ACCOUNT_STRINGS } from "@/lib/string-constants";
 const sidebarNavItems = [
   {
     title: ACCOUNT_STRINGS.NAV_ORDERS,
-    href: "/account",
+    href: "/account/orders",
     icon: <List className="mr-2 h-4 w-4" />,
   },
   {
@@ -63,8 +63,7 @@ export default function AccountLayout({ children }: SettingsLayoutProps) {
                   variant="ghost"
                   className={cn(
                     "w-full justify-start",
-                     // Note: using startsWith to handle nested routes like /account/orders/[id]
-                    (item.href === '/account' ? pathname === item.href : pathname.startsWith(item.href))
+                    pathname.startsWith(item.href)
                       ? "bg-muted hover:bg-muted"
                       : "hover:bg-transparent hover:underline"
                   )}

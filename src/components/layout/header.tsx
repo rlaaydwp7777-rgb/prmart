@@ -28,13 +28,14 @@ export function Header() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="font-medium text-muted-foreground hover:text-primary p-0 h-auto">
-                    <ChevronDown className="relative top-[1px] h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180" />
+                    {HEADER_LINKS.CATEGORIES}
+                    <ChevronDown className="relative top-[1px] ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-56">
                   {CATEGORIES.map((category) => (
                      <DropdownMenuItem key={category.name} asChild>
-                       <Link href="#">
+                       <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}`}>
                         <category.icon className="mr-2 h-4 w-4" />
                         <span>{category.name}</span>
                        </Link>

@@ -96,6 +96,7 @@ export const HEADER_LINKS = {
     VIEW_ALL: "전체보기",
     REQUEST_IDEA: "아이디어 요청",
     START_SELLING: "판매 시작하기",
+    CATEGORIES: "카테고리",
 }
 
 export const SIDEBAR_STRINGS = {
