@@ -1,20 +1,16 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Star } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
 import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
-import { CATEGORIES } from "@/lib/constants";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// This is a placeholder function. In a real application, this would fetch data from a CMS or a database like Firestore.
+
 async function getHomePageContent(): Promise<HomePageContent> {
-  // In the future, this will be:
-  // const doc = await getDoc(doc(db, "siteContent", "home"));
-  // return doc.data() as HomePageContent;
   return {
     headline: "당신의 아이디어가 자산이 되는 곳, prmart",
     subheadline: "prmart는 검증된 노하우, 템플릿, 그리고 AI 프롬프트를 통해 당신의 아이디어가 실질적인 가치로 전환되는 생태계입니다.",
@@ -34,10 +30,10 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 pt-48">
+      <main className="flex-1 pt-32">
         {/* Hero Section */}
         <section className="relative w-full pt-12 pb-12 md:pt-16 md:pb-20">
-           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/10 via-background to-background -z-10"></div>
+           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-background to-background -z-10"></div>
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center text-center space-y-6">
                 <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
@@ -66,11 +62,39 @@ export default async function Home() {
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.featuredPromptsHeadline}</h2>
                 <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.featuredPromptsSubheadline}</p>
             </div>
-            <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {FEATURED_PROMPTS.map((prompt) => (
-                <PromptCard key={prompt.id} prompt={prompt} />
-              ))}
-            </div>
+            
+            <Tabs defaultValue="popular" className="w-full">
+              <div className="flex justify-center">
+                <TabsList>
+                  <TabsTrigger value="popular">실시간 인기 TOP 10</TabsTrigger>
+                  <TabsTrigger value="new">새로 등록된 아이디어</TabsTrigger>
+                  <TabsTrigger value="recommended">prmart 추천 아이디어</TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="popular">
+                <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {FEATURED_PROMPTS.map((prompt) => (
+                    <PromptCard key={prompt.id} prompt={prompt} />
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="new">
+                 <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {/* TODO: Implement new prompts fetching */}
+                  {FEATURED_PROMPTS.slice().reverse().map((prompt) => (
+                    <PromptCard key={prompt.id} prompt={prompt} />
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="recommended">
+                 <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {/* TODO: Implement recommended prompts fetching */}
+                  {FEATURED_PROMPTS.filter(p => p.rating > 4.8).map((prompt) => (
+                    <PromptCard key={prompt.id} prompt={prompt} />
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </section>
 

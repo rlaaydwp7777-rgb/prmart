@@ -1,5 +1,5 @@
 import type { Category, Prompt } from "./types";
-import { Bot, Code, LineChart, VenetianMask, Film, Palette } from "lucide-react";
+import { Bot, Code, LineChart, VenetianMask, Palette } from "lucide-react";
 import { CATEGORY_NAMES } from "./string-constants";
 
 export const CATEGORIES: Category[] = [
@@ -20,7 +20,8 @@ export const FEATURED_PROMPTS: Prompt[] = [
     rating: 4.9,
     reviews: 120,
     image: "https://picsum.photos/400/300?random=1",
-    aiHint: "code terminal"
+    aiHint: "code terminal",
+    rank: 1,
   },
   {
     id: "2",
@@ -31,7 +32,8 @@ export const FEATURED_PROMPTS: Prompt[] = [
     rating: 4.8,
     reviews: 95,
     image: "https://picsum.photos/400/300?random=2",
-    aiHint: "design components"
+    aiHint: "design components",
+    rank: 2,
   },
   {
     id: "3",
@@ -42,7 +44,8 @@ export const FEATURED_PROMPTS: Prompt[] = [
     rating: 4.9,
     reviews: 210,
     image: "https://picsum.photos/400/300?random=3",
-    aiHint: "email inbox"
+    aiHint: "email inbox",
+    rank: 3,
   },
   {
     id: "4",
@@ -53,6 +56,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     rating: 5.0,
     reviews: 78,
     image: "https://picsum.photos/400/300?random=4",
-    aiHint: "stock chart"
+    aiHint: "stock chart",
+    rank: 4,
   }
 ];

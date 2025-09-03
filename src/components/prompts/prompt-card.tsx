@@ -2,13 +2,35 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star } from "lucide-react";
+import { Star, Trophy } from "lucide-react";
 import type { Prompt } from "@/lib/types";
 import { PROMPT_CARD_STRINGS } from "@/lib/string-constants";
+import { cn } from "@/lib/utils";
 
 interface PromptCardProps {
   prompt: Prompt;
 }
+
+const RankBadge = ({ rank }: { rank: number }) => {
+  if (rank > 10) return null;
+
+  const rankColors: { [key: number]: string } = {
+    1: "bg-amber-400 text-amber-900 border-amber-500",
+    2: "bg-slate-300 text-slate-800 border-slate-400",
+    3: "bg-orange-400 text-orange-900 border-orange-500",
+  };
+
+  return (
+    <div className={cn(
+      "absolute top-3 left-3 flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-bold",
+      rankColors[rank] || "bg-muted text-muted-foreground border-border"
+    )}>
+      <Trophy className="h-3 w-3" />
+      <span>{rank}</span>
+    </div>
+  );
+};
+
 
 export function PromptCard({ prompt }: PromptCardProps) {
   return (
@@ -24,6 +46,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
               className="object-cover w-full aspect-video"
               data-ai-hint={prompt.aiHint}
             />
+            {prompt.rank && <RankBadge rank={prompt.rank} />}
             <Badge variant="secondary" className="absolute top-3 right-3">{prompt.category}</Badge>
           </div>
           <div className="p-4 space-y-2">

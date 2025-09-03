@@ -10,6 +10,7 @@ export interface Prompt {
   reviews: number;
   image: string;
   aiHint: string;
+  rank?: number;
 }
 
 export interface Category {
