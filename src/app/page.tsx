@@ -223,11 +223,11 @@ export default async function Home() {
                                     <Bell className="h-5 w-5 text-primary"/>
                                 </div>
                                 <div className="flex-1">
-                                    <p className="font-medium">
+                                    <div className="font-medium">
                                         <span className="font-bold text-primary">{activity.user}</span>님이 
                                         <span className="font-bold"> {activity.item}</span>을(를) {activity.action}했습니다.
                                         {activity.price && <Badge variant="outline" className="ml-2">₩{activity.price.toLocaleString()}</Badge>}
-                                    </p>
+                                    </div>
                                     <p className="text-sm text-muted-foreground">{activity.time}</p>
                                 </div>
                             </div>
