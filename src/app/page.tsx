@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -96,14 +97,12 @@ const testimonials = [
   },
 ];
 
-
-export default async function Home() {
-  const content = await getHomePageContent();
+export default function Home() {
+  const content = getHomePageContent();
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 pt-16">
+      <main className="flex-1">
         {/* Hero Section */}
         <section className="relative w-full pt-20 pb-20 md:pt-28 md:pb-28">
            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-background to-background -z-10"></div>
@@ -306,7 +305,6 @@ export default async function Home() {
           </div>
         </section>
       </main>
-      <Footer />
     </div>
   );
 }
