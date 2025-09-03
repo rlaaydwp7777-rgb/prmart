@@ -15,9 +15,9 @@ export const BUTTONS = {
 }
 
 export const HOME_STRINGS = {
-    HEADLINE_PART_1: "상상이 자산이 되는 곳, ",
-    HEADLINE_PART_2: "prmart",
-    SUBHEADLINE: "Where Imagination Becomes an Asset. 검증된 지식과 경험을 발견하고, 당신의 창의력을 수익으로 전환하세요.",
+    HEADLINE_PART_1: "당신의 상상과 지식이 ",
+    HEADLINE_PART_2: "최고의 자산이 되는 곳",
+    SUBHEADLINE: "prmart는 검증된 노하우, 템플릿, 그리고 AI 프롬프트를 통해 당신의 아이디어가 실질적인 가치로 전환되는 생태계입니다.",
     CATEGORIES_HEADLINE: "카테고리 쇼케이스",
     CATEGORIES_SUBHEADLINE: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
     FEATURED_PROMPTS_HEADLINE: "추천 상품",
@@ -104,8 +104,7 @@ export const AUTH_STRINGS = {
 }
 
 export const HEADER_LINKS = {
-    PRODUCTS: "상품",
-    BROWSE: "둘러보기",
+    VIEW_ALL: "전체보기",
     REQUEST_IDEA: "아이디어 요청",
     START_SELLING: "판매 시작하기",
 }
