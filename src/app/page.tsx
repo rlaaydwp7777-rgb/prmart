@@ -122,34 +122,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center space-y-8">
                 <div className="space-y-4">
                     <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                    {content.headline}
+                      당신의 아이디어를 금으로 바꿔드립니다. prmart
                     </h1>
-                    {content.subheadline && (
-                      <p 
-                        className="max-w-[700px] mx-auto text-muted-foreground text-lg md:text-xl lg:text-2xl"
-                        dangerouslySetInnerHTML={{ __html: content.subheadline }}
-                      />
-                    )}
                 </div>
 
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg">
-                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/requests">
-                      {HEADER_LINKS.REQUEST_IDEA}
-                       <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* Search & Categories Section */}
-        <section id="search-and-categories" className="w-full pb-12 md:pb-20 lg:pb-24">
-            <div className="container px-4 md:px-6">
                 <div className="w-full max-w-2xl mx-auto">
                   <div className="relative flex gap-2">
                      <DropdownMenu>
@@ -191,7 +167,26 @@ export default function Home() {
                     </Button>
                   </div>
                 </div>
-                 <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5 pt-8">
+
+                <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                  <Button asChild size="lg">
+                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline">
+                    <Link href="/requests">
+                      {HEADER_LINKS.REQUEST_IDEA}
+                       <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                </div>
+            </div>
+          </div>
+        </section>
+        
+        {/* Categories Section */}
+        <section id="categories" className="w-full pb-12 md:pb-20 lg:pb-24">
+            <div className="container px-4 md:px-6">
+                 <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category) => (
                       <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
                           <Card className="flex flex-col items-center justify-center p-4 gap-2 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
