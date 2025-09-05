@@ -100,8 +100,7 @@ export default function Home() {
             <CarouselContent>
               {heroSlides.map((slide, index) => (
                 <CarouselItem key={index} className="h-full relative">
-                 <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}></div>
-                  <div className="absolute inset-0">
+                  <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
                     <Image
                       src={slide.image}
                       alt={slide.title}
