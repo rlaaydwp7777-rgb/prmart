@@ -145,42 +145,9 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-1 pt-16">
-        {/* Hero Section */}
-        <div className="relative w-full text-white">
-            <Carousel
-                plugins={[plugin.current]}
-                className="w-full h-[70vh] md:h-[80vh] lg:h-[85vh]"
-                onMouseEnter={plugin.current.stop}
-                onMouseLeave={plugin.current.reset}
-                opts={{ loop: true }}
-            >
-                <CarouselContent className="h-full">
-                    {heroSlides.map((slide) => (
-                        <CarouselItem key={slide.category} className="h-full relative">
-                            <Image
-                              src={slide.image}
-                              alt={slide.title}
-                              fill
-                              className="object-cover"
-                              data-ai-hint={slide.aiHint}
-                            />
-                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 relative z-10">
-                              <div className="container flex flex-col items-center justify-center text-center space-y-8">
-                                  <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                                      {slide.title}
-                                  </h1>
-                              </div>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                 <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
-                <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
-            </Carousel>
-        </div>
         
         {/* Search Section */}
-        <section className="py-12 md:py-16 -mt-32 lg:-mt-40 relative z-20">
+        <section className="py-12 md:py-16 relative z-20">
           <div className="container">
             <Card className="max-w-4xl mx-auto p-6 shadow-2xl">
                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-6">
