@@ -6,7 +6,7 @@ import * as React from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck, Search, ChevronDown, Rocket } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
@@ -14,7 +14,6 @@ import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -57,37 +56,6 @@ const howToSteps = [
       title: "3. 즉시 다운로드/사용",
       description: "구매한 디지털 자산은 마이페이지에서 언제든지 다운로드하고 활용할 수 있습니다.",
     },
-];
-
-const recentActivities = [
-    {
-      action: "판매",
-      item: "Next.js 14 Boilerplate",
-      time: "방금 전",
-      user: "DevMaster",
-      price: 25000,
-    },
-    {
-      action: "등록",
-      item: "Minimalist UI Kit",
-      time: "2분 전",
-      user: "PixelPerfect",
-      price: null,
-    },
-    {
-      action: "판매",
-      item: "Email Marketing Sequences",
-      time: "5분 전",
-      user: "GrowthHacker",
-      price: 18000,
-    },
-    {
-        action: "리뷰",
-        item: "분기별 주식 투자 리포트",
-        time: "10분 전",
-        user: "SEOGuru",
-        price: null,
-    }
 ];
 
 const testimonials = [
@@ -357,35 +325,6 @@ export default function Home() {
             </div>
         </section>
 
-        {/* Live Activity Feed Section */}
-        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
-            <div className="container px-4 md:px-6">
-                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">실시간 prmart</h2>
-                    <p className="max-w-[900px] text-muted-foreground md:text-xl">지금 prmart에서는 무슨 일이 일어나고 있을까요?</p>
-                </div>
-                <Card className="max-w-2xl mx-auto">
-                    <CardContent className="p-6 space-y-4">
-                        {recentActivities.map((activity, index) => (
-                            <div key={index} className="flex items-start gap-4">
-                                <div className="p-2 bg-primary/10 rounded-full">
-                                    <BellIcon className="h-5 w-5 text-primary"/>
-                                </div>
-                                <div className="flex-1">
-                                    <div className="font-medium">
-                                        <span className="font-bold text-primary">{activity.user}</span>님이 
-                                        <span className="font-bold"> {activity.item}</span>을(를) {activity.action}했습니다.
-                                        {activity.price && <Badge variant="outline" className="ml-2">₩{activity.price.toLocaleString()}</Badge>}
-                                    </div>
-                                    <p className="text-sm text-muted-foreground">{activity.time}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </CardContent>
-                </Card>
-            </div>
-        </section>
-
 
         <section className="w-full py-12 md:py-20 lg:py-24 bg-primary text-primary-foreground">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
@@ -409,5 +348,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
