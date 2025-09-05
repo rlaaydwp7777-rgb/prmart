@@ -99,7 +99,7 @@ export default function Home() {
           >
             <CarouselContent>
               {heroSlides.map((slide, index) => (
-                <CarouselItem key={index} className="relative h-[70vh] md:h-[80vh] lg:h-[85vh]">
+                <CarouselItem key={index} className="relative h-[60vh] md:h-[70vh] lg:h-[75vh]">
                   <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
                     <Image
                       src={slide.image}
@@ -432,3 +432,4 @@ const sellerSteps = [
     
 
     
+
