@@ -148,7 +148,7 @@ export default function Home() {
         <div className="relative w-full text-white">
             <Carousel
                 plugins={[plugin.current]}
-                className="w-full h-screen"
+                className="w-full h-[60vh]"
                 onMouseEnter={plugin.current.stop}
                 onMouseLeave={plugin.current.reset}
                 opts={{ loop: true }}
@@ -161,64 +161,11 @@ export default function Home() {
                                     backgroundImage: `url(${slide.image})` 
                                 }}
                             >
-                                <div className="h-full w-full flex flex-col items-center justify-center bg-black/50 pt-16">
+                                <div className="h-full w-full flex flex-col items-center justify-center bg-black/50">
                                   <div className="container px-4 flex-1 flex flex-col items-center justify-center text-center space-y-8">
                                       <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                                           {slide.title}
                                       </h1>
-                                      <div className="w-full max-w-2xl mx-auto">
-                                        <div className="relative flex gap-2">
-                                          <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
-                                              <Button variant="secondary" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-white/90 hover:bg-white text-black">
-                                                <span className="mr-2">카테고리</span>
-                                                <ChevronDown className="h-4 w-4" />
-                                              </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent className="w-64">
-                                                {CATEGORIES.map((category) => (
-                                                  <DropdownMenuSub key={category.name}>
-                                                    <DropdownMenuSubTrigger>
-                                                      <category.icon className="mr-2 h-4 w-4" />
-                                                      <span>{category.name}</span>
-                                                    </DropdownMenuSubTrigger>
-                                                    <DropdownMenuPortal>
-                                                      <DropdownMenuSubContent>
-                                                        {category.subCategories.map((sub) => (
-                                                            <DropdownMenuItem key={sub.name} asChild>
-                                                                <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
-                                                                    {sub.name}
-                                                                </Link>
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                      </DropdownMenuSubContent>
-                                                    </DropdownMenuPortal>
-                                                  </DropdownMenuSub>
-                                                ))}
-                                            </DropdownMenuContent>
-                                          </DropdownMenu>
-                                          <div className="relative flex-1">
-                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                            <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full text-black" />
-                                          </div>
-                                          <Button size="lg" className="rounded-full h-14 w-14 p-0">
-                                            <Search className="h-6 w-6"/>
-                                            <span className="sr-only">Search</span>
-                                          </Button>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                                        <Button asChild size="lg">
-                                          <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
-                                        </Button>
-                                        <Button asChild size="lg" variant="secondary">
-                                          <Link href="/requests">
-                                            {HEADER_LINKS.REQUEST_IDEA}
-                                            <ArrowRight className="ml-2 h-5 w-5" />
-                                          </Link>
-                                        </Button>
-                                      </div>
                                   </div>
                                 </div>
                             </div>
@@ -229,6 +176,72 @@ export default function Home() {
                 <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
             </Carousel>
         </div>
+        
+        {/* Search Section */}
+        <section className="py-12 md:py-16 -mt-24 relative z-10">
+          <div className="container">
+            <Card className="max-w-4xl mx-auto p-6 shadow-2xl">
+               <div className="flex flex-col items-center justify-center space-y-4 text-center mb-6">
+                <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
+                  {content.headline}
+                </h1>
+              </div>
+              <div className="w-full max-w-2xl mx-auto">
+                <div className="relative flex gap-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground">
+                        <span className="mr-2">카테고리</span>
+                        <ChevronDown className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-64">
+                        {CATEGORIES.map((category) => (
+                          <DropdownMenuSub key={category.name}>
+                            <DropdownMenuSubTrigger>
+                              <category.icon className="mr-2 h-4 w-4" />
+                              <span>{category.name}</span>
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                {category.subCategories.map((sub) => (
+                                    <DropdownMenuItem key={sub.name} asChild>
+                                        <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
+                                            {sub.name}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                ))}
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                        ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <div className="relative flex-1">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
+                  </div>
+                  <Button size="lg" className="rounded-full h-14 w-14 p-0">
+                    <Search className="h-6 w-6"/>
+                    <span className="sr-only">Search</span>
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex justify-center flex-col gap-2 mt-6 min-[400px]:flex-row">
+                <Button asChild size="lg">
+                  <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link href="/requests">
+                    {HEADER_LINKS.REQUEST_IDEA}
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </section>
 
         {/* Categories Section */}
         <section id="categories" className="w-full py-12 md:py-20">
