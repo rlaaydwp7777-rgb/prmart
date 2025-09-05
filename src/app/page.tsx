@@ -40,6 +40,34 @@ async function getHomePageContent(): Promise<HomePageContent> {
   };
 }
 
+
+const heroSlides = [
+    {
+        category: "AI & 프로덕션",
+        title: "한 줄의 프롬프트가 작품이 됩니다.",
+        image: "https://picsum.photos/1920/1080?random=50",
+        aiHint: "abstract art digital"
+    },
+    {
+        category: "개발 & IT 자동화",
+        title: "코드 한 줄이 당신의 비즈니스를 바꿉니다.",
+        image: "https://picsum.photos/1920/1080?random=51",
+        aiHint: "code terminal"
+    },
+    {
+        category: "재테크 & 투자",
+        title: "지식 한 페이지가 수익으로 바뀝니다.",
+        image: "https://picsum.photos/1920/1080?random=52",
+        aiHint: "stock chart"
+    },
+    {
+        category: "여행 & 라이프",
+        title: "당신의 일정표가 누군가의 최고의 여행이 됩니다.",
+        image: "https://picsum.photos/1920/1080?random=53",
+        aiHint: "beautiful landscape"
+    },
+];
+
 const buyerSteps = [
     {
       icon: Search,
@@ -117,75 +145,91 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="relative w-full pt-20 pb-12 md:pt-28 md:pb-16">
-           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-primary/5 via-background to-background -z-10"></div>
-          <div className="container px-4 md:px-6">
-            <div className="flex flex-col items-center justify-center text-center space-y-8">
-                <div className="space-y-4">
-                    <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                      당신의 아이디어를 금으로 바꿔드립니다.
-                    </h1>
-                </div>
+         <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
+            <Carousel
+                plugins={[plugin.current]}
+                className="w-full h-full"
+                onMouseEnter={plugin.current.stop}
+                onMouseLeave={plugin.current.reset}
+                opts={{ loop: true }}
+            >
+                <CarouselContent className="h-full">
+                    {heroSlides.map((slide) => (
+                        <CarouselItem key={slide.category} className="h-full">
+                            <div
+                                className="w-full h-full bg-cover bg-center flex items-center justify-center"
+                                style={{ backgroundImage: `url(${slide.image})` }}
+                            >
+                                <div className="absolute inset-0 bg-black/50" />
+                                <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-8 p-4">
+                                    <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
+                                        {slide.title}
+                                    </h1>
+                                    <div className="w-full max-w-2xl mx-auto">
+                                      <div className="relative flex gap-2">
+                                         <DropdownMenu>
+                                          <DropdownMenuTrigger asChild>
+                                            <Button variant="secondary" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-white/90 hover:bg-white text-black">
+                                              <span className="mr-2">카테고리</span>
+                                              <ChevronDown className="h-4 w-4" />
+                                            </Button>
+                                          </DropdownMenuTrigger>
+                                          <DropdownMenuContent className="w-64">
+                                             {CATEGORIES.map((category) => (
+                                               <DropdownMenuSub key={category.name}>
+                                                  <DropdownMenuSubTrigger>
+                                                    <category.icon className="mr-2 h-4 w-4" />
+                                                    <span>{category.name}</span>
+                                                  </DropdownMenuSubTrigger>
+                                                  <DropdownMenuPortal>
+                                                    <DropdownMenuSubContent>
+                                                      {category.subCategories.map((sub) => (
+                                                          <DropdownMenuItem key={sub.name} asChild>
+                                                              <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
+                                                                  {sub.name}
+                                                              </Link>
+                                                          </DropdownMenuItem>
+                                                      ))}
+                                                    </DropdownMenuSubContent>
+                                                  </DropdownMenuPortal>
+                                               </DropdownMenuSub>
+                                             ))}
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
+                                        <div className="relative flex-1">
+                                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                          <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full text-black" />
+                                        </div>
+                                        <Button size="lg" className="rounded-full h-14 w-14 p-0">
+                                          <Search className="h-6 w-6"/>
+                                          <span className="sr-only">Search</span>
+                                        </Button>
+                                      </div>
+                                    </div>
 
-                <div className="w-full max-w-2xl mx-auto">
-                  <div className="relative flex gap-2">
-                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground">
-                          <span className="mr-2">카테고리</span>
-                          <ChevronDown className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-64">
-                         {CATEGORIES.map((category) => (
-                           <DropdownMenuSub key={category.name}>
-                              <DropdownMenuSubTrigger>
-                                <category.icon className="mr-2 h-4 w-4" />
-                                <span>{category.name}</span>
-                              </DropdownMenuSubTrigger>
-                              <DropdownMenuPortal>
-                                <DropdownMenuSubContent>
-                                  {category.subCategories.map((sub) => (
-                                      <DropdownMenuItem key={sub.name} asChild>
-                                          <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
-                                              {sub.name}
-                                          </Link>
-                                      </DropdownMenuItem>
-                                  ))}
-                                </DropdownMenuSubContent>
-                              </DropdownMenuPortal>
-                           </DropdownMenuSub>
-                         ))}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                    <div className="relative flex-1">
-                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
-                    </div>
-                    <Button size="lg" className="rounded-full h-14 w-14 p-0">
-                      <Search className="h-6 w-6"/>
-                      <span className="sr-only">Search</span>
-                    </Button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button asChild size="lg">
-                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link href="/requests">
-                      {HEADER_LINKS.REQUEST_IDEA}
-                       <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                </div>
-            </div>
-          </div>
+                                    <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                                      <Button asChild size="lg">
+                                         <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                                      </Button>
+                                      <Button asChild size="lg" variant="secondary">
+                                        <Link href="/requests">
+                                          {HEADER_LINKS.REQUEST_IDEA}
+                                           <ArrowRight className="ml-2 h-5 w-5" />
+                                        </Link>
+                                      </Button>
+                                    </div>
+                                </div>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                 <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
+                <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
+            </Carousel>
         </section>
-        
+
         {/* Categories Section */}
-        <section id="categories" className="w-full pb-12 md:pb-20 lg:pb-24">
+        <section id="categories" className="w-full py-12 md:py-20">
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category) => {
