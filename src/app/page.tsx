@@ -93,9 +93,9 @@ export default function Home() {
         <section>
           <Carousel
             plugins={[plugin.current]}
-            className="w-full"
             onMouseEnter={() => plugin.current.stop()}
             onMouseLeave={() => plugin.current.reset()}
+            className="w-full"
           >
             <CarouselContent>
               {heroSlides.map((slide, index) => (
@@ -130,7 +130,7 @@ export default function Home() {
         </section>
 
         {/* Search Section */}
-         <section className="py-12 md:py-16 -mt-32 lg:-mt-40 relative z-20">
+         <section className="py-12 md:py-16">
             <div className="container max-w-4xl mx-auto">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
@@ -433,3 +433,6 @@ const sellerSteps = [
 
     
 
+
+
+    
