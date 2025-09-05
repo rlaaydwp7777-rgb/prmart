@@ -29,16 +29,16 @@ import { cn } from "@/lib/utils";
 
 
 const heroSlides = [
-    { title: "AI & 프로덕션", headline: "한 줄의 프롬프트가 작품이 됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600" },
-    { title: "개발 & IT 자동화", headline: "단 하나의 코드가 당신의 시간을 삽니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600" },
-    { title: "재테크 & 투자", headline: "지식 한 페이지가 수익으로 바뀝니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600" },
-    { title: "여행 & 라이프", headline: "당신의 일정표가 누군가의 최고의 여행이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500" },
-    { title: "생활 & 육아 꿀팁", headline: "당신의 경험이 누군가의 답이 됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500" },
-    { title: "비즈니스 & 마케팅", headline: "당신의 노하우가 비즈니스를 성장시킵니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500" },
-    { title: "창작 & 디자인", headline: "클릭 한 번으로 영감을 현실로 만듭니다.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500" },
-    { title: "학습 & 자기계발", headline: "당신의 지식이 누군가의 무기가 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600" },
-    { title: "모빌리티 & 자동차", headline: "당신의 드라이빙이 새로운 트렌드가 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800" },
-    { title: "라이프 인프라", headline: "당신의 분석이 더 나은 생활을 만듭니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500" },
+    { title: "AI & 프로덕션", headline: "한 줄의 프롬프트가 작품이 됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production illustration" },
+    { title: "개발 & IT 자동화", headline: "단 하나의 코드가 당신의 시간을 삽니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation illustration" },
+    { title: "재테크 & 투자", headline: "지식 한 페이지가 수익으로 바뀝니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "investment illustration" },
+    { title: "여행 & 라이프", headline: "당신의 일정표가 누군가의 최고의 여행이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel life illustration" },
+    { title: "생활 & 육아 꿀팁", headline: "당신의 경험이 누군가의 답이 됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "parenting tips illustration" },
+    { title: "비즈니스 & 마케팅", headline: "당신의 노하우가 비즈니스를 성장시킵니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business marketing illustration" },
+    { title: "창작 & 디자인", headline: "클릭 한 번으로 영감을 현실로 만듭니다.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "creative design illustration" },
+    { title: "학습 & 자기계발", headline: "당신의 지식이 누군가의 무기가 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/600/400?random=38", aiHint: "self development illustration" },
+    { title: "모빌리티 & 자동차", headline: "당신의 드라이빙이 새로운 트렌드가 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "mobility automobile illustration" },
+    { title: "라이프 인프라", headline: "당신의 분석이 더 나은 생활을 만듭니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "life infrastructure illustration" },
 ];
 
 
@@ -62,9 +62,22 @@ export default function Home() {
             <CarouselContent>
               {heroSlides.map((slide, index) => (
                 <CarouselItem key={index}>
-                  <div className={cn("w-full h-[400px] flex flex-col items-center justify-center text-white p-4", slide.bgColor)}>
-                    <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
-                    <p className="mt-4 text-lg md:text-xl text-center text-shadow-md">{slide.headline}</p>
+                  <div className={cn("w-full h-[400px] text-white p-4", slide.bgColor)}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full container mx-auto">
+                        <div className="flex flex-col text-left space-y-4">
+                            <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
+                            <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
+                        </div>
+                        <div className="relative h-64 md:h-80 w-full">
+                            <Image
+                                src={slide.image}
+                                alt={slide.title}
+                                fill
+                                className="object-contain rounded-lg"
+                                data-ai-hint={slide.aiHint}
+                            />
+                        </div>
+                    </div>
                   </div>
                 </CarouselItem>
               ))}
@@ -401,5 +414,3 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
-
-    
