@@ -64,9 +64,11 @@ export default function Home() {
                 <CarouselItem key={index}>
                   <div className={cn("w-full h-[400px] text-white p-4", slide.bgColor)}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full container mx-auto">
-                        <div className="flex flex-col text-left space-y-4">
-                            <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
-                            <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
+                        <div className="flex flex-col justify-center">
+                           <div className="text-left space-y-4">
+                                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
+                                <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
+                           </div>
                         </div>
                         <div className="relative h-64 md:h-80 w-full">
                             <Image
@@ -414,3 +416,5 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
+
+    
