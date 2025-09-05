@@ -2,20 +2,8 @@
 "use client";
 
 import * as React from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket, BadgeDollarSign, Banknote } from "lucide-react";
-import { PromptCard } from "@/components/prompts/prompt-card";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
-import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
-import type { HomePageContent } from "@/lib/types";
+import Image from "next/image";
 import Link from "next/link";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import Autoplay from "embla-carousel-autoplay";
 import {
   Carousel,
@@ -24,6 +12,19 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket, BadgeDollarSign, Banknote, BellIcon } from "lucide-react";
+import { PromptCard } from "@/components/prompts/prompt-card";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
+import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
+import type { HomePageContent } from "@/lib/types";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 
@@ -155,19 +156,20 @@ export default function Home() {
             >
                 <CarouselContent className="h-full">
                     {heroSlides.map((slide) => (
-                        <CarouselItem key={slide.category} className="h-full">
-                            <div className="h-full w-full bg-cover bg-center"
-                                style={{ 
-                                    backgroundImage: `url(${slide.image})` 
-                                }}
-                            >
-                                <div className="h-full w-full flex flex-col items-center justify-center bg-black/50">
-                                  <div className="h-full container px-4 flex flex-col items-center justify-center text-center space-y-8">
-                                      <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                                          {slide.title}
-                                      </h1>
-                                  </div>
-                                </div>
+                        <CarouselItem key={slide.category} className="h-full relative">
+                            <Image
+                              src={slide.image}
+                              alt={slide.title}
+                              fill
+                              className="object-cover -z-10"
+                              data-ai-hint={slide.aiHint}
+                            />
+                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/50">
+                              <div className="container px-4 flex flex-col items-center justify-center text-center space-y-8">
+                                  <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
+                                      {slide.title}
+                                  </h1>
+                              </div>
                             </div>
                         </CarouselItem>
                     ))}
@@ -451,5 +453,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
