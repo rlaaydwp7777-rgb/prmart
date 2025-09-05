@@ -3,7 +3,7 @@
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck, Search } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck, Search, ChevronDown, Rocket } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS } from "@/lib/string-constants";
@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -141,8 +142,39 @@ export default async function Home() {
             <div className="container px-4 md:px-6">
                 <div className="w-full max-w-2xl mx-auto">
                   <div className="relative flex gap-2">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg flex-1" />
+                     <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground">
+                          <span className="mr-2">카테고리</span>
+                          <ChevronDown className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-64">
+                         {CATEGORIES.map((category) => (
+                           <DropdownMenuSub key={category.name}>
+                              <DropdownMenuSubTrigger>
+                                <category.icon className="mr-2 h-4 w-4" />
+                                <span>{category.name}</span>
+                              </DropdownMenuSubTrigger>
+                              <DropdownMenuPortal>
+                                <DropdownMenuSubContent>
+                                  {category.subCategories.map((sub) => (
+                                      <DropdownMenuItem key={sub.name} asChild>
+                                          <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
+                                              {sub.name}
+                                          </Link>
+                                      </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuPortal>
+                           </DropdownMenuSub>
+                         ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <div className="relative flex-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                      <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
+                    </div>
                     <Button size="lg" className="rounded-full h-14 w-14 p-0">
                       <Search className="h-6 w-6"/>
                       <span className="sr-only">Search</span>

@@ -1,15 +1,8 @@
 import Link from "next/link";
-import { Bell, ChevronDown, Globe, Search, ShoppingCart, Sparkles } from "lucide-react";
+import { Bell, Globe, ShoppingCart, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS } from "@/lib/string-constants";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { CATEGORIES } from "@/lib/constants";
 
 export function Header() {
   return (
@@ -25,24 +18,6 @@ export function Header() {
                <Link href="/browse" className="font-medium text-muted-foreground transition-colors hover:text-primary">
                  {HEADER_LINKS.VIEW_ALL}
               </Link>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="font-medium text-muted-foreground hover:text-primary p-0 h-auto">
-                    {HEADER_LINKS.CATEGORIES}
-                    <ChevronDown className="relative top-[1px] ml-1 h-4 w-4 transition duration-200 group-data-[state=open]:rotate-180" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  {CATEGORIES.map((category) => (
-                     <DropdownMenuItem key={category.name} asChild>
-                       <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}`}>
-                        <category.icon className="mr-2 h-4 w-4" />
-                        <span>{category.name}</span>
-                       </Link>
-                     </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
               <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
                 {HEADER_LINKS.REQUEST_IDEA}
               </Link>

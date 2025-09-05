@@ -13,9 +13,14 @@ export interface Prompt {
   rank?: number;
 }
 
+export interface SubCategory {
+  name: string;
+}
+
 export interface Category {
   name: string;
   icon: LucideIcon;
+  subCategories: SubCategory[];
 }
 
 export interface HomePageContent {
