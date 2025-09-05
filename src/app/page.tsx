@@ -156,68 +156,72 @@ export default function Home() {
                 <CarouselContent className="h-full">
                     {heroSlides.map((slide) => (
                         <CarouselItem key={slide.category} className="h-full">
-                            <div
-                                className="w-full h-full bg-cover bg-center flex items-center justify-center"
-                                style={{ backgroundImage: `url(${slide.image})` }}
+                            <div className="h-full w-full"
+                                style={{ 
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    backgroundImage: `url(${slide.image})` 
+                                }}
                             >
-                                <div className="absolute inset-0 bg-black/50" />
-                                <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-8 p-4">
-                                    <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                                        {slide.title}
-                                    </h1>
-                                    <div className="w-full max-w-2xl mx-auto">
-                                      <div className="relative flex gap-2">
-                                         <DropdownMenu>
-                                          <DropdownMenuTrigger asChild>
-                                            <Button variant="secondary" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-white/90 hover:bg-white text-black">
-                                              <span className="mr-2">카테고리</span>
-                                              <ChevronDown className="h-4 w-4" />
-                                            </Button>
-                                          </DropdownMenuTrigger>
-                                          <DropdownMenuContent className="w-64">
-                                             {CATEGORIES.map((category) => (
-                                               <DropdownMenuSub key={category.name}>
-                                                  <DropdownMenuSubTrigger>
-                                                    <category.icon className="mr-2 h-4 w-4" />
-                                                    <span>{category.name}</span>
-                                                  </DropdownMenuSubTrigger>
-                                                  <DropdownMenuPortal>
-                                                    <DropdownMenuSubContent>
-                                                      {category.subCategories.map((sub) => (
-                                                          <DropdownMenuItem key={sub.name} asChild>
-                                                              <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
-                                                                  {sub.name}
-                                                              </Link>
-                                                          </DropdownMenuItem>
-                                                      ))}
-                                                    </DropdownMenuSubContent>
-                                                  </DropdownMenuPortal>
-                                               </DropdownMenuSub>
-                                             ))}
-                                          </DropdownMenuContent>
-                                        </DropdownMenu>
-                                        <div className="relative flex-1">
-                                          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                                          <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full text-black" />
+                                <div className="w-full h-full flex items-center justify-center bg-black/50">
+                                  <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-8 p-4">
+                                      <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
+                                          {slide.title}
+                                      </h1>
+                                      <div className="w-full max-w-2xl mx-auto">
+                                        <div className="relative flex gap-2">
+                                          <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                              <Button variant="secondary" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-white/90 hover:bg-white text-black">
+                                                <span className="mr-2">카테고리</span>
+                                                <ChevronDown className="h-4 w-4" />
+                                              </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent className="w-64">
+                                                {CATEGORIES.map((category) => (
+                                                  <DropdownMenuSub key={category.name}>
+                                                    <DropdownMenuSubTrigger>
+                                                      <category.icon className="mr-2 h-4 w-4" />
+                                                      <span>{category.name}</span>
+                                                    </DropdownMenuSubTrigger>
+                                                    <DropdownMenuPortal>
+                                                      <DropdownMenuSubContent>
+                                                        {category.subCategories.map((sub) => (
+                                                            <DropdownMenuItem key={sub.name} asChild>
+                                                                <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
+                                                                    {sub.name}
+                                                                </Link>
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                      </DropdownMenuSubContent>
+                                                    </DropdownMenuPortal>
+                                                  </DropdownMenuSub>
+                                                ))}
+                                            </DropdownMenuContent>
+                                          </DropdownMenu>
+                                          <div className="relative flex-1">
+                                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                                            <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full text-black" />
+                                          </div>
+                                          <Button size="lg" className="rounded-full h-14 w-14 p-0">
+                                            <Search className="h-6 w-6"/>
+                                            <span className="sr-only">Search</span>
+                                          </Button>
                                         </div>
-                                        <Button size="lg" className="rounded-full h-14 w-14 p-0">
-                                          <Search className="h-6 w-6"/>
-                                          <span className="sr-only">Search</span>
+                                      </div>
+
+                                      <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                                        <Button asChild size="lg">
+                                          <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                                        </Button>
+                                        <Button asChild size="lg" variant="secondary">
+                                          <Link href="/requests">
+                                            {HEADER_LINKS.REQUEST_IDEA}
+                                            <ArrowRight className="ml-2 h-5 w-5" />
+                                          </Link>
                                         </Button>
                                       </div>
-                                    </div>
-
-                                    <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                                      <Button asChild size="lg">
-                                         <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
-                                      </Button>
-                                      <Button asChild size="lg" variant="secondary">
-                                        <Link href="/requests">
-                                          {HEADER_LINKS.REQUEST_IDEA}
-                                           <ArrowRight className="ml-2 h-5 w-5" />
-                                        </Link>
-                                      </Button>
-                                    </div>
+                                  </div>
                                 </div>
                             </div>
                         </CarouselItem>
@@ -436,5 +440,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
