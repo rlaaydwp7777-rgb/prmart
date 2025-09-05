@@ -1,13 +1,18 @@
 import type { Category, Prompt } from "./types";
-import { Bot, Code, LineChart, VenetianMask, Palette } from "lucide-react";
+import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { CATEGORY_NAMES } from "./string-constants";
 
 export const CATEGORIES: Category[] = [
-  { name: CATEGORY_NAMES.AI_CREATION, icon: Bot },
+  { name: CATEGORY_NAMES.AI_PRODUCTION, icon: Rocket },
   { name: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, icon: Code },
   { name: CATEGORY_NAMES.INVESTMENT_FINTECH, icon: LineChart },
-  { name: CATEGORY_NAMES.LIFE_KNOWHOW, icon: VenetianMask },
-  { name: CATEGORY_NAMES.DESIGN_MEDIA, icon: Palette },
+  { name: CATEGORY_NAMES.TRAVEL_LIFE, icon: Plane },
+  { name: CATEGORY_NAMES.LIVING_PARENTING_TIPS, icon: Users },
+  { name: CATEGORY_NAMES.BUSINESS_MARKETING, icon: Briefcase },
+  { name: CATEGORY_NAMES.CREATION_DESIGN, icon: Brush },
+  { name: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, icon: BookOpen },
+  { name: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, icon: Car },
+  { name: CATEGORY_NAMES.LIFE_INFRA, icon: Home },
 ];
 
 export const FEATURED_PROMPTS: Prompt[] = [
@@ -27,7 +32,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "2",
     title: "Minimalist UI Kit",
     author: "PixelPerfect",
-    category: CATEGORY_NAMES.DESIGN_MEDIA,
+    category: CATEGORY_NAMES.CREATION_DESIGN,
     price: 35000,
     rating: 4.8,
     reviews: 95,
@@ -39,7 +44,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     id: "3",
     title: "Email Marketing Sequences",
     author: "GrowthHacker",
-    category: CATEGORY_NAMES.LIFE_KNOWHOW,
+    category: CATEGORY_NAMES.BUSINESS_MARKETING,
     price: 18000,
     rating: 4.9,
     reviews: 210,

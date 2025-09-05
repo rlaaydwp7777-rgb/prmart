@@ -21,11 +21,16 @@ export const PROMPT_CARD_STRINGS = {
 }
 
 export const CATEGORY_NAMES = {
-    AI_CREATION: "AI 크리에이션",
-    DEVELOPMENT_AUTOMATION: "개발 · 자동화",
-    INVESTMENT_FINTECH: "투자 · 재테크",
-    LIFE_KNOWHOW: "라이프 · 노하우",
-    DESIGN_MEDIA: "디자인 · 미디어",
+    AI_PRODUCTION: "AI & 프로덕션",
+    DEVELOPMENT_AUTOMATION: "개발 & IT 자동화",
+    INVESTMENT_FINTECH: "재테크 & 투자",
+    TRAVEL_LIFE: "여행 & 라이프",
+    LIVING_PARENTING_TIPS: "생활 & 육아 꿀팁",
+    BUSINESS_MARKETING: "비즈니스 & 마케팅",
+    CREATION_DESIGN: "창작 & 디자인",
+    LEARNING_SELF_DEVELOPMENT: "학습 & 자기계발",
+    MOBILITY_AUTOMOBILE: "모빌리티 & 자동차",
+    LIFE_INFRA: "라이프 인프라 (부동산·주거)",
 }
 
 export const FOOTER_STRINGS = {
