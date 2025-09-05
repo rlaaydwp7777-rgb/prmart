@@ -1,10 +1,11 @@
+
 "use client";
 
 import * as React from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket } from "lucide-react";
+import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket, BadgeDollarSign, Banknote } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
@@ -38,21 +39,39 @@ async function getHomePageContent(): Promise<HomePageContent> {
   };
 }
 
-const howToSteps = [
+const buyerSteps = [
     {
-      icon: Upload,
-      title: "1. 아이디어 등록",
-      description: "당신의 노하우, 템플릿, 프롬프트를 손쉽게 등록하고 판매를 시작하세요.",
+      icon: Search,
+      title: "1. 아이디어 탐색",
+      description: "필요한 노하우, 템플릿, 프롬프트를 카테고리 또는 검색을 통해 발견하세요.",
     },
     {
       icon: Wallet,
-      title: "2. 간편 결제",
-      description: "구매자는 안전한 결제 시스템을 통해 원하는 아이디어를 즉시 구매할 수 있습니다.",
+      title: "2. 안전 결제",
+      description: "안전한 결제 시스템을 통해 원하는 아이디어를 즉시 구매할 수 있습니다.",
     },
     {
       icon: Download,
-      title: "3. 즉시 다운로드/사용",
+      title: "3. 즉시 다운로드",
       description: "구매한 디지털 자산은 마이페이지에서 언제든지 다운로드하고 활용할 수 있습니다.",
+    },
+];
+
+const sellerSteps = [
+    {
+      icon: Upload,
+      title: "1. 상품 등록",
+      description: "AI 어시스턴트의 도움을 받아 당신의 지식을 손쉽게 등록하고 판매를 시작하세요.",
+    },
+    {
+      icon: BadgeDollarSign,
+      title: "2. 판매 및 알림",
+      description: "상품이 판매되면 실시간 알림을 받고, 판매 내역을 대시보드에서 확인하세요.",
+    },
+    {
+      icon: Banknote,
+      title: "3. 수익 정산",
+      description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
 
@@ -80,7 +99,7 @@ const testimonials = [
 export default function Home() {
     const [content, setContent] = React.useState<HomePageContent | null>(null);
     const plugin = React.useRef(
-        Autoplay({ delay: 2000, stopOnInteraction: true })
+        Autoplay({ delay: 4000, stopOnInteraction: true })
     );
 
     React.useEffect(() => {
@@ -309,17 +328,40 @@ export default function Home() {
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">prmart, 이렇게 이용하세요</h2>
                     <p className="max-w-[900px] text-muted-foreground md:text-xl">단 3단계로 당신의 아이디어를 거래하고 가치를 창출하세요.</p>
                 </div>
-                <div className="mx-auto grid gap-6 md:grid-cols-3">
-                    {howToSteps.map((step) => (
-                        <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
-                           <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
-                            <step.icon className="h-10 w-10" />
-                            </div>
-                            <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
-                            <CardDescription>{step.description}</CardDescription>
-                        </Card>
-                    ))}
-                </div>
+                <Tabs defaultValue="buyer" className="w-full max-w-4xl mx-auto">
+                   <div className="flex justify-center">
+                    <TabsList>
+                        <TabsTrigger value="buyer">구매자 가이드</TabsTrigger>
+                        <TabsTrigger value="seller">판매자 가이드</TabsTrigger>
+                    </TabsList>
+                  </div>
+                  <TabsContent value="buyer" className="pt-8">
+                     <div className="mx-auto grid gap-6 md:grid-cols-3">
+                        {buyerSteps.map((step) => (
+                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                                <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
+                                    <step.icon className="h-10 w-10" />
+                                </div>
+                                <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
+                                <CardDescription>{step.description}</CardDescription>
+                            </Card>
+                        ))}
+                    </div>
+                  </TabsContent>
+                   <TabsContent value="seller" className="pt-8">
+                     <div className="mx-auto grid gap-6 md:grid-cols-3">
+                        {sellerSteps.map((step) => (
+                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                                <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
+                                    <step.icon className="h-10 w-10" />
+                                </div>
+                                <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
+                                <CardDescription>{step.description}</CardDescription>
+                            </Card>
+                        ))}
+                    </div>
+                  </TabsContent>
+                </Tabs>
             </div>
         </section>
 
@@ -346,3 +388,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
