@@ -18,14 +18,14 @@ export interface SubCategory {
 }
 
 export interface Category {
-  name: string;
+  name:string;
   icon: LucideIcon;
   subCategories: SubCategory[];
 }
 
 export interface HomePageContent {
   headline: string;
-  subheadline: string;
+  subheadline: string | null;
   categoriesHeadline: string;
   categoriesSubheadline: string;
   featuredPromptsHeadline: string;
