@@ -149,7 +149,7 @@ export default function Home() {
         <div className="relative w-full text-white">
             <Carousel
                 plugins={[plugin.current]}
-                className="w-full h-[60vh]"
+                className="w-full h-[70vh] md:h-[80vh] lg:h-[85vh]"
                 onMouseEnter={plugin.current.stop}
                 onMouseLeave={plugin.current.reset}
                 opts={{ loop: true }}
@@ -164,8 +164,8 @@ export default function Home() {
                               className="object-cover -z-10"
                               data-ai-hint={slide.aiHint}
                             />
-                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/50">
-                              <div className="container px-4 flex flex-col items-center justify-center text-center space-y-8">
+                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4">
+                              <div className="container flex flex-col items-center justify-center text-center space-y-8">
                                   <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                                       {slide.title}
                                   </h1>
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
         
         {/* Search Section */}
-        <section className="py-12 md:py-16 -mt-24 relative z-10">
+        <section className="py-12 md:py-16 -mt-32 lg:-mt-40 relative z-20">
           <div className="container">
             <Card className="max-w-4xl mx-auto p-6 shadow-2xl">
                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-6">
@@ -254,7 +254,7 @@ export default function Home() {
                     return (
                       <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
                           <Card className={cn(
-                            "flex flex-col items-center justify-center p-4 gap-2 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
+                            "flex flex-col items-center justify-center p-6 gap-3 h-[140px] sm:h-[160px] transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
                           )}>
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
@@ -286,14 +286,14 @@ export default function Home() {
                 </TabsList>
               </div>
               <TabsContent value="popular">
-                <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {FEATURED_PROMPTS.map((prompt) => (
                     <PromptCard key={prompt.id} prompt={prompt} />
                   ))}
                 </div>
               </TabsContent>
               <TabsContent value="new">
-                 <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                 <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {/* TODO: Implement new prompts fetching */}
                   {FEATURED_PROMPTS.slice().reverse().map((prompt) => (
                     <PromptCard key={prompt.id} prompt={prompt} />
@@ -301,7 +301,7 @@ export default function Home() {
                 </div>
               </TabsContent>
               <TabsContent value="recommended">
-                 <div className="grid grid-cols-1 gap-6 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                 <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                   {/* TODO: Implement recommended prompts fetching */}
                   {FEATURED_PROMPTS.filter(p => p.rating > 4.8).map((prompt) => (
                     <PromptCard key={prompt.id} prompt={prompt} />
@@ -330,7 +330,7 @@ export default function Home() {
                         >
                             <CarouselContent>
                                 {FEATURED_PROMPTS.concat(FEATURED_PROMPTS).map((prompt, index) => (
-                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="md:basis-1/3 lg:basis-1/5">
+                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
                                          <div className="p-1">
                                             <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
                                         </div>
@@ -441,7 +441,7 @@ export default function Home() {
                 {content.ctaSubheadline}
               </p>
             </div>
-            <div className="mx-auto w-full max-w-sm space-x-2">
+            <div className="mx-auto w-full flex justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg">
                 <a href="/seller/dashboard">{BUTTONS.START_SELLING}</a>
               </Button>
