@@ -93,13 +93,13 @@ export default function Home() {
         <section>
           <Carousel
             plugins={[plugin.current]}
-            className="w-full h-[70vh] md:h-[80vh] lg:h-[85vh]"
-            onMouseEnter={plugin.current.stop}
-            onMouseLeave={plugin.current.reset}
+            className="w-full"
+            onMouseEnter={() => plugin.current.stop()}
+            onMouseLeave={() => plugin.current.reset()}
           >
             <CarouselContent>
               {heroSlides.map((slide, index) => (
-                <CarouselItem key={index} className="h-full relative">
+                <CarouselItem key={index} className="relative h-[70vh] md:h-[80vh] lg:h-[85vh]">
                   <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
                     <Image
                       src={slide.image}
@@ -110,7 +110,7 @@ export default function Home() {
                       data-ai-hint={slide.aiHint}
                     />
                   </div>
-                  <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 relative z-10 text-white">
+                  <div className="relative z-10 h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 text-white">
                      <div className="container grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full">
                          <div className="flex flex-col justify-center">
                            <div className="text-left space-y-4">
@@ -124,8 +124,8 @@ export default function Home() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-             <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 hidden sm:flex" />
-             <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden sm:flex" />
+             <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex" />
+             <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex" />
           </Carousel>
         </section>
 
