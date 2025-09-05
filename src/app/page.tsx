@@ -88,7 +88,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 pt-16">
+      <main>
         
         <section>
           <Carousel
@@ -427,6 +427,8 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
+
+    
 
     
 
