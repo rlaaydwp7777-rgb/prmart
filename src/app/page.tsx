@@ -48,6 +48,38 @@ const featuredSlides = [
 ];
 
 
+function CategoryCarousel({ category }: { category: typeof CATEGORIES[0] }) {
+  const plugin = React.useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true })
+  );
+
+  return (
+    <Carousel
+      opts={{
+        align: "start",
+        loop: true,
+      }}
+      plugins={[plugin.current]}
+      onMouseEnter={() => plugin.current.stop()}
+      onMouseLeave={() => plugin.current.reset()}
+      className="w-full"
+    >
+      <CarouselContent>
+        {FEATURED_PROMPTS.concat(FEATURED_PROMPTS).map((prompt, index) => (
+          <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
+            <div className="p-1">
+              <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
+            </div>
+          </CarouselItem>
+        ))}
+      </CarouselContent>
+      <CarouselPrevious />
+      <CarouselNext />
+    </Carousel>
+  );
+}
+
+
 export default function Home() {
     const plugin = React.useRef(
         Autoplay({ delay: 4000, stopOnInteraction: true })
@@ -56,35 +88,38 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         
         <section>
           <Carousel
             plugins={[plugin.current]}
-            className="w-full"
+            className="w-full h-[70vh] md:h-[80vh] lg:h-[85vh]"
             onMouseEnter={plugin.current.stop}
             onMouseLeave={plugin.current.reset}
           >
             <CarouselContent>
               {heroSlides.map((slide, index) => (
-                <CarouselItem key={index}>
-                  <div className={cn("w-full h-[400px] text-white p-4", slide.bgColor)}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full container mx-auto">
-                        <div className="flex flex-col justify-center">
+                <CarouselItem key={index} className="h-full relative">
+                 <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}></div>
+                  <div className="absolute inset-0">
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      priority={index === 0}
+                      className="object-cover opacity-30"
+                      data-ai-hint={slide.aiHint}
+                    />
+                  </div>
+                  <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 relative z-10 text-white">
+                     <div className="container grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full">
+                         <div className="flex flex-col justify-center">
                            <div className="text-left space-y-4">
                                 <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
                                 <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
                            </div>
                         </div>
-                        <div className="relative h-64 md:h-80 w-full">
-                            <Image
-                                src={slide.image}
-                                alt={slide.title}
-                                fill
-                                className="object-contain rounded-lg"
-                                data-ai-hint={slide.aiHint}
-                            />
-                        </div>
+                        {/* Right side is intentionally left blank for the background image to show through */}
                     </div>
                   </div>
                 </CarouselItem>
@@ -96,13 +131,13 @@ export default function Home() {
         </section>
 
         {/* Search Section */}
-        <section className="py-12 md:py-16 relative z-10">
+         <section className="py-12 md:py-16 -mt-32 lg:-mt-40 relative z-20">
             <div className="container max-w-4xl mx-auto">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground">
+                      <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-background">
                         <span className="mr-2">카테고리</span>
                         <ChevronDown className="h-4 w-4" />
                       </Button>
@@ -199,7 +234,7 @@ export default function Home() {
                         <CarouselItem key={index}>
                             <div className="space-y-4">
                                 <h3 className="text-2xl font-bold text-center">{slide.title}</h3>
-                                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                     {slide.prompts.slice(0, 4).map((prompt) => (
                                         <PromptCard key={prompt.id} prompt={prompt} />
                                     ))}
@@ -220,28 +255,7 @@ export default function Home() {
                 {CATEGORIES.map((category) => (
                     <div key={category.name}>
                         <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">{category.name} 인기 상품</h3>
-                        <Carousel
-                            opts={{
-                                align: "start",
-                                loop: true,
-                            }}
-                             plugins={[React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current]}
-                             onMouseEnter={() => React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current.stop()}
-                             onMouseLeave={() => React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current.reset()}
-                            className="w-full"
-                        >
-                            <CarouselContent>
-                                {FEATURED_PROMPTS.concat(FEATURED_PROMPTS).map((prompt, index) => (
-                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
-                                         <div className="p-1">
-                                            <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
-                                        </div>
-                                    </CarouselItem>
-                                ))}
-                            </CarouselContent>
-                            <CarouselPrevious />
-                            <CarouselNext />
-                        </Carousel>
+                         <CategoryCarousel category={category} />
                     </div>
                 ))}
             </div>
@@ -413,5 +427,7 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
+
+    
 
     
