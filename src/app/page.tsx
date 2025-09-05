@@ -41,6 +41,12 @@ const heroSlides = [
     { title: "라이프 인프라", headline: "당신의 분석이 더 나은 생활을 만듭니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house" },
 ];
 
+const featuredSlides = [
+    { title: "실시간 인기 TOP 10", prompts: FEATURED_PROMPTS },
+    { title: "새로 등록된 아이디어", prompts: [...FEATURED_PROMPTS].reverse() },
+    { title: "prmart 추천 아이디어", prompts: FEATURED_PROMPTS.filter(p => p.rating > 4.8) },
+];
+
 
 export default function Home() {
     const plugin = React.useRef(
@@ -182,38 +188,31 @@ export default function Home() {
                 <p className="max-w-[900px] text-muted-foreground md:text-xl">prmart 전문가들이 엄선한 인기 상품들을 만나보세요.</p>
             </div>
             
-            <Tabs defaultValue="popular" className="w-full">
-              <div className="flex justify-center">
-                <TabsList>
-                  <TabsTrigger value="popular">실시간 인기 TOP 10</TabsTrigger>
-                  <TabsTrigger value="new">새로 등록된 아이디어</TabsTrigger>
-                  <TabsTrigger value="recommended">prmart 추천 아이디어</TabsTrigger>
-                </TabsList>
-              </div>
-              <TabsContent value="popular">
-                <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {FEATURED_PROMPTS.map((prompt) => (
-                    <PromptCard key={prompt.id} prompt={prompt} />
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="new">
-                 <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {/* TODO: Implement new prompts fetching */}
-                  {FEATURED_PROMPTS.slice().reverse().map((prompt) => (
-                    <PromptCard key={prompt.id} prompt={prompt} />
-                  ))}
-                </div>
-              </TabsContent>
-              <TabsContent value="recommended">
-                 <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                  {/* TODO: Implement recommended prompts fetching */}
-                  {FEATURED_PROMPTS.filter(p => p.rating > 4.8).map((prompt) => (
-                    <PromptCard key={prompt.id} prompt={prompt} />
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
+             <Carousel
+                opts={{
+                    align: "start",
+                    loop: true,
+                }}
+                plugins={[React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true })).current]}
+                className="w-full"
+            >
+                <CarouselContent>
+                    {featuredSlides.map((slide, index) => (
+                        <CarouselItem key={index}>
+                            <div className="space-y-4">
+                                <h3 className="text-2xl font-bold text-center">{slide.title}</h3>
+                                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {slide.prompts.slice(0, 4).map((prompt) => (
+                                        <PromptCard key={prompt.id} prompt={prompt} />
+                                    ))}
+                                </div>
+                            </div>
+                        </CarouselItem>
+                    ))}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 z-10 hidden xl:flex" />
+                <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 z-10 hidden xl:flex" />
+            </Carousel>
           </div>
         </section>
 
@@ -416,5 +415,7 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
+
+    
 
     
