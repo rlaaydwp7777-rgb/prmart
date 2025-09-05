@@ -1,5 +1,8 @@
 
 
+"use client";
+
+import * as React from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -15,6 +18,14 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import Autoplay from "embla-carousel-autoplay";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -100,8 +111,20 @@ const testimonials = [
   },
 ];
 
-export default async function Home() {
-  const content = await getHomePageContent();
+export default function Home() {
+    const [content, setContent] = React.useState<HomePageContent | null>(null);
+    const plugin = React.useRef(
+        Autoplay({ delay: 2000, stopOnInteraction: true })
+    );
+
+    React.useEffect(() => {
+        getHomePageContent().then(setContent);
+    }, []);
+
+    if (!content) {
+        return <div></div>; 
+    }
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -239,8 +262,42 @@ export default async function Home() {
           </div>
         </section>
 
+        {/* Category Rankings Section */}
+        <section id="category-rankings" className="w-full py-12 md:py-20 lg:py-24">
+            <div className="container space-y-12">
+                {CATEGORIES.map((category) => (
+                    <div key={category.name}>
+                        <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">{category.name} 인기 상품</h3>
+                        <Carousel
+                            opts={{
+                                align: "start",
+                                loop: true,
+                            }}
+                             plugins={[plugin.current]}
+                             onMouseEnter={plugin.current.stop}
+                             onMouseLeave={plugin.current.reset}
+                            className="w-full"
+                        >
+                            <CarouselContent>
+                                {FEATURED_PROMPTS.concat(FEATURED_PROMPTS).map((prompt, index) => (
+                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="md:basis-1/3 lg:basis-1/5">
+                                         <div className="p-1">
+                                            <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
+                    </div>
+                ))}
+            </div>
+        </section>
+
+
         {/* Trust & Proof Section */}
-        <section id="trust-and-proof" className="w-full py-12 md:py-20 lg:py-24">
+        <section id="trust-and-proof" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">신뢰할 수 있는 prmart</h2>
@@ -280,7 +337,7 @@ export default async function Home() {
         </section>
 
         {/* How-to Section */}
-        <section id="how-to" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
+        <section id="how-to" className="w-full py-12 md:py-20 lg:py-24 bg-background">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">prmart, 이렇게 이용하세요</h2>
@@ -288,7 +345,7 @@ export default async function Home() {
                 </div>
                 <div className="mx-auto grid gap-6 md:grid-cols-3">
                     {howToSteps.map((step) => (
-                        <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-background">
+                        <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
                            <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                             <step.icon className="h-10 w-10" />
                             </div>
@@ -301,7 +358,7 @@ export default async function Home() {
         </section>
 
         {/* Live Activity Feed Section */}
-        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24">
+        <section id="live-feed" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
                     <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">실시간 prmart</h2>
