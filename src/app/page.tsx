@@ -145,10 +145,10 @@ export default function Home() {
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
-         <section className="relative w-full h-[60vh] md:h-[70vh] text-white">
+        <div className="relative w-full text-white">
             <Carousel
                 plugins={[plugin.current]}
-                className="w-full h-full"
+                className="w-full h-screen"
                 onMouseEnter={plugin.current.stop}
                 onMouseLeave={plugin.current.reset}
                 opts={{ loop: true }}
@@ -156,15 +156,13 @@ export default function Home() {
                 <CarouselContent className="h-full">
                     {heroSlides.map((slide) => (
                         <CarouselItem key={slide.category} className="h-full">
-                            <div className="h-full w-full"
+                            <div className="h-full w-full bg-cover bg-center"
                                 style={{ 
-                                    backgroundSize: 'cover',
-                                    backgroundPosition: 'center',
                                     backgroundImage: `url(${slide.image})` 
                                 }}
                             >
-                                <div className="w-full h-full flex items-center justify-center bg-black/50">
-                                  <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-8 p-4">
+                                <div className="h-full w-full flex flex-col items-center justify-center bg-black/50 pt-16">
+                                  <div className="container px-4 flex-1 flex flex-col items-center justify-center text-center space-y-8">
                                       <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                                           {slide.title}
                                       </h1>
@@ -230,7 +228,7 @@ export default function Home() {
                  <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
                 <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-white bg-white/20 hover:bg-white/30 border-white/50" />
             </Carousel>
-        </section>
+        </div>
 
         {/* Categories Section */}
         <section id="categories" className="w-full py-12 md:py-20">
