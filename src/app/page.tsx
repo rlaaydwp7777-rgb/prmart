@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Upload, Wallet, Download, Bell as BellIcon, Quote, ShieldCheck, Search, ChevronDown, Rocket } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
-import { BUTTONS } from "@/lib/string-constants";
+import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
 import type { HomePageContent } from "@/lib/types";
 import Link from "next/link";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -147,13 +147,13 @@ export default function Home() {
 
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="#featured-prompts">
-                      {BUTTONS.START_EXPLORING}
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
+                     <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
                   </Button>
                   <Button asChild size="lg" variant="outline">
-                    <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                    <Link href="/requests">
+                      {HEADER_LINKS.REQUEST_IDEA}
+                       <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
                   </Button>
                 </div>
             </div>
@@ -409,3 +409,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
