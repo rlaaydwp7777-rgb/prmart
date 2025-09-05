@@ -42,33 +42,6 @@ async function getHomePageContent(): Promise<HomePageContent> {
 }
 
 
-const heroSlides = [
-    {
-        category: "AI & 프로덕션",
-        title: "한 줄의 프롬프트가 작품이 됩니다.",
-        image: "https://picsum.photos/1920/1080?random=50",
-        aiHint: "abstract art digital"
-    },
-    {
-        category: "개발 & IT 자동화",
-        title: "코드 한 줄이 당신의 비즈니스를 바꿉니다.",
-        image: "https://picsum.photos/1920/1080?random=51",
-        aiHint: "code terminal"
-    },
-    {
-        category: "재테크 & 투자",
-        title: "지식 한 페이지가 수익으로 바뀝니다.",
-        image: "https://picsum.photos/1920/1080?random=52",
-        aiHint: "stock chart"
-    },
-    {
-        category: "여행 & 라이프",
-        title: "당신의 일정표가 누군가의 최고의 여행이 됩니다.",
-        image: "https://picsum.photos/1920/1080?random=53",
-        aiHint: "beautiful landscape"
-    },
-];
-
 const buyerSteps = [
     {
       icon: Search,
@@ -149,12 +122,7 @@ export default function Home() {
         {/* Search Section */}
         <section className="py-12 md:py-16 relative z-20">
           <div className="container">
-            <Card className="max-w-4xl mx-auto p-6 shadow-2xl">
-               <div className="flex flex-col items-center justify-center space-y-4 text-center mb-6">
-                <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">
-                  {content.headline}
-                </h1>
-              </div>
+            <div className="max-w-4xl mx-auto p-6">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
                   <DropdownMenu>
@@ -208,7 +176,7 @@ export default function Home() {
                   </Link>
                 </Button>
               </div>
-            </Card>
+            </div>
           </div>
         </section>
 
@@ -420,3 +388,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
