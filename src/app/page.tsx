@@ -28,91 +28,24 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal
 import { cn } from "@/lib/utils";
 
 
-async function getHomePageContent(): Promise<HomePageContent> {
-  return {
-    headline: "사는 순간 아끼고, 파는 순간 버는 곳.",
-    subheadline: "AI 프롬프트부터 비즈니스 노하우까지, 세상의 모든 아이디어를 거래하세요.",
-    categoriesHeadline: "카테고리 쇼케이스",
-    categoriesSubheadline: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
-    featuredPromptsHeadline: "지금 뜨는 아이디어",
-    featuredPromptsSubheadline: "prmart 전문가들이 엄선한 인기 상품들을 만나보세요.",
-    ctaHeadline: "당신의 지식을 자산으로 만들 시간",
-    ctaSubheadline: "지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.",
-  };
-}
-
-
-const buyerSteps = [
-    {
-      icon: Search,
-      title: "1. 아이디어 탐색",
-      description: "필요한 노하우, 템플릿, 프롬프트를 카테고리 또는 검색을 통해 발견하세요.",
-    },
-    {
-      icon: Wallet,
-      title: "2. 안전 결제",
-      description: "안전한 결제 시스템을 통해 원하는 아이디어를 즉시 구매할 수 있습니다.",
-    },
-    {
-      icon: Download,
-      title: "3. 즉시 다운로드",
-      description: "구매한 디지털 자산은 마이페이지에서 언제든지 다운로드하고 활용할 수 있습니다.",
-    },
+const heroSlides = [
+    { title: "AI & 프로덕션", headline: "한 줄의 프롬프트가 작품이 됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600" },
+    { title: "개발 & IT 자동화", headline: "단 하나의 코드가 당신의 시간을 삽니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600" },
+    { title: "재테크 & 투자", headline: "지식 한 페이지가 수익으로 바뀝니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600" },
+    { title: "여행 & 라이프", headline: "당신의 일정표가 누군가의 최고의 여행이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500" },
+    { title: "생활 & 육아 꿀팁", headline: "당신의 경험이 누군가의 답이 됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500" },
+    { title: "비즈니스 & 마케팅", headline: "당신의 노하우가 비즈니스를 성장시킵니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500" },
+    { title: "창작 & 디자인", headline: "클릭 한 번으로 영감을 현실로 만듭니다.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500" },
+    { title: "학습 & 자기계발", headline: "당신의 지식이 누군가의 무기가 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600" },
+    { title: "모빌리티 & 자동차", headline: "당신의 드라이빙이 새로운 트렌드가 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800" },
+    { title: "라이프 인프라", headline: "당신의 분석이 더 나은 생활을 만듭니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500" },
 ];
 
-const sellerSteps = [
-    {
-      icon: Upload,
-      title: "1. 상품 등록",
-      description: "AI 어시스턴트의 도움을 받아 당신의 지식을 손쉽게 등록하고 판매를 시작하세요.",
-    },
-    {
-      icon: BadgeDollarSign,
-      title: "2. 판매 및 알림",
-      description: "상품이 판매되면 실시간 알림을 받고, 판매 내역을 대시보드에서 확인하세요.",
-    },
-    {
-      icon: Banknote,
-      title: "3. 수익 정산",
-      description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
-    },
-];
-
-const testimonials = [
-  {
-    quote: "이 템플릿 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요. 다음 프로젝트에도 무조건 재구매각입니다.",
-    author: "김지훈",
-    role: "풀스택 개발자",
-    avatar: "https://picsum.photos/100/100?random=10"
-  },
-  {
-    quote: "prmart에서 판매를 시작하고 월급만큼의 부수입을 얻고 있어요. 제 노하우가 다른 사람에게 도움이 된다는 사실이 정말 뿌듯합니다.",
-    author: "박서연",
-    role: "마케팅 전문가",
-    avatar: "https://picsum.photos/100/100?random=11"
-  },
-  {
-    quote: "디자인 리소스 찾느라 시간 낭비할 필요가 없어졌어요. prmart에는 퀄리티 높은 자료가 넘쳐나서 작업 효율이 극대화되었습니다.",
-    author: "최민준",
-    role: "UI/UX 디자이너",
-    avatar: "https://picsum.photos/100/100?random=12"
-  },
-];
 
 export default function Home() {
-    const [content, setContent] = React.useState<HomePageContent | null>(null);
     const plugin = React.useRef(
         Autoplay({ delay: 4000, stopOnInteraction: true })
     );
-
-    React.useEffect(() => {
-        getHomePageContent().then(setContent);
-    }, []);
-
-    if (!content) {
-        return <div></div>; 
-    }
-
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -120,19 +53,31 @@ export default function Home() {
       <main className="flex-1 pt-16">
         
         <section>
-          <Image 
-            src="https://placehold.co/1600x400/f1f5f9/f1f5f9.png" 
-            alt="placeholder" 
-            width={1600} 
-            height={400} 
-            className="w-full object-cover"
-          />
+          <Carousel
+            plugins={[plugin.current]}
+            className="w-full"
+            onMouseEnter={plugin.current.stop}
+            onMouseLeave={plugin.current.reset}
+          >
+            <CarouselContent>
+              {heroSlides.map((slide, index) => (
+                <CarouselItem key={index}>
+                  <div className={cn("w-full h-[400px] flex flex-col items-center justify-center text-white p-4", slide.bgColor)}>
+                    <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
+                    <p className="mt-4 text-lg md:text-xl text-center text-shadow-md">{slide.headline}</p>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+             <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 hidden sm:flex" />
+             <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden sm:flex" />
+          </Carousel>
         </section>
 
         {/* Search Section */}
         <section className="py-12 md:py-16 relative z-10">
           <div className="container">
-            <div className="max-w-4xl mx-auto">
+             <div className="max-w-4xl mx-auto">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
                   <DropdownMenu>
@@ -218,8 +163,8 @@ export default function Home() {
         <section id="featured-prompts" className="w-full py-12 md:py-20 lg:py-24 bg-muted/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">{content.featuredPromptsHeadline}</h2>
-                <p className="max-w-[900px] text-muted-foreground md:text-xl">{content.featuredPromptsSubheadline}</p>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">지금 뜨는 아이디어</h2>
+                <p className="max-w-[900px] text-muted-foreground md:text-xl">prmart 전문가들이 엄선한 인기 상품들을 만나보세요.</p>
             </div>
             
             <Tabs defaultValue="popular" className="w-full">
@@ -268,9 +213,9 @@ export default function Home() {
                                 align: "start",
                                 loop: true,
                             }}
-                             plugins={[plugin.current]}
-                             onMouseEnter={plugin.current.stop}
-                             onMouseLeave={plugin.current.reset}
+                             plugins={[React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current]}
+                             onMouseEnter={() => React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current.stop()}
+                             onMouseLeave={() => React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true })).current.reset()}
                             className="w-full"
                         >
                             <CarouselContent>
@@ -380,10 +325,10 @@ export default function Home() {
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-4xl md:text-5xl font-bold font-headline tracking-tighter">
-                {content.ctaHeadline}
+                당신의 지식을 자산으로 만들 시간
               </h2>
               <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-lg lg:text-xl">
-                {content.ctaSubheadline}
+                지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.
               </p>
             </div>
             <div className="mx-auto w-full flex justify-center">
@@ -398,3 +343,63 @@ export default function Home() {
     </div>
   );
 }
+
+const testimonials = [
+  {
+    quote: "이 템플릿 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요. 다음 프로젝트에도 무조건 재구매각입니다.",
+    author: "김지훈",
+    role: "풀스택 개발자",
+    avatar: "https://picsum.photos/100/100?random=10"
+  },
+  {
+    quote: "prmart에서 판매를 시작하고 월급만큼의 부수입을 얻고 있어요. 제 노하우가 다른 사람에게 도움이 된다는 사실이 정말 뿌듯합니다.",
+    author: "박서연",
+    role: "마케팅 전문가",
+    avatar: "https://picsum.photos/100/100?random=11"
+  },
+  {
+    quote: "디자인 리소스 찾느라 시간 낭비할 필요가 없어졌어요. prmart에는 퀄리티 높은 자료가 넘쳐나서 작업 효율이 극대화되었습니다.",
+    author: "최민준",
+    role: "UI/UX 디자이너",
+    avatar: "https://picsum.photos/100/100?random=12"
+  },
+];
+
+
+const buyerSteps = [
+    {
+      icon: Search,
+      title: "1. 아이디어 탐색",
+      description: "필요한 노하우, 템플릿, 프롬프트를 카테고리 또는 검색을 통해 발견하세요.",
+    },
+    {
+      icon: Wallet,
+      title: "2. 안전 결제",
+      description: "안전한 결제 시스템을 통해 원하는 아이디어를 즉시 구매할 수 있습니다.",
+    },
+    {
+      icon: Download,
+      title: "3. 즉시 다운로드",
+      description: "구매한 디지털 자산은 마이페이지에서 언제든지 다운로드하고 활용할 수 있습니다.",
+    },
+];
+
+const sellerSteps = [
+    {
+      icon: Upload,
+      title: "1. 상품 등록",
+      description: "AI 어시스턴트의 도움을 받아 당신의 지식을 손쉽게 등록하고 판매를 시작하세요.",
+    },
+    {
+      icon: BadgeDollarSign,
+      title: "2. 판매 및 알림",
+      description: "상품이 판매되면 실시간 알림을 받고, 판매 내역을 대시보드에서 확인하세요.",
+    },
+    {
+      icon: Banknote,
+      title: "3. 수익 정산",
+      description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
+    },
+];
+
+    
