@@ -24,6 +24,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { cn } from "@/lib/utils";
 
 
 async function getHomePageContent(): Promise<HomePageContent> {
@@ -122,7 +123,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center text-center space-y-8">
                 <div className="space-y-4">
                     <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
-                      당신의 아이디어를 금으로 바꿔드립니다. prmart
+                      당신의 아이디어를 금으로 바꿔드립니다.
                     </h1>
                 </div>
 
@@ -187,16 +188,22 @@ export default function Home() {
         <section id="categories" className="w-full pb-12 md:pb-20 lg:pb-24">
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
-                  {CATEGORIES.map((category) => (
+                  {CATEGORIES.map((category) => {
+                    const isHighlighted = category.name === "AI & 프로덕션" || category.name === "개발 & IT 자동화";
+                    return (
                       <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
-                          <Card className="flex flex-col items-center justify-center p-4 gap-2 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1">
+                          <Card className={cn(
+                            "flex flex-col items-center justify-center p-4 gap-2 h-full transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
+                            isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
+                          )}>
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                                   <category.icon className="h-6 w-6" />
                               </div>
                               <span className="font-semibold text-sm text-center">{category.name}</span>
                           </Card>
                       </Link>
-                  ))}
+                    )
+                  })}
               </div>
             </div>
         </section>
@@ -385,3 +392,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
