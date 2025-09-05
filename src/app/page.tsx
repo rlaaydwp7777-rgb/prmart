@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import * as React from "react";
@@ -164,7 +162,7 @@ export default function Home() {
                     </DropdownMenu>
                     <div className="relative flex-1">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                      <Input placeholder="검색" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
+                      <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
                     </div>
                     <Button size="lg" className="rounded-full h-14 w-14 p-0">
                       <Search className="h-6 w-6"/>
