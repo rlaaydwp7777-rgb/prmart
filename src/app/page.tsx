@@ -90,7 +90,7 @@ export default function Home() {
       <Header />
       <main>
         
-        <section>
+        <section className="pt-16">
           <Carousel
             plugins={[plugin.current]}
             onMouseEnter={() => plugin.current.stop()}
@@ -111,14 +111,11 @@ export default function Home() {
                     />
                   </div>
                   <div className="relative z-10 h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 text-white">
-                     <div className="container grid grid-cols-1 md:grid-cols-2 gap-4 items-center h-full">
-                         <div className="flex flex-col justify-center">
-                           <div className="text-left space-y-4">
-                                <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
-                                <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
-                           </div>
-                        </div>
-                        {/* Right side is intentionally left blank for the background image to show through */}
+                     <div className="container flex flex-col items-center justify-center h-full">
+                       <div className="text-center space-y-4">
+                            <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
+                            <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
+                       </div>
                     </div>
                   </div>
                 </CarouselItem>
@@ -434,5 +431,7 @@ const sellerSteps = [
     
 
 
+
+    
 
     
