@@ -143,7 +143,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pt-16">
         {/* Hero Section */}
         <div className="relative w-full text-white">
             <Carousel
@@ -162,7 +162,7 @@ export default function Home() {
                                 }}
                             >
                                 <div className="h-full w-full flex flex-col items-center justify-center bg-black/50">
-                                  <div className="container px-4 flex-1 flex flex-col items-center justify-center text-center space-y-8">
+                                  <div className="h-full container px-4 flex flex-col items-center justify-center text-center space-y-8">
                                       <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                                           {slide.title}
                                       </h1>
@@ -451,3 +451,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
