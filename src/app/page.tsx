@@ -15,17 +15,17 @@ import {
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Upload, Wallet, Download, Quote, ShieldCheck, Search, ChevronDown, Rocket, BadgeDollarSign, Banknote, BellIcon } from "lucide-react";
+import { ArrowRight, Search, ChevronDown, Rocket, BadgeDollarSign, Banknote, Upload, Wallet, Download, Quote, ShieldCheck } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
 import type { HomePageContent } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 const heroSlides = [
@@ -97,8 +97,7 @@ export default function Home() {
 
         {/* Search Section */}
         <section className="py-12 md:py-16 relative z-10">
-          <div className="container">
-             <div className="max-w-4xl mx-auto">
+            <div className="container max-w-4xl mx-auto">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
                   <DropdownMenu>
@@ -153,7 +152,6 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-          </div>
         </section>
 
         {/* Categories Section */}
@@ -234,7 +232,7 @@ export default function Home() {
                         >
                             <CarouselContent>
                                 {FEATURED_PROMPTS.concat(FEATURED_PROMPTS).map((prompt, index) => (
-                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/3 lg:basis-1/5">
+                                    <CarouselItem key={`${category.name}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
                                          <div className="p-1">
                                             <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
                                         </div>
@@ -415,7 +413,3 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
-
-    
-
-    
