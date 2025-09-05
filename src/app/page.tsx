@@ -30,8 +30,8 @@ import { cn } from "@/lib/utils";
 
 async function getHomePageContent(): Promise<HomePageContent> {
   return {
-    headline: "당신의 아이디어를 금으로 바꿔드립니다. prmart",
-    subheadline: null,
+    headline: "사는 순간 아끼고, 파는 순간 버는 곳.",
+    subheadline: "AI 프롬프트부터 비즈니스 노하우까지, 세상의 모든 아이디어를 거래하세요.",
     categoriesHeadline: "카테고리 쇼케이스",
     categoriesSubheadline: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
     featuredPromptsHeadline: "지금 뜨는 아이디어",
@@ -119,10 +119,20 @@ export default function Home() {
       <Header />
       <main className="flex-1 pt-16">
         
+        <section>
+          <Image 
+            src="https://placehold.co/1600x400/f1f5f9/f1f5f9.png" 
+            alt="placeholder" 
+            width={1600} 
+            height={400} 
+            className="w-full object-cover"
+          />
+        </section>
+
         {/* Search Section */}
-        <section className="py-12 md:py-16 relative z-20">
+        <section className="py-12 md:py-16 relative z-10">
           <div className="container">
-            <div className="max-w-4xl mx-auto p-6">
+            <div className="max-w-4xl mx-auto">
               <div className="w-full max-w-2xl mx-auto">
                 <div className="relative flex gap-2">
                   <DropdownMenu>
@@ -388,5 +398,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
