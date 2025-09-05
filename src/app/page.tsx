@@ -161,10 +161,10 @@ export default function Home() {
                               src={slide.image}
                               alt={slide.title}
                               fill
-                              className="object-cover -z-10"
+                              className="object-cover"
                               data-ai-hint={slide.aiHint}
                             />
-                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4">
+                            <div className="h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 relative z-10">
                               <div className="container flex flex-col items-center justify-center text-center space-y-8">
                                   <h1 className="font-headline text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter whitespace-pre-wrap">
                                       {slide.title}
