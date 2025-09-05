@@ -28,7 +28,7 @@ import {
 
 async function getHomePageContent(): Promise<HomePageContent> {
   return {
-    headline: "사는 순간 아끼고, 파는 순간 버는 곳.",
+    headline: "당신의 아이디어를 금으로 바꿔드립니다. prmart",
     subheadline: null,
     categoriesHeadline: "카테고리 쇼케이스",
     categoriesSubheadline: "개발, 디자인, 마케팅 등 당신에게 필요한 모든 분야의 지식을 찾아보세요.",
@@ -390,5 +390,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
