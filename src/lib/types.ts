@@ -13,6 +13,16 @@ export interface Prompt {
   rank?: number;
 }
 
+export interface IdeaRequest {
+    id: string;
+    title: string;
+    description: string;
+    author: string;
+    category: string;
+    budget: number;
+    proposals: number;
+}
+
 export interface SubCategory {
   name: string;
 }

@@ -3,13 +3,50 @@ import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { PromptCard } from "@/components/prompts/prompt-card";
-import { FEATURED_PROMPTS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
+import { RequestCard } from "@/components/requests/request-card";
+import type { IdeaRequest } from "@/lib/types";
+
+const ideaRequests: IdeaRequest[] = [
+  {
+    id: "req-1",
+    title: "유튜브 채널아트 & 썸네일 자동 생성기",
+    author: "크리에이터준",
+    category: "AI & 프로덕션",
+    budget: 50000,
+    proposals: 5,
+    description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요. 포토샵 없이도 고퀄리티 디자인이 가능하면 좋겠습니다."
+  },
+  {
+    id: "req-2",
+    title: "부동산 월세 수익률 계산기 (엑셀 템플릿)",
+    author: "재테크왕",
+    category: "재테크 & 투자",
+    budget: 15000,
+    proposals: 12,
+    description: "매매가, 보증금, 월세, 대출금리, 보유세 등 기본 정보만 입력하면 연간/월간 수익률, ROI, 현금흐름을 자동으로 계산해주는 엑셀 대시보드가 필요합니다."
+  },
+  {
+    id: "req-3",
+    title: "반려동물 건강상태 체크 AI 프롬프트",
+    author: "집사일기",
+    category: "생활 & 육아 꿀팁",
+    budget: 30000,
+    proposals: 8,
+    description: "반려동물의 사진과 사료 종류, 활동량 등 간단한 정보를 입력하면 AI가 건강 상태에 대한 기본적인 조언을 해주는 프롬프트를 구합니다. (주의: 의료적 진단을 대체하는 것이 아님)"
+  },
+  {
+    id: "req-4",
+    title: "개발자 기술면접 질문 모음 & 답변 가이드",
+    author: "취준생",
+    category: "개발 & IT 자동화",
+    budget: 20000,
+    proposals: 21,
+    description: "Next.js, TypeScript, Node.js 분야의 주요 기술면접 질문과 모범 답변, 관련 CS 지식이 정리된 PDF 또는 노션 템플릿을 요청합니다."
+  }
+];
 
 export default async function RequestsPage() {
-  // These would be fetched from a database based on a specific request in a real app
-  const suggestedPrompts = FEATURED_PROMPTS.slice(0, 4);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -25,12 +62,20 @@ export default async function RequestsPage() {
             </p>
           </div>
 
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="space-y-2">
-                <Input placeholder="요청 제목 (예: 인스타그램 릴스 제작용 영상 편집 템플릿)" className="text-lg h-12" />
+          <div className="max-w-2xl mx-auto space-y-6 border p-6 sm:p-8 rounded-lg">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                  <label htmlFor="request-title" className="font-medium">요청 제목</label>
+                  <Input id="request-title" placeholder="예: 인스타그램 릴스 제작용 템플릿" className="text-base h-11" />
+              </div>
+               <div className="space-y-2">
+                  <label htmlFor="request-price" className="font-medium">희망 가격 (선택 사항)</label>
+                  <Input id="request-price" type="number" placeholder="예: 20000" className="text-base h-11" />
+              </div>
             </div>
             <div className="space-y-2">
-                 <Textarea placeholder="필요한 아이디어에 대해 자세히 설명해주세요. (예: 숏폼 영상에 바로 적용할 수 있는 트렌디한 자막과 효과가 포함된 CapCut 템플릿이 필요합니다.)" className="min-h-[150px] text-base"/>
+                 <label htmlFor="request-description" className="font-medium">상세 설명</label>
+                 <Textarea id="request-description" placeholder="필요한 아이디어에 대해 자세히 설명해주세요." className="min-h-[120px] text-base"/>
             </div>
             <Button size="lg" className="w-full">
               아이디어 등록하기
@@ -42,23 +87,12 @@ export default async function RequestsPage() {
           <div className="space-y-8">
             <div className="text-center">
                 <h2 className="text-3xl font-bold font-headline tracking-tight">다른 사용자들의 요청</h2>
-                <p className="text-muted-foreground mt-2">이런 아이디어들은 어떠세요? 마음에 드는 상품을 제안해보세요.</p>
+                <p className="text-muted-foreground mt-2">이런 아이디어들은 어떠세요? 마음에 드는 요청에 당신의 상품을 제안해보세요.</p>
             </div>
-            {/* This section would dynamically show different requests */}
-            <div>
-                <h3 className="font-bold text-xl mb-2">"유튜브 채널아트 & 썸네일 자동 생성기"</h3>
-                <p className="text-muted-foreground mb-4">
-                    채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요. 포토샵 없이도 고퀄리티 디자인이 가능하면 좋겠습니다.
-                </p>
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {suggestedPrompts.map((prompt) => (
-                    <PromptCard key={prompt.id} prompt={prompt} />
-                    ))}
-                </div>
-                 <div className="mt-6 flex flex-col items-center">
-                    <Textarea placeholder="내 상품을 제안하는 댓글을 작성하세요..." className="max-w-xl mb-2"/>
-                    <Button variant="outline">댓글로 제안하기</Button>
-                </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {ideaRequests.map((request) => (
+                <RequestCard key={request.id} request={request} />
+              ))}
             </div>
           </div>
         </div>
