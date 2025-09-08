@@ -43,7 +43,7 @@ export default function SellerLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PRODUCTS}>
-                  <Link href="#">
+                  <Link href="/seller/products">
                     <Package />
                     <span>{SIDEBAR_STRINGS.PRODUCTS}</span>
                   </Link>
@@ -51,7 +51,7 @@ export default function SellerLayout({
               </SidebarMenuItem>
                <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
-                  <Link href="#">
+                  <Link href="/seller/analytics">
                     <BarChart3 />
                     <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
                   </Link>
@@ -59,7 +59,7 @@ export default function SellerLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.SETTINGS}>
-                  <Link href="#">
+                  <Link href="/seller/settings">
                     <Settings />
                     <span>{SIDEBAR_STRINGS.SETTINGS}</span>
                   </Link>
@@ -79,7 +79,7 @@ export default function SellerLayout({
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ACCOUNT}>
-                  <Link href="#">
+                  <Link href="/account/settings">
                     <UserCircle />
                     <span>{SIDEBAR_STRINGS.ACCOUNT}</span>
                   </Link>

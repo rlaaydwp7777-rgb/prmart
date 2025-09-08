@@ -2,9 +2,8 @@
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { DollarSign, Package, BarChart, Star, Users, Trophy } from "lucide-react";
+import { DollarSign, Package, BarChart, Star, Trophy } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 
 const bestSellers = [
