@@ -6,6 +6,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { RequestCard } from "@/components/requests/request-card";
 import type { IdeaRequest } from "@/lib/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CATEGORIES } from "@/lib/constants";
 
 const ideaRequests: IdeaRequest[] = [
   {
@@ -69,10 +71,23 @@ export default async function RequestsPage() {
                   <Input id="request-title" placeholder="예: 인스타그램 릴스 제작용 템플릿" className="text-base h-11" />
               </div>
                <div className="space-y-2">
+                  <label htmlFor="request-category" className="font-medium">카테고리</label>
+                   <Select name="category">
+                    <SelectTrigger id="request-category" className="text-base h-11">
+                      <SelectValue placeholder="카테고리 선택" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map(cat => (
+                        <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+              </div>
+            </div>
+             <div className="space-y-2">
                   <label htmlFor="request-price" className="font-medium">희망 가격 (선택 사항)</label>
                   <Input id="request-price" type="number" placeholder="예: 20000" className="text-base h-11" />
               </div>
-            </div>
             <div className="space-y-2">
                  <label htmlFor="request-description" className="font-medium">상세 설명</label>
                  <Textarea id="request-description" placeholder="필요한 아이디어에 대해 자세히 설명해주세요." className="min-h-[120px] text-base"/>
@@ -89,6 +104,16 @@ export default async function RequestsPage() {
                 <h2 className="text-3xl font-bold font-headline tracking-tight">다른 사용자들의 요청</h2>
                 <p className="text-muted-foreground mt-2">이런 아이디어들은 어떠세요? 마음에 드는 요청에 당신의 상품을 제안해보세요.</p>
             </div>
+            
+            <div className="flex flex-wrap justify-center gap-2">
+                <Button>전체보기</Button>
+                {CATEGORIES.map((category) => (
+                    <Button key={category.name} variant="outline">
+                        {category.name}
+                    </Button>
+                ))}
+            </div>
+
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {ideaRequests.map((request) => (
                 <RequestCard key={request.id} request={request} />
