@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useMemo } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
@@ -8,6 +11,7 @@ import { RequestCard } from "@/components/requests/request-card";
 import type { IdeaRequest } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 
 const ideaRequests: IdeaRequest[] = [
   {
@@ -48,7 +52,15 @@ const ideaRequests: IdeaRequest[] = [
   }
 ];
 
-export default async function RequestsPage() {
+export default function RequestsPage() {
+  const [selectedCategory, setSelectedCategory] = useState("전체보기");
+
+  const filteredRequests = useMemo(() => {
+    if (selectedCategory === "전체보기") {
+      return ideaRequests;
+    }
+    return ideaRequests.filter(request => request.category === selectedCategory);
+  }, [selectedCategory]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -65,6 +77,10 @@ export default async function RequestsPage() {
           </div>
 
           <div className="max-w-2xl mx-auto space-y-6 border p-6 sm:p-8 rounded-lg">
+             <div className="text-center">
+                <h2 className="text-2xl font-bold font-headline tracking-tight">필요한 아이디어를 등록하세요</h2>
+                <p className="text-muted-foreground mt-1">판매자들이 당신의 요청을 보고 상품을 제안할 거예요.</p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                   <label htmlFor="request-title" className="font-medium">요청 제목</label>
@@ -106,19 +122,33 @@ export default async function RequestsPage() {
             </div>
             
             <div className="flex flex-wrap justify-center gap-2">
-                <Button>전체보기</Button>
+                <Button 
+                    onClick={() => setSelectedCategory("전체보기")}
+                    variant={selectedCategory === "전체보기" ? "default" : "outline"}
+                >
+                    전체보기
+                </Button>
                 {CATEGORIES.map((category) => (
-                    <Button key={category.name} variant="outline">
+                    <Button 
+                        key={category.name} 
+                        variant={selectedCategory === category.name ? "default" : "outline"}
+                        onClick={() => setSelectedCategory(category.name)}
+                    >
                         {category.name}
                     </Button>
                 ))}
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {ideaRequests.map((request) => (
+              {filteredRequests.map((request) => (
                 <RequestCard key={request.id} request={request} />
               ))}
             </div>
+             {filteredRequests.length === 0 && (
+                <div className="text-center py-10 text-muted-foreground col-span-full">
+                    해당 카테고리에 등록된 요청이 없습니다.
+                </div>
+            )}
           </div>
         </div>
       </main>
