@@ -1,14 +1,14 @@
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { PromptCard } from "@/components/prompts/prompt-card";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { FEATURED_PROMPTS } from "@/lib/constants";
-import { PROMPT_CARD_STRINGS } from "@/lib/string-constants";
-import { Heart, MessageCircle, Send, ShoppingCart, Star, Zap } from "lucide-react";
+import { Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -44,7 +44,6 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
       <Header />
       <main className="flex-1 pt-24 pb-12">
         <div className="container px-4 md:px-6">
-          {/* Main Product Section */}
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Left Column: Image Gallery */}
             <div className="grid gap-4">
@@ -56,7 +55,6 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                 className="object-cover w-full h-auto aspect-[4/3] rounded-lg shadow-lg border"
                 data-ai-hint={prompt.aiHint}
               />
-              {/* TODO: Add multiple images carousel */}
             </div>
 
             {/* Right Column: Product Details & CTA */}
@@ -108,31 +106,42 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
           {/* Detailed Info & Reviews Section */}
           <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
             <div className="md:col-span-2 space-y-8">
-                {/* Product Description */}
                 <div>
-                    <h2 className="text-2xl font-bold font-headline mb-4">상품 설명</h2>
-                    <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
-                        <p>
-                            이 보일러플레이트는 최신 Next.js 14, TypeScript, Tailwind CSS, 그리고 prmart의 디자인 시스템을 기반으로 구축되었습니다. 
-                            인증, 데이터베이스 연동, 그리고 서버 컴포넌트의 모범 사례를 포함하여 여러분의 다음 프로젝트를 즉시 시작할 수 있도록 돕습니다.
-                            AI 기반 기능 통합을 위한 Genkit 설정이 포함되어 있습니다.
-                        </p>
-                        <p>
-                            주요 기능:
-                        </p>
-                        <ul>
-                            <li>Next.js 14 앱 라우터</li>
-                            <li>ShadCN UI 및 Tailwind CSS</li>
-                            <li>Firebase 인증 및 Firestore</li>
-                            <li>Genkit AI 통합</li>
-                        </ul>
-                        {/* TODO: Use Accordion for FAQ, file list, version log */}
-                    </div>
+                    <h2 className="text-2xl font-bold font-headline mb-4">상품 상세 정보</h2>
+                    <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
+                                    <p>이 보일러플레이트는 최신 Next.js 14, TypeScript, Tailwind CSS, 그리고 prmart의 디자인 시스템을 기반으로 구축되었습니다. 인증, 데이터베이스 연동, 그리고 서버 컴포넌트의 모범 사례를 포함하여 여러분의 다음 프로젝트를 즉시 시작할 수 있도록 돕습니다. AI 기반 기능 통합을 위한 Genkit 설정이 포함되어 있습니다.</p>
+                                    <p>주요 기능:</p>
+                                    <ul>
+                                        <li>Next.js 14 앱 라우터</li>
+                                        <li>ShadCN UI 및 Tailwind CSS</li>
+                                        <li>Firebase 인증 및 Firestore</li>
+                                        <li>Genkit AI 통합</li>
+                                    </ul>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-2">
+                            <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
+                            <AccordionContent>
+                                ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)
+                            </AccordionContent>
+                        </AccordionItem>
+                         <AccordionItem value="item-3">
+                            <AccordionTrigger className="text-lg font-semibold">자주 묻는 질문</AccordionTrigger>
+                            <AccordionContent>
+                                <strong>Q: 상업적으로 이용할 수 있나요?</strong>
+                                <p>A: 네, 구매 후 상업적 프로젝트를 포함하여 자유롭게 사용하실 수 있습니다. 재판매는 금지됩니다.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 </div>
 
                 <Separator/>
 
-                {/* Reviews Section */}
                 <div>
                      <h2 className="text-2xl font-bold font-headline mb-4">구매자 후기 ({mockReviews.length})</h2>
                      <div className="space-y-6">
@@ -155,20 +164,21 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                                 </div>
                            </div>
                         ))}
-                        {/* TODO: Add review submission form for actual buyers */}
                      </div>
                 </div>
             </div>
             
-            {/* Seller Info Card */}
             <div className="md:col-span-1 space-y-6">
                  <Card>
-                    <CardContent className="p-6 text-center">
+                    <CardHeader>
+                        <h3 className="font-bold text-lg font-headline">판매자 정보</h3>
+                    </CardHeader>
+                    <CardContent className="text-center">
                          <Avatar className="h-20 w-20 mx-auto mb-4">
                             <AvatarImage src={`https://avatar.vercel.sh/${prompt.author}.png`} alt={prompt.author} data-ai-hint="person face" />
                             <AvatarFallback>{prompt.author.substring(0, 2)}</AvatarFallback>
                         </Avatar>
-                        <h3 className="font-bold text-lg font-headline">{prompt.author}</h3>
+                        <h4 className="font-bold text-lg">{prompt.author}</h4>
                         <p className="text-sm text-muted-foreground">AI와 자동화로 세상을 이롭게 합니다.</p>
                         <Button variant="outline" className="w-full mt-4">
                             <Send className="mr-2 h-4 w-4" />
@@ -176,15 +186,13 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                         </Button>
                     </CardContent>
                  </Card>
-                 {/* TODO: Add more from this seller section */}
             </div>
           </div>
 
           <Separator className="my-12 md:my-16" />
 
-          {/* Related Products Section */}
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">관련 상품</h2>
+            <h2 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">이 카테고리의 다른 상품</h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {relatedPrompts.map((relatedPrompt) => (
                     <PromptCard key={relatedPrompt.id} prompt={relatedPrompt} />
