@@ -22,7 +22,7 @@ export function AuthButtons() {
     <div className="flex items-center gap-2">
       <LoginDialog />
       <Button asChild>
-        <Link href="#">{BUTTONS.SIGNUP}</Link>
+        <Link href="/signup">{BUTTONS.SIGNUP}</Link>
       </Button>
     </div>
   );
