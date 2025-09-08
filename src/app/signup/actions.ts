@@ -1,7 +1,7 @@
 'use server'
 
 import { z } from 'zod'
-import { auth }.from '@/lib/firebase'
+import { auth } from '@/lib/firebase'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 
 export type SignupFormState = {
