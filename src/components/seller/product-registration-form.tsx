@@ -17,7 +17,7 @@ import { CATEGORIES } from "@/lib/constants";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Loader2, Sparkles, Terminal, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud } from "lucide-react";
 import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 
@@ -40,8 +40,8 @@ function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className="w-full">
-      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle className="mr-2 h-4 w-4" />}
-      {BUTTONS.SUBMIT_FOR_REVIEW}
+      {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
+      {BUTTONS.REGISTER_PRODUCT}
     </Button>
   );
 }

@@ -13,6 +13,7 @@ export const BUTTONS = {
     CONTINUE_WITH_GOOGLE: "Google 계정으로 계속하기",
     GENERATE_WITH_AI: "AI로 생성하기",
     SUBMIT_FOR_REVIEW: "품질 검수 제출",
+    REGISTER_PRODUCT: "상품 등록하기",
 }
 
 export const PROMPT_CARD_STRINGS = {
@@ -64,7 +65,7 @@ export const FOOTER_STRINGS = {
 export const SELLER_DASHBOARD_STRINGS = {
     HEADLINE: "판매자 대시보드",
     SUBHEADLINE: "상품을 관리하고 판매 실적을 확인하세요.",
-    AI_ASSISTANT_TITLE: "AI 판매 도우미",
+    AI_ASSISTANT_TITLE: "AI 상품 등록 도우미",
     AI_ASSISTANT_DESCRIPTION: "새 상품을 등록하세요. AI가 단계별로 도와드립니다.",
     PRODUCT_TITLE_LABEL: "상품 제목",
     PRODUCT_TITLE_PLACEHOLDER: "예: 최고의 생산성 플래너 템플릿",
