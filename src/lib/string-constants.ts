@@ -12,7 +12,6 @@ export const BUTTONS = {
     SIGNUP: "회원가입",
     CONTINUE_WITH_GOOGLE: "Google 계정으로 계속하기",
     GENERATE_WITH_AI: "AI로 생성하기",
-    SUBMIT_FOR_REVIEW: "품질 검수 제출",
     REGISTER_PRODUCT: "상품 등록하기",
 }
 
@@ -52,11 +51,11 @@ export const FOOTER_STRINGS = {
     CEO: "대표",
     CEO_NAME: "김대표",
     BUSINESS_NUMBER: "사업자등록번호",
-    BUSINESS_NUMBER_VALUE: "100-00-00000",
+    BUSINESS_NUMBER_VALUE: "123-45-67890",
     ECOMMERCE_NUMBER: "통신판매업신고번호",
-    ECOMMERCE_NUMBER_VALUE: "2024-부산-0000",
+    ECOMMERCE_NUMBER_VALUE: "2024-부산해운대-1234",
     ADDRESS: "주소",
-    ADDRESS_VALUE: "부산광역시 해운대구",
+    ADDRESS_VALUE: "부산광역시 해운대구 센텀중앙로 97, A동 1234호",
     EMAIL: "이메일",
     EMAIL_VALUE: "contact@prmart.ai",
     COPYRIGHT: `© ${new Date().getFullYear()} prmart. All Rights Reserved.`,
