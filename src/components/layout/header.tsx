@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Bell, Globe, ShoppingCart, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS } from "@/lib/string-constants";
@@ -28,15 +28,6 @@ export function Header() {
             </nav>
           </div>
           <div className="flex items-center gap-2">
-             <Button variant="ghost" size="icon" aria-label="Language">
-              <Globe />
-            </Button>
-             <Button variant="ghost" size="icon" aria-label="Notifications">
-              <Bell />
-            </Button>
-             <Button variant="ghost" size="icon" aria-label="Cart">
-              <ShoppingCart />
-            </Button>
             <AuthButtons />
           </div>
         </div>
@@ -44,5 +35,3 @@ export function Header() {
     </header>
   );
 }
-
-    
