@@ -37,7 +37,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.DASHBOARD}>
                   <Link href="/seller/dashboard">
                     <LayoutDashboard />
-                    <span>{SIDEBAR_STRINGS.DASHBOARD}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.DASHBOARD}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -45,7 +45,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PRODUCTS}>
                   <Link href="/seller/products">
                     <Package />
-                    <span>{SIDEBAR_STRINGS.PRODUCTS}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.PRODUCTS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -53,7 +53,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
                   <Link href="/seller/analytics">
                     <BarChart3 />
-                    <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.ANALYTICS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -61,7 +61,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.SETTINGS}>
                   <Link href="/seller/settings">
                     <Settings />
-                    <span>{SIDEBAR_STRINGS.SETTINGS}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.SETTINGS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -73,7 +73,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.HELP}>
                   <Link href="#">
                     <LifeBuoy />
-                    <span>{SIDEBAR_STRINGS.HELP}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.HELP}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -81,7 +81,7 @@ export default function SellerLayout({
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ACCOUNT}>
                   <Link href="/account/settings">
                     <UserCircle />
-                    <span>{SIDEBAR_STRINGS.ACCOUNT}</span>
+                    <span className="text-sm">{SIDEBAR_STRINGS.ACCOUNT}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
