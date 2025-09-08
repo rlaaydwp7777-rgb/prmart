@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { FEATURED_PROMPTS } from "@/lib/constants";
-import { Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
+import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -36,6 +36,9 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   if (!prompt) {
     notFound();
   }
+  
+  // In a real app, this would be determined by checking the user's purchase history.
+  const mockPurchaseStatus = true; 
 
   const relatedPrompts = FEATURED_PROMPTS.filter(p => p.category === prompt.category && p.id !== prompt.id).slice(0, 4);
 
@@ -84,20 +87,35 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                 ₩{prompt.price.toLocaleString()}
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-                 <Button size="lg" variant="outline" className="w-full">
-                    <Heart className="mr-2"/>
-                    위시리스트
-                 </Button>
-                 <Button size="lg" variant="outline" className="w-full">
-                    <ShoppingCart className="mr-2"/>
-                    장바구니
-                 </Button>
-              </div>
-              <Button size="lg" className="w-full text-lg h-12">
-                <Zap className="mr-2"/>
-                바로 구매
-              </Button>
+              {mockPurchaseStatus ? (
+                <div className="flex flex-col gap-2 mt-auto">
+                   <Button size="lg" className="w-full">
+                        <Eye className="mr-2"/>
+                        콘텐츠 보기
+                    </Button>
+                    <Button size="lg" variant="outline" className="w-full">
+                        <Download className="mr-2"/>
+                        다운로드
+                    </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 mt-auto">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button size="lg" variant="outline" className="w-full">
+                            <Heart className="mr-2"/>
+                            위시리스트
+                        </Button>
+                        <Button size="lg" variant="outline" className="w-full">
+                            <ShoppingCart className="mr-2"/>
+                            장바구니
+                        </Button>
+                    </div>
+                    <Button size="lg" className="w-full text-lg h-12">
+                        <Zap className="mr-2"/>
+                        바로 구매
+                    </Button>
+                </div>
+              )}
             </div>
           </div>
           
