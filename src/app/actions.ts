@@ -1,3 +1,4 @@
+
 "use server";
 
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
@@ -11,12 +12,13 @@ const productSchema = z.object({
   category: z.string().min(1, "카테고리를 선택해주세요."),
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
+  sellOnce: z.boolean().optional(),
 });
 
 export type FormState = {
   message: string;
   success: boolean;
-  fields?: Record<string, string>;
+  fields?: Record<string, any>;
   issues?: string[];
   qualityResult?: AssessContentQualityOutput;
 };
@@ -43,6 +45,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
     category: rawData.category,
     tags: rawData.tags,
     price: rawData.price,
+    sellOnce: rawData.sellOnce === 'on'
   });
 
   if (!validatedFields.success) {

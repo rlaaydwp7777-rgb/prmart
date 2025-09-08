@@ -21,6 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText } from "lucide-react";
 import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
+import { Switch } from "../ui/switch";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -28,6 +29,7 @@ const productSchema = z.object({
   category: z.string().min(1, "카테고리를 선택해주세요."),
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
+  sellOnce: z.boolean().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -60,12 +62,14 @@ export function ProductRegistrationForm() {
       description: "",
       category: "",
       tags: "",
-      price: 0
+      price: 0,
+      sellOnce: false,
     }
   });
   
   const titleValue = watch("title");
   const categoryValue = watch("category");
+  const sellOnceValue = watch("sellOnce");
 
   useEffect(() => {
     if (!formState) return;
@@ -85,17 +89,19 @@ export function ProductRegistrationForm() {
         description: "",
         category: "",
         tags: "",
-        price: 0
+        price: 0,
+        sellOnce: false,
       });
     } else if (formState.fields) {
       // Re-populate form with previous data on server-side validation failure
-      const { title, description, category, tags, price } = formState.fields;
+      const { title, description, category, tags, price, sellOnce } = formState.fields;
       reset({ 
         title, 
         description, 
         category, 
         tags, 
-        price: Number(price) || 0 
+        price: Number(price) || 0,
+        sellOnce: !!sellOnce
       });
     }
   }, [formState, toast, reset]);
@@ -136,6 +142,11 @@ export function ProductRegistrationForm() {
   const handleCategoryChange = (value: string) => {
     setValue('category', value, {shouldValidate: true});
   }
+
+  const handleSellOnceChange = (checked: boolean) => {
+    setValue('sellOnce', checked, { shouldValidate: true });
+  };
+
 
   return (
     <>
@@ -209,6 +220,11 @@ export function ProductRegistrationForm() {
           <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
           <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
           {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch id="sell-once" name="sellOnce" checked={sellOnceValue} onCheckedChange={handleSellOnceChange} />
+          <Label htmlFor="sell-once">1회만 판매 (판매 후 자동 품절 처리)</Label>
         </div>
 
         <SubmitButton />
