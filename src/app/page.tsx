@@ -29,16 +29,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 const heroSlides = [
-    { title: "AI & 프로덕션", headline: "한 줄의 프롬프트가 작품이 됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production", href: "/c/ai-&-프로덕션" },
-    { title: "개발 & IT 자동화", headline: "단 하나의 코드가 당신의 시간을 삽니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation", href: "/c/개발-&-it-자동화" },
-    { title: "재테크 & 투자", headline: "지식 한 페이지가 수익으로 바뀝니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "stock graph", href: "/c/재테크-&-투자" },
-    { title: "여행 & 라이프", headline: "당신의 일정표가 누군가의 최고의 여행이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel suitcase", href: "/c/여행-&-라이프" },
-    { title: "생활 & 육아 꿀팁", headline: "당신의 경험이 누군가의 답이 됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "family illustration", href: "/c/생활-&-육아-꿀팁" },
-    { title: "비즈니스 & 마케팅", headline: "당신의 노하우가 비즈니스를 성장시킵니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business meeting", href: "/c/비즈니스-&-마케팅" },
-    { title: "창작 & 디자인", headline: "클릭 한 번으로 영감을 현실로 만듭니다.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "design tools", href: "/c/창작-&-디자인" },
-    { title: "학습 & 자기계발", headline: "당신의 지식이 누군가의 무기가 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/400/300?random=38", aiHint: "reading book", href: "/c/학습-&-자기계발" },
-    { title: "모빌리티 & 자동차", headline: "당신의 드라이빙이 새로운 트렌드가 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "electric car", href: "/c/모빌리티-&-자동차" },
-    { title: "라이프 인프라", headline: "당신의 분석이 더 나은 생활을 만듭니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house", href: "/c/라이프-인프라-(부동산·주거)" },
+    { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production", href: "/c/ai-&-프로덕션" },
+    { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation", href: "/c/개발-&-it-자동화" },
+    { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "stock graph", href: "/c/재테크-&-투자" },
+    { title: "여행 & 라이프", headline: "여행 일정표도 누군가의 최고의 상품이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel suitcase", href: "/c/여행-&-라이프" },
+    { title: "생활 & 육아 꿀팁", headline: "생활 경험과 육아 노하우도 가치로 연결됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "family illustration", href: "/c/생활-&-육아-꿀팁" },
+    { title: "비즈니스 & 마케팅", headline: "실무 전략과 마케팅 자료, 누구나 올리고 누구나 삽니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business meeting", href: "/c/비즈니스-&-마케팅" },
+    { title: "창작 & 디자인", headline: "창작 아이디어와 디자인 리소스가 거래되는 곳.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "design tools", href: "/c/창작-&-디자인" },
+    { title: "학습 & 자기계발", headline: "지식 한 페이지도 prmart에서 자산이 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/400/300?random=38", aiHint: "reading book", href: "/c/학습-&-자기계발" },
+    { title: "모빌리티 & 자동차", headline: "드라이빙 노하우와 모빌리티 인사이트도 상품이 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "electric car", href: "/c/모빌리티-&-자동차" },
+    { title: "라이프 인프라", headline: "부동산 분석, 주거 데이터도 손쉽게 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house", href: "/c/라이프-인프라-(부동산·주거)" },
 ];
 
 const featuredSlides = [
@@ -435,6 +435,8 @@ const sellerSteps = [
     
 
 
+
+    
 
     
 
