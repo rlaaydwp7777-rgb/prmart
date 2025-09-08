@@ -14,8 +14,11 @@ export function RequestCard({ request }: RequestCardProps) {
     <Link href={`/requests/${request.id}`} className="block h-full">
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg duration-300">
             <CardHeader>
-                <Badge variant="secondary" className="w-fit mb-2">{request.category}</Badge>
-                <CardTitle className="text-lg font-headline leading-snug group-hover:underline">
+                <div className="flex gap-2">
+                    <Badge variant="secondary" className="w-fit">{request.category}</Badge>
+                    {request.isExample && <Badge variant="outline">예제</Badge>}
+                </div>
+                <CardTitle className="text-lg font-headline leading-snug group-hover:underline pt-2">
                     {request.title}
                 </CardTitle>
             </CardHeader>
@@ -35,7 +38,7 @@ export function RequestCard({ request }: RequestCardProps) {
                         </div>
                     </div>
                     <div className="text-lg font-bold text-primary">
-                        ₩{request.budget.toLocaleString()}
+                        {request.budget > 0 ? `₩${request.budget.toLocaleString()}` : "협의 가능"}
                     </div>
                 </div>
                 <Button className="w-full">제안하기</Button>

@@ -47,7 +47,10 @@ export function PromptCard({ prompt }: PromptCardProps) {
               data-ai-hint={prompt.aiHint}
             />
             {prompt.rank && <RankBadge rank={prompt.rank} />}
-            <Badge variant="secondary" className="absolute top-3 right-3">{prompt.category}</Badge>
+             <div className="absolute top-3 right-3 flex gap-2">
+                {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
+                <Badge variant="secondary">{prompt.category}</Badge>
+            </div>
           </div>
           <div className="p-4 space-y-2">
             <h3 className="font-bold text-lg truncate font-headline">{prompt.title}</h3>
@@ -58,7 +61,9 @@ export function PromptCard({ prompt }: PromptCardProps) {
                 <span className="font-medium">{prompt.rating.toFixed(1)}</span>
                 <span className="text-muted-foreground text-sm">({prompt.reviews.toLocaleString()} {PROMPT_CARD_STRINGS.REVIEWS})</span>
               </div>
-              <span className="font-bold text-xl text-primary">₩{prompt.price.toLocaleString()}</span>
+              <span className="font-bold text-xl text-primary">
+                {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}` : "무료"}
+              </span>
             </div>
           </div>
         </CardContent>

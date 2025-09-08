@@ -1,4 +1,4 @@
-import type { Category } from "./types";
+import type { Category, Prompt } from "./types";
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { CATEGORY_NAMES } from "./string-constants";
 
@@ -115,53 +115,130 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
+const EXAMPLE_PROMPTS: Prompt[] = [
+  // AI & 프로덕션
+  { id: "ex-ai-1", title: "시네마틱 룩 Midjourney 프롬프트", author: "AI Artist", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.9, reviews: 15, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", isExample: true },
+  { id: "ex-ai-2", title: "ChatGPT 블로그 포스트 자동 생성기", author: "WriterBot", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.8, reviews: 22, image: "https://picsum.photos/400/300?random=102", aiHint: "writing text", isExample: true },
+  { id: "ex-ai-3", title: "Sora용 단편 영화 시나리오 프롬프트", author: "FilmMakerAI", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 5.0, reviews: 8, image: "https://picsum.photos/400/300?random=103", aiHint: "movie scene", isExample: true },
+  { id: "ex-ai-4", title: "Zapier & GPT 연동 자동화 가이드", author: "AutomationPro", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.7, reviews: 18, image: "https://picsum.photos/400/300?random=104", aiHint: "data flow", isExample: true },
+  { id: "ex-ai-5", title: "실사풍 캐릭터 생성 Stable Diffusion 프롬프트", author: "DigitalHuman", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.9, reviews: 31, image: "https://picsum.photos/400/300?random=105", aiHint: "portrait woman", isExample: true },
+
+  // 개발 & IT 자동화
+  { id: "ex-dev-1", title: "Python 웹 스크레이핑 스크립트", author: "CodeWizard", category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, price: 0, rating: 4.8, reviews: 45, image: "https://picsum.photos/400/300?random=106", aiHint: "python code", isExample: true },
+  { id: "ex-dev-2", title: "엑셀 데이터 클리닝 VBA 매크로", author: "ExcelMaster", category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, price: 0, rating: 4.9, reviews: 62, image: "https://picsum.photos/400/300?random=107", aiHint: "spreadsheet data", isExample: true },
+  { id: "ex-dev-3", title: "Next.js & Firebase 인증 보일러플레이트", author: "FullstackDev", category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, price: 0, rating: 5.0, reviews: 30, image: "https://picsum.photos/400/300?random=108", aiHint: "react code", isExample: true },
+  { id: "ex-dev-4", title: "SQL 쿼리 성능 최적화 가이드", author: "DBA Hero", category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, price: 0, rating: 4.7, reviews: 25, image: "https://picsum.photos/400/300?random=109", aiHint: "database schema", isExample: true },
+  { id: "ex-dev-5", title: "Docker 기반 개발 환경 세팅", author: "DevOpsLife", category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION, price: 0, rating: 4.8, reviews: 19, image: "https://picsum.photos/400/300?random=110", aiHint: "server terminal", isExample: true },
+
+  // 재테크 & 투자
+  { id: "ex-inv-1", title: "미국 기술주 성장성 분석 리포트", author: "AnalystKim", category: CATEGORY_NAMES.INVESTMENT_FINTECH, price: 0, rating: 4.9, reviews: 88, image: "https://picsum.photos/400/300?random=111", aiHint: "stock market", isExample: true },
+  { id: "ex-inv-2", title: "부동산 투자 수익률 계산 엑셀 템플릿", author: "RealEstatePro", category: CATEGORY_NAMES.INVESTMENT_FINTECH, price: 0, rating: 5.0, reviews: 102, image: "https://picsum.photos/400/300?random=112", aiHint: "calculator money", isExample: true },
+  { id: "ex-inv-3", title: "연말정산 필승 절세 전략 가이드", author: "TaxSaver", category: CATEGORY_NAMES.INVESTMENT_FINTECH, price: 0, rating: 4.8, reviews: 95, image: "https://picsum.photos/400/300?random=113", aiHint: "documents files", isExample: true },
+  { id: "ex-inv-4", title: "비트코인 반감기 분석 및 전망", author: "CryptoWhale", category: CATEGORY_NAMES.INVESTMENT_FINTECH, price: 0, rating: 4.7, reviews: 55, image: "https://picsum.photos/400/300?random=114", aiHint: "bitcoin chart", isExample: true },
+  { id: "ex-inv-5", title: "2024년 글로벌 금융 트렌드", author: "EconomyInsight", category: CATEGORY_NAMES.INVESTMENT_FINTECH, price: 0, rating: 4.9, reviews: 40, image: "https://picsum.photos/400/300?random=115", aiHint: "city skyline", isExample: true },
+
+  // 여행 & 라이프
+  { id: "ex-life-1", title: "제주도 3박 4일 동쪽 코스 추천", author: "Traveler", category: CATEGORY_NAMES.TRAVEL_LIFE, price: 0, rating: 4.9, reviews: 123, image: "https://picsum.photos/400/300?random=116", aiHint: "jeju island", isExample: true },
+  { id: "ex-life-2", title: "유럽 한달살기 항공권 특가 정보", author: "SkyScanner", category: CATEGORY_NAMES.TRAVEL_LIFE, price: 0, rating: 4.8, reviews: 88, image: "https://picsum.photos/400/300?random=117", aiHint: "europe street", isExample: true },
+  { id: "ex-life-3", title: "감성 여행사진 보정 프리셋 (라이트룸)", author: "PhotoGrapher", category: CATEGORY_NAMES.TRAVEL_LIFE, price: 0, rating: 5.0, reviews: 75, image: "https://picsum.photos/400/300?random=118", aiHint: "camera lens", isExample: true },
+  { id: "ex-life-4", title: "나홀로 교토 2박 3일 여행 플랜", author: "SoloTravel", category: CATEGORY_NAMES.TRAVEL_LIFE, price: 0, rating: 4.9, reviews: 92, image: "https://picsum.photos/400/300?random=119", aiHint: "kyoto temple", isExample: true },
+  { id: "ex-life-5", title: "전국 자전거길 여행 커뮤니티", author: "Rider", category: CATEGORY_NAMES.TRAVEL_LIFE, price: 0, rating: 4.7, reviews: 41, image: "https://picsum.photos/400/300?random=120", aiHint: "bicycle path", isExample: true },
+
+  // 생활 & 육아 꿀팁
+  { id: "ex-tip-1", title: "신생아 100일의 기적 수면교육법", author: "SuperMom", category: CATEGORY_NAMES.LIVING_PARENTING_TIPS, price: 0, rating: 5.0, reviews: 250, image: "https://picsum.photos/400/300?random=121", aiHint: "sleeping baby", isExample: true },
+  { id: "ex-tip-2", title: "미니멀리즘 인테리어 가이드북", author: "SimpleLife", category: CATEGORY_NAMES.LIVING_PARENTING_TIPS, price: 0, rating: 4.9, reviews: 180, image: "https://picsum.photos/400/300?random=122", aiHint: "minimalist room", isExample: true },
+  { id: "ex-tip-3", title: "매일 10분 홈트레이닝 루틴", author: "HealthCoach", category: CATEGORY_NAMES.LIVING_PARENTING_TIPS, price: 0, rating: 4.8, reviews: 130, image: "https://picsum.photos/400/300?random=123", aiHint: "home workout", isExample: true },
+  { id: "ex-tip-4", title: "초간단 에어프라이어 레시피 모음", author: "ChefLee", category: CATEGORY_NAMES.LIVING_PARENTING_TIPS, price: 0, rating: 4.9, reviews: 210, image: "https://picsum.photos/400/300?random=124", aiHint: "air fryer", isExample: true },
+  { id: "ex-tip-5", title: "통신비 절약을 위한 알뜰폰 비교", author: "SmartSaver", category: CATEGORY_NAMES.LIVING_PARENTING_TIPS, price: 0, rating: 4.7, reviews: 80, image: "https://picsum.photos/400/300?random=125", aiHint: "smartphone hand", isExample: true },
+
+  // 비즈니스 & 마케팅
+  { id: "ex-biz-1", title: "인스타그램 릴스 콘텐츠 기획 템플릿", author: "SocialGuru", category: CATEGORY_NAMES.BUSINESS_MARKETING, price: 0, rating: 4.9, reviews: 140, image: "https://picsum.photos/400/300?random=126", aiHint: "instagram feed", isExample: true },
+  { id: "ex-biz-2", title: "투자 제안서 PPT 템플릿", author: "BizPro", category: CATEGORY_NAMES.BUSINESS_MARKETING, price: 0, rating: 5.0, reviews: 99, image: "https://picsum.photos/400/300?random=127", aiHint: "presentation slide", isExample: true },
+  { id: "ex-biz-3", title: "퍼포먼스 마케팅 A/B 테스트 노하우", author: "Marketer", category: CATEGORY_NAMES.BUSINESS_MARKETING, price: 0, rating: 4.8, reviews: 76, image: "https://picsum.photos/400/300?random=128", aiHint: "marketing chart", isExample: true },
+  { id: "ex-biz-4", title: "스타트업을 위한 정부지원사업 리스트", author: "StartupHelper", category: CATEGORY_NAMES.BUSINESS_MARKETING, price: 0, rating: 4.9, reviews: 110, image: "https://picsum.photos/400/300?random=129", aiHint: "business document", isExample: true },
+  { id: "ex-biz-5", title: "세일즈 콜드메일 템플릿 모음", author: "SalesKing", category: CATEGORY_NAMES.BUSINESS_MARKETING, price: 0, rating: 4.7, reviews: 65, image: "https://picsum.photos/400/300?random=130", aiHint: "email inbox", isExample: true },
+
+  // 창작 & 디자인
+  { id: "ex-design-1", title: "상업용 무료 폰트 모음집", author: "FontMaster", category: CATEGORY_NAMES.CREATION_DESIGN, price: 0, rating: 5.0, reviews: 300, image: "https://picsum.photos/400/300?random=131", aiHint: "typography design", isExample: true },
+  { id: "ex-design-2", title: "피그마 UI 디자인 시스템 템플릿", author: "UIDesigner", category: CATEGORY_NAMES.CREATION_DESIGN, price: 0, rating: 4.9, reviews: 180, image: "https://picsum.photos/400/300?random=132", aiHint: "design components", isExample: true },
+  { id: "ex-design-3", title: "다빈치 리졸브 영상 색보정 LUT", author: "Colorist", category: CATEGORY_NAMES.CREATION_DESIGN, price: 0, rating: 4.8, reviews: 120, image: "https://picsum.photos/400/300?random=133", aiHint: "color palette", isExample: true },
+  { id: "ex-design-4", title: "웹소설 표지 디자인 레퍼런스", author: "BookCoverArt", category: CATEGORY_NAMES.CREATION_DESIGN, price: 0, rating: 4.7, reviews: 90, image: "https://picsum.photos/400/300?random=134", aiHint: "fantasy book", isExample: true },
+  { id: "ex-design-5", title: "귀여운 동물 캐릭터 일러스트 소스", author: "Illustrator", category: CATEGORY_NAMES.CREATION_DESIGN, price: 0, rating: 4.9, reviews: 250, image: "https://picsum.photos/400/300?random=135", aiHint: "cute cat", isExample: true },
+
+  // 학습 & 자기계발
+  { id: "ex-learn-1", title: "개발자를 위한 영어회화 표현집", author: "EngDev", category: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, price: 0, rating: 4.8, reviews: 95, image: "https://picsum.photos/400/300?random=136", aiHint: "learning english", isExample: true },
+  { id: "ex-learn-2", title: "정보처리기사 실기 요약 노트", author: "CertMaster", category: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, price: 0, rating: 4.9, reviews: 150, image: "https://picsum.photos/400/300?random=137", aiHint: "taking notes", isExample: true },
+  { id: "ex-learn-3", title: "생산성을 높이는 노션 활용법", author: "NotionExpert", category: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, price: 0, rating: 5.0, reviews: 220, image: "https://picsum.photos/400/300?random=138", aiHint: "notion workspace", isExample: true },
+  { id: "ex-learn-4", title: "논리적 글쓰기를 위한 템플릿", author: "Writer", category: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, price: 0, rating: 4.7, reviews: 85, image: "https://picsum.photos/400/300?random=139", aiHint: "writing book", isExample: true },
+  { id: "ex-learn-5", title: "코딩 테스트를 위한 알고리즘 정리", author: "AlgoKing", category: CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT, price: 0, rating: 4.9, reviews: 180, image: "https://picsum.photos/400/300?random=140", aiHint: "algorithm flowchart", isExample: true },
+
+  // 모빌리티 & 자동차
+  { id: "ex-car-1", title: "내 생애 첫 차 구매 가이드 (20대)", author: "CarLover", category: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, price: 0, rating: 4.9, reviews: 110, image: "https://picsum.photos/400/300?random=141", aiHint: "new car", isExample: true },
+  { id: "ex-car-2", title: "중고차 구매 시 필수 체크리스트", author: "UsedCarPro", category: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, price: 0, rating: 5.0, reviews: 130, image: "https://picsum.photos/400/300?random=142", aiHint: "car inspection", isExample: true },
+  { id: "ex-car-3", title: "테슬라 모델3 완벽 사용 설명서", author: "TeslaFan", category: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, price: 0, rating: 4.8, reviews: 90, image: "https://picsum.photos/400/300?random=143", aiHint: "tesla car", isExample: true },
+  { id: "ex-car-4", title: "셀프 세차 용품 및 노하우", author: "DetailingGod", category: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, price: 0, rating: 4.7, reviews: 70, image: "https://picsum.photos/400/300?random=144", aiHint: "car wash", isExample: true },
+  { id: "ex-car-5", title: "자동차 보험료 절약 꿀팁", author: "InsuranceMan", category: CATEGORY_NAMES.MOBILITY_AUTOMOBILE, price: 0, rating: 4.9, reviews: 100, image: "https://picsum.photos/400/300?random=145", aiHint: "insurance document", isExample: true },
+
+  // 라이프 인프라 (부동산·주거)
+  { id: "ex-infra-1", title: "서울 역세권 아파트 임장 리포트", author: "HomeSeeker", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 4.9, reviews: 150, image: "https://picsum.photos/400/300?random=146", aiHint: "seoul apartment", isExample: true },
+  { id: "ex-infra-2", title: "전세 사기 예방을 위한 계약 체크리스트", author: "SafeHome", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 5.0, reviews: 200, image: "https://picsum.photos/400/300?random=147", aiHint: "contract document", isExample: true },
+  { id: "ex-infra-3", title: "10평 원룸 인테리어 꿀팁 모음", author: "InteriorDesigner", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 4.8, reviews: 120, image: "https://picsum.photos/400/300?random=148", aiHint: "small room", isExample: true },
+  { id: "ex-infra-4", title: "LH/SH 청년 주택 청약 가이드", author: "MyHome", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 4.9, reviews: 180, image: "https://picsum.photos/400/300?random=149", aiHint: "house keys", isExample: true },
+  { id: "ex-infra-5", title: "2024년 부동산 정책 해설집", author: "PolicyAnalyst", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 4.7, reviews: 80, image: "https://picsum.photos/400/300?random=150", aiHint: "government building", isExample: true },
+];
+
 export const FEATURED_PROMPTS: Prompt[] = [
   {
     id: "1",
     title: "Next.js 14 Boilerplate",
     author: "DevMaster",
     category: CATEGORY_NAMES.DEVELOPMENT_AUTOMATION,
-    price: 25000,
+    price: 0,
     rating: 4.9,
     reviews: 120,
     image: "https://picsum.photos/400/300?random=1",
     aiHint: "code terminal",
     rank: 1,
+    isExample: true,
   },
   {
     id: "2",
     title: "Minimalist UI Kit",
     author: "PixelPerfect",
     category: CATEGORY_NAMES.CREATION_DESIGN,
-    price: 35000,
+    price: 0,
     rating: 4.8,
     reviews: 95,
     image: "https://picsum.photos/400/300?random=2",
     aiHint: "design components",
     rank: 2,
+    isExample: true,
   },
   {
     id: "3",
     title: "Email Marketing Sequences",
     author: "GrowthHacker",
     category: CATEGORY_NAMES.BUSINESS_MARKETING,
-    price: 18000,
+    price: 0,
     rating: 4.9,
     reviews: 210,
     image: "https://picsum.photos/400/300?random=3",
     aiHint: "email inbox",
     rank: 3,
+    isExample: true,
   },
   {
     id: "4",
     title: "분기별 주식 투자 리포트",
     author: "SEOGuru",
     category: CATEGORY_NAMES.INVESTMENT_FINTECH,
-    price: 12000,
+    price: 0,
     rating: 5.0,
     reviews: 78,
     image: "https://picsum.photos/400/300?random=4",
     aiHint: "stock chart",
     rank: 4,
-  }
+    isExample: true,
+  },
+  ...EXAMPLE_PROMPTS,
 ];

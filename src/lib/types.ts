@@ -11,6 +11,7 @@ export interface Prompt {
   image: string;
   aiHint: string;
   rank?: number;
+  isExample?: boolean;
 }
 
 export interface IdeaRequest {
@@ -21,6 +22,7 @@ export interface IdeaRequest {
     category: string;
     budget: number;
     proposals: number;
+    isExample?: boolean;
 }
 
 export interface SubCategory {
