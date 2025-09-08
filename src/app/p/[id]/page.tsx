@@ -58,6 +58,19 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                 className="object-cover w-full h-auto aspect-[4/3] rounded-lg shadow-lg border"
                 data-ai-hint={prompt.aiHint}
               />
+               <div className="grid grid-cols-5 gap-2">
+                {[...Array(5)].map((_, i) => (
+                  <Image
+                    key={i}
+                    src={`https://picsum.photos/200/150?random=${30 + i}`}
+                    alt={`${prompt.title} thumbnail ${i + 1}`}
+                    width={200}
+                    height={150}
+                    className="object-cover w-full h-auto aspect-[4/3] rounded-md cursor-pointer border hover:border-primary"
+                    data-ai-hint="product screenshot"
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Right Column: Product Details & CTA */}
@@ -132,6 +145,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                             <AccordionContent>
                                 <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
                                     <p>이 보일러플레이트는 최신 Next.js 14, TypeScript, Tailwind CSS, 그리고 prmart의 디자인 시스템을 기반으로 구축되었습니다. 인증, 데이터베이스 연동, 그리고 서버 컴포넌트의 모범 사례를 포함하여 여러분의 다음 프로젝트를 즉시 시작할 수 있도록 돕습니다. AI 기반 기능 통합을 위한 Genkit 설정이 포함되어 있습니다.</p>
+                                    <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
                                     <p>주요 기능:</p>
                                     <ul>
                                         <li>Next.js 14 앱 라우터</li>

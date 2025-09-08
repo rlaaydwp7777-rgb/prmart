@@ -18,7 +18,7 @@ import { CATEGORIES } from "@/lib/constants";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud } from "lucide-react";
+import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText } from "lucide-react";
 import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 
@@ -147,6 +147,17 @@ export function ProductRegistrationForm() {
         </div>
 
         <div className="space-y-2">
+            <Label htmlFor="product-images">상품 이미지</Label>
+            <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
+              <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-4 text-muted-foreground">
+                이미지를 여기로 드래그하거나 클릭하여 업로드하세요. (권장: 4:3 비율)
+              </p>
+              <Input id="product-images" type="file" className="sr-only" multiple />
+            </div>
+        </div>
+
+        <div className="space-y-2">
           <div className="flex justify-between items-center">
             <Label htmlFor="description">{SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
             <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
@@ -154,12 +165,20 @@ export function ProductRegistrationForm() {
               {BUTTONS.GENERATE_WITH_AI}
             </Button>
           </div>
-          <Textarea
-            id="description"
-            placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
-            className="min-h-[120px]"
-            {...register("description")}
-          />
+           <Card>
+              <CardContent className="p-2 space-y-2">
+                <div className="flex gap-1">
+                    <Button variant="ghost" size="sm"><ImageIcon className="mr-2 h-4 w-4" /> 이미지 추가</Button>
+                    <Button variant="ghost" size="sm"><FileText className="mr-2 h-4 w-4" /> 템플릿에서 가져오기</Button>
+                </div>
+                <Textarea
+                    id="description"
+                    placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
+                    className="min-h-[200px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    {...register("description")}
+                />
+              </CardContent>
+            </Card>
           {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
         </div>
 
