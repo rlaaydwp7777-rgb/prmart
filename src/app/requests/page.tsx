@@ -47,10 +47,11 @@ const ideaRequests: IdeaRequest[] = [
     author: "취준생",
     category: "개발 & IT 자동화",
     budget: 20000,
-    proposals: 21,
+    proposals: 2,
     description: "Next.js, TypeScript, Node.js 분야의 주요 기술면접 질문과 모범 답변, 관련 CS 지식이 정리된 PDF 또는 노션 템플릿을 요청합니다."
   }
 ];
+
 
 export default function RequestsPage() {
   const [selectedCategory, setSelectedCategory] = useState("전체보기");
