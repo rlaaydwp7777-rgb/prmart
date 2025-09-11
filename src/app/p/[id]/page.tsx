@@ -12,6 +12,7 @@ import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-reac
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MainLayout } from "@/components/layout/main-layout";
 
 async function getPromptDetails(id: string) {
   // In a real app, you would fetch this from a database.
@@ -43,9 +44,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   const relatedPrompts = FEATURED_PROMPTS.filter(p => p.category === prompt.category && p.id !== prompt.id).slice(0, 4);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 pt-24 pb-12">
+    <MainLayout>
         <div className="container px-4 md:px-6">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Left Column: Image Gallery */}
@@ -97,7 +96,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
               <Separator />
               
               <div className="text-4xl font-bold font-headline text-primary">
-                ₩{prompt.price.toLocaleString()}
+                {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}`: "무료"}
               </div>
 
               {mockPurchaseStatus ? (
@@ -232,9 +231,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
 

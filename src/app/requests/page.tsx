@@ -12,6 +12,7 @@ import type { IdeaRequest } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CATEGORIES } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { MainLayout } from "@/components/layout/main-layout";
 
 const ideaRequests: IdeaRequest[] = [
   {
@@ -68,9 +69,7 @@ export default function RequestsPage() {
   }, [selectedCategory]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 pt-24 pb-12">
+    <MainLayout>
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
@@ -156,8 +155,8 @@ export default function RequestsPage() {
             )}
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
+
+    

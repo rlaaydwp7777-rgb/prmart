@@ -10,6 +10,7 @@ import { PromptCard } from "@/components/prompts/prompt-card";
 import { FEATURED_PROMPTS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import type { IdeaRequest } from "@/lib/types";
+import { MainLayout } from "@/components/layout/main-layout";
 
 
 const ideaRequests: IdeaRequest[] = [
@@ -80,9 +81,7 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 pt-24 pb-12">
+    <MainLayout>
         <div className="container px-4 md:px-6">
           <div className="max-w-3xl mx-auto">
             {/* Request Details */}
@@ -165,8 +164,8 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
             </div>
           </div>
         </div>
-      </main>
-      <Footer />
-    </div>
+    </MainLayout>
   );
 }
+
+    
