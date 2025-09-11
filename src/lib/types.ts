@@ -27,10 +27,12 @@ export interface IdeaRequest {
 
 export interface SubCategory {
   name: string;
+  slug: string;
 }
 
 export interface Category {
   name:string;
+  slug: string;
   icon: LucideIcon;
   subCategories: SubCategory[];
 }

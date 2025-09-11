@@ -29,16 +29,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 const heroSlides = [
-    { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production", href: "/c/ai-&-프로덕션" },
-    { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation", href: "/c/개발-&-it-자동화" },
-    { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "stock graph", href: "/c/재테크-&-투자" },
-    { title: "여행 & 라이프", headline: "여행 일정표도 누군가의 최고의 상품이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel suitcase", href: "/c/여행-&-라이프" },
-    { title: "생활 & 육아 꿀팁", headline: "생활 경험과 육아 노하우도 가치로 연결됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "family illustration", href: "/c/생활-&-육아-꿀팁" },
-    { title: "비즈니스 & 마케팅", headline: "실무 전략과 마케팅 자료, 누구나 올리고 누구나 삽니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business meeting", href: "/c/비즈니스-&-마케팅" },
-    { title: "창작 & 디자인", headline: "창작 아이디어와 디자인 리소스가 거래되는 곳.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "design tools", href: "/c/창작-&-디자인" },
-    { title: "학습 & 자기계발", headline: "지식 한 페이지도 prmart에서 자산이 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/400/300?random=38", aiHint: "reading book", href: "/c/학습-&-자기계발" },
-    { title: "모빌리티 & 자동차", headline: "드라이빙 노하우와 모빌리티 인사이트도 상품이 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "electric car", href: "/c/모빌리티-&-자동차" },
-    { title: "라이프 인프라", headline: "부동산 분석, 주거 데이터도 손쉽게 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house", href: "/c/라이프-인프라-(부동산·주거)" },
+    { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production", href: "/c/ai-production" },
+    { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation", href: "/c/development-automation" },
+    { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "stock graph", href: "/c/investment-fintech" },
+    { title: "여행 & 라이프", headline: "여행 일정표도 누군가의 최고의 상품이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel suitcase", href: "/c/travel-life" },
+    { title: "생활 & 육아 꿀팁", headline: "생활 경험과 육아 노하우도 가치로 연결됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "family illustration", href: "/c/living-parenting" },
+    { title: "비즈니스 & 마케팅", headline: "실무 전략과 마케팅 자료, 누구나 올리고 누구나 삽니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business meeting", href: "/c/business-marketing" },
+    { title: "창작 & 디자인", headline: "창작 아이디어와 디자인 리소스가 거래되는 곳.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "design tools", href: "/c/creation-design" },
+    { title: "학습 & 자기계발", headline: "지식 한 페이지도 prmart에서 자산이 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/400/300?random=38", aiHint: "reading book", href: "/c/learning-self-dev" },
+    { title: "모빌리티 & 자동차", headline: "드라이빙 노하우와 모빌리티 인사이트도 상품이 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "electric car", href: "/c/mobility-automobile" },
+    { title: "라이프 인프라", headline: "부동산 분석, 주거 데이터도 손쉽게 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house", href: "/c/life-infra" },
 ];
 
 const featuredSlides = [
@@ -143,17 +143,19 @@ export default function Home() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-64">
-                        {CATEGORIES.map((category) => (
+                        {CATEGORIES.map((category) => {
+                          const Icon = category.icon;
+                          return (
                           <DropdownMenuSub key={category.name}>
                             <DropdownMenuSubTrigger>
-                              <category.icon className="mr-2 h-4 w-4" />
+                              <Icon className="mr-2 h-4 w-4" />
                               <span>{category.name}</span>
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
                               <DropdownMenuSubContent>
                                 {category.subCategories.map((sub) => (
                                     <DropdownMenuItem key={sub.name} asChild>
-                                        <Link href={`/c/${encodeURIComponent(category.name.toLowerCase())}/${encodeURIComponent(sub.name.toLowerCase())}`}>
+                                        <Link href={`/c/${category.slug}/${sub.slug}`}>
                                             {sub.name}
                                         </Link>
                                     </DropdownMenuItem>
@@ -161,7 +163,7 @@ export default function Home() {
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
-                        ))}
+                        )})}
                     </DropdownMenuContent>
                   </DropdownMenu>
                   <div className="relative flex-1">
@@ -195,14 +197,15 @@ export default function Home() {
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category) => {
                     const isHighlighted = category.name === "AI & 프로덕션" || category.name === "개발 & IT 자동화";
+                    const Icon = category.icon;
                     return (
-                      <Link key={category.name} href={`/c/${encodeURIComponent(category.name.toLowerCase())}`} className="group">
+                      <Link key={category.name} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
                             "flex flex-col items-center justify-center p-6 gap-3 h-[140px] sm:h-[160px] transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
                           )}>
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                                  <category.icon className="h-6 w-6" />
+                                  <Icon className="h-6 w-6" />
                               </div>
                               <span className="font-semibold text-sm text-center">{category.name}</span>
                           </Card>
@@ -318,28 +321,32 @@ export default function Home() {
                   </div>
                   <TabsContent value="buyer" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {buyerSteps.map((step) => (
+                        {buyerSteps.map((step) => {
+                          const Icon = step.icon;
+                          return (
                             <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
-                                    <step.icon className="h-10 w-10" />
+                                    <Icon className="h-10 w-10" />
                                 </div>
                                 <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
                                 <CardDescription>{step.description}</CardDescription>
                             </Card>
-                        ))}
+                        )})}
                     </div>
                   </TabsContent>
                    <TabsContent value="seller" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {sellerSteps.map((step) => (
+                        {sellerSteps.map((step) => {
+                          const Icon = step.icon;
+                          return (
                             <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
-                                    <step.icon className="h-10 w-10" />
+                                    <Icon className="h-10 w-10" />
                                 </div>
                                 <CardTitle className="font-headline mb-2 text-2xl">{step.title}</CardTitle>
                                 <CardDescription>{step.description}</CardDescription>
                             </Card>
-                        ))}
+                        )})}
                     </div>
                   </TabsContent>
                 </Tabs>
@@ -359,7 +366,7 @@ export default function Home() {
             </div>
             <div className="mx-auto w-full flex justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg">
-                <a href="/seller/dashboard">{BUTTONS.START_SELLING}</a>
+                <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
               </Button>
             </div>
           </div>

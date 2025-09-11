@@ -20,19 +20,19 @@ export function Footer() {
           <div className="space-y-2">
             <h4 className="font-semibold">{FOOTER_STRINGS.QUICK_LINKS}</h4>
             <ul className="space-y-1 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</a></li>
-              <li><a href="/browse" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</a></li>
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</a></li>
-              <li><a href="/seller/dashboard" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</a></li>
+              <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</Link></li>
+              <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</Link></li>
+              <li><Link href="/requests" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</Link></li>
+              <li><Link href="/seller/dashboard" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</Link></li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-semibold">{FOOTER_STRINGS.SUPPORT}</h4>
             <ul className="space-y-1 text-muted-foreground">
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.SUPPORT_CENTER}</a></li>
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.TERMS}</a></li>
-              <li><a href="#" className="hover:text-primary">{FOOTER_STRINGS.PRIVACY_POLICY}</a></li>
+              <li><Link href="#" className="hover:text-primary">{FOOTER_STRINGS.SUPPORT_CENTER}</Link></li>
+              <li><Link href="#" className="hover:text-primary">{FOOTER_STRINGS.TERMS}</Link></li>
+              <li><Link href="#" className="hover:text-primary">{FOOTER_STRINGS.PRIVACY_POLICY}</Link></li>
             </ul>
           </div>
 
