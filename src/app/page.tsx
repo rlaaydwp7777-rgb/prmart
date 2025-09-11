@@ -102,7 +102,6 @@ function CategoryCarousel({ category }: { category: typeof CATEGORIES[0] }) {
   const plugin = React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
   const categoryPrompts = FEATURED_PROMPTS.filter(p => p.categorySlug === category.slug);
   
-  // To make the carousel loop smoothly, we need enough items.
   const items = categoryPrompts.length > 5 ? categoryPrompts : [...categoryPrompts, ...categoryPrompts, ...categoryPrompts];
 
   return (
@@ -170,18 +169,18 @@ export default function Home() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
-                    {CATEGORIES.map((category) => {
+                    {CATEGORIES.map((category, catIndex) => {
                       const Icon = category.icon;
                       return (
-                        <DropdownMenuSub key={category.slug}>
+                        <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
                           <DropdownMenuSubTrigger>
                             <Icon className="mr-2 h-4 w-4" />
                             <span>{category.name}</span>
                           </DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
                             <DropdownMenuSubContent>
-                              {category.subCategories.map((sub) => (
-                                <DropdownMenuItem key={sub.slug} asChild>
+                              {category.subCategories.map((sub, subIndex) => (
+                                <DropdownMenuItem key={`${sub.slug}-${subIndex}`} asChild>
                                   <Link href={`/c/${category.slug}/${sub.slug}`}>
                                     {sub.name}
                                   </Link>
