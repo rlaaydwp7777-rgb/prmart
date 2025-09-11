@@ -1,3 +1,4 @@
+
 import type { Category, Prompt } from "./types";
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { CATEGORY_NAMES } from "./string-constants";
@@ -252,8 +253,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     isExample: true,
   },
   ...EXAMPLE_PROMPTS,
-].map(p => ({
-  ...p,
-  categorySlug: slugify(p.category)
-}));
-```
+].map(p => {
+  const category = CATEGORIES.find(c => c.name === p.category);
+  return { ...p, categorySlug: category?.slug };
+});
