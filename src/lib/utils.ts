@@ -10,11 +10,10 @@ export function slugify(text: string) {
   return text
     .toString()
     .toLowerCase()
-    .normalize("NFD")                         // remove accents
+    .normalize("NFD") // remove accents
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/&/g, "and")                       // replace ampersand with 'and'
-    .replace(/[^a-z0-9\s-]/g, "") // allow ascii letters/numbers/hyphen/space
+    .replace(/[^a-z0-9\s-ㄱ-ㅎㅏ-ㅣ가-힣]/g, "") // allow hangul
     .trim()
-    .replace(/\s+/g, "-")                    // spaces -> hyphen
+    .replace(/\s+/g, "-") // spaces -> hyphen
     .replace(/-+/g, "-");
 }
