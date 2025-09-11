@@ -110,7 +110,7 @@ function CategoryCarousel({ category }: { category: typeof CATEGORIES[0] }) {
     <Carousel opts={{ align: "start", loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
       <CarouselContent>
         {items.map((prompt, index) => (
-          <CarouselItem key={prompt.id ? `${prompt.id}-${index}` : index} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
+          <CarouselItem key={`${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
             <div className="p-1">
               <PromptCard prompt={prompt} />
             </div>
@@ -134,7 +134,7 @@ export default function Home() {
           <Carousel plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
             <CarouselContent>
               {heroSlides.map((slide, index) => (
-                <CarouselItem key={slide.slug || index}>
+                <CarouselItem key={`${slide.slug}-${index}`}>
                   <Link href={`/c/${slide.slug}`}>
                     <div className="relative h-[30vh] md:h-[35vh] lg:h-[40vh] w-full">
                       <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
@@ -224,11 +224,11 @@ export default function Home() {
         <section id="categories" className="w-full py-12 md:py-20">
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
-                  {CATEGORIES.map((category) => {
+                  {CATEGORIES.map((category, index) => {
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     const Icon = category.icon;
                     return (
-                      <Link key={category.slug} href={`/c/${category.slug}`} className="group">
+                      <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
                             "flex flex-col items-center justify-center p-6 gap-3 h-[140px] sm:h-[160px] transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
@@ -407,4 +407,6 @@ export default function Home() {
 }
 
     
+    
+
     
