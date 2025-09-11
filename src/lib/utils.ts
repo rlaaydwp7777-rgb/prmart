@@ -12,7 +12,7 @@ export function slugify(text: string) {
     .toLowerCase()
     .normalize("NFD")                         // remove accents
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/&/g, "and")                    // replace ampersand with and
+    .replace(/&/g, "")                    // replace ampersand with empty string
     .replace(/[^a-z0-9\s-]/g, "")            // allow only ascii letters/numbers/hyphen/space
     .trim()
     .replace(/\s+/g, "-")                    // spaces -> hyphen
