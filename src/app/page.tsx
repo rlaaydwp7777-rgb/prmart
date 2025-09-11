@@ -261,8 +261,8 @@ export default function Home() {
                 className="w-full"
             >
                 <CarouselContent>
-                    {featuredSlides.map((slide) => (
-                        <CarouselItem key={slide.title}>
+                    {featuredSlides.map((slide, index) => (
+                        <CarouselItem key={`${slide.title}-${index}`}>
                             <div className="space-y-4">
                                 <h3 className="text-2xl font-bold text-center">{slide.title}</h3>
                                 <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -404,3 +404,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
