@@ -2,42 +2,46 @@ import { PromptCard } from "@/components/prompts/prompt-card";
 import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { notFound } from "next/navigation";
 import { MainLayout } from "@/components/layout/main-layout";
-import type { Category, SubCategory } from "@/lib/types";
+import type { Category, SubCategory, Prompt } from "@/lib/types";
 
 export default async function CategoryPage({ params }: { params: { slug: string[] } }) {
   const { slug } = params;
+  
+  if (!slug || slug.length === 0) {
+    notFound();
+  }
+
+  const categorySlug = decodeURIComponent(slug[0]);
+  const subCategorySlug = slug.length > 1 ? decodeURIComponent(slug[1]) : null;
+
   let category: Category | undefined;
   let subCategory: SubCategory | undefined;
   let pageTitle = "";
   let pageDescription = "";
+  let prompts: Prompt[] = [];
 
-  if (slug.length === 1) {
-    // Main category page: /c/[category-slug]
-    category = CATEGORIES.find(c => c.slug === slug[0]);
-    if (category) {
-      pageTitle = category.name;
-      pageDescription = `${category.name} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
-    }
-  } else if (slug.length === 2) {
-    // Subcategory page: /c/[category-slug]/[subcategory-slug]
-    category = CATEGORIES.find(c => c.slug === slug[0]);
-    if (category) {
-      subCategory = category.subCategories.find(sc => sc.slug === slug[1]);
-      if (subCategory) {
-        pageTitle = subCategory.name;
-        pageDescription = `${subCategory.name} 서브카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
-      }
-    }
-  }
+  category = CATEGORIES.find(c => c.slug === categorySlug);
 
   if (!category) {
     notFound();
   }
 
-  // Filter prompts by the main category name for simplicity.
-  // In a real app, this would be a more complex database query possibly filtering by subcategory as well.
-  const categoryPrompts = FEATURED_PROMPTS.filter(p => p.category === category?.name);
-  
+  if (subCategorySlug) {
+    subCategory = category.subCategories.find(sc => sc.slug === subCategorySlug);
+    if (subCategory) {
+      pageTitle = subCategory.name;
+      pageDescription = `${subCategory.name} 서브카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
+      // This is a mock filter. In a real app, prompts would have a subCategory field/slug to filter by.
+      prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name).slice(0, 2);
+    } else {
+      notFound();
+    }
+  } else {
+    pageTitle = category.name;
+    pageDescription = `${category.name} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
+    prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name);
+  }
+
   return (
     <MainLayout>
         <div className="container px-4 md:px-6">
@@ -50,9 +54,9 @@ export default async function CategoryPage({ params }: { params: { slug: string[
             </p>
           </div>
           
-          {categoryPrompts.length > 0 ? (
+          {prompts.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {categoryPrompts.map((prompt) => (
+                {prompts.map((prompt) => (
                 <PromptCard key={prompt.id} prompt={prompt} />
                 ))}
             </div>
@@ -65,5 +69,3 @@ export default async function CategoryPage({ params }: { params: { slug: string[
     </MainLayout>
   );
 }
-
-    

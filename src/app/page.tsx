@@ -29,16 +29,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 
 const heroSlides = [
-    { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/600/400?random=31", aiHint: "AI production", href: "/c/ai-and-prodution" },
-    { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/600/400?random=32", aiHint: "development automation", href: "/c/development-it-automation" },
-    { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/600/400?random=33", aiHint: "stock graph", href: "/c/investment-fintech" },
-    { title: "여행 & 라이프", headline: "여행 일정표도 누군가의 최고의 상품이 됩니다.", bgColor: "bg-gradient-to-br from-sky-500 to-cyan-500", image: "https://picsum.photos/600/400?random=34", aiHint: "travel suitcase", href: "/c/travel-life" },
-    { title: "생활 & 육아 꿀팁", headline: "생활 경험과 육아 노하우도 가치로 연결됩니다.", bgColor: "bg-gradient-to-br from-amber-400 to-orange-500", image: "https://picsum.photos/600/400?random=35", aiHint: "family illustration", href: "/c/living-parenting-tips" },
-    { title: "비즈니스 & 마케팅", headline: "실무 전략과 마케팅 자료, 누구나 올리고 누구나 삽니다.", bgColor: "bg-gradient-to-br from-blue-700 to-blue-500", image: "https://picsum.photos/600/400?random=36", aiHint: "business meeting", href: "/c/business-marketing" },
-    { title: "창작 & 디자인", headline: "창작 아이디어와 디자인 리소스가 거래되는 곳.", bgColor: "bg-gradient-to-br from-pink-500 to-rose-500", image: "https://picsum.photos/600/400?random=37", aiHint: "design tools", href: "/c/creation-design" },
-    { title: "학습 & 자기계발", headline: "지식 한 페이지도 prmart에서 자산이 됩니다.", bgColor: "bg-gradient-to-br from-teal-500 to-cyan-600", image: "https://picsum.photos/400/300?random=38", aiHint: "reading book", href: "/c/learning-self-development" },
-    { title: "모빌리티 & 자동차", headline: "드라이빙 노하우와 모빌리티 인사이트도 상품이 됩니다.", bgColor: "bg-gradient-to-br from-gray-700 to-gray-800", image: "https://picsum.photos/600/400?random=39", aiHint: "electric car", href: "/c/mobility-automobile" },
-    { title: "라이프 인프라", headline: "부동산 분석, 주거 데이터도 손쉽게 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-lime-600 to-green-500", image: "https://picsum.photos/600/400?random=40", aiHint: "modern house", href: "/c/life-infra-real-estate-and-housing" },
+    { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/1600/900?random=31", aiHint: "AI production", slug: "ai-and-production" },
+    { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/1600/900?random=32", aiHint: "development automation", slug: "development-it-automation" },
+    { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/1600/900?random=33", aiHint: "stock graph", slug: "investment-fintech" },
 ];
 
 const featuredSlides = [
@@ -100,7 +93,7 @@ export default function Home() {
             <CarouselContent>
               {heroSlides.map((slide, index) => (
                  <CarouselItem key={index}>
-                  <Link href={slide.href}>
+                  <Link href={`/c/${slide.slug}`}>
                     <div className="relative h-[30vh] md:h-[35vh] lg:h-[40vh] w-full">
                         <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
                         <Image
@@ -146,7 +139,7 @@ export default function Home() {
                         {CATEGORIES.map((category) => {
                           const Icon = category.icon;
                           return (
-                          <DropdownMenuSub key={category.name}>
+                          <DropdownMenuSub key={category.slug}>
                             <DropdownMenuSubTrigger>
                               <Icon className="mr-2 h-4 w-4" />
                               <span>{category.name}</span>
@@ -154,7 +147,7 @@ export default function Home() {
                             <DropdownMenuPortal>
                               <DropdownMenuSubContent>
                                 {category.subCategories.map((sub) => (
-                                    <DropdownMenuItem key={sub.name} asChild>
+                                    <DropdownMenuItem key={sub.slug} asChild>
                                         <Link href={`/c/${category.slug}/${sub.slug}`}>
                                             {sub.name}
                                         </Link>
@@ -196,10 +189,10 @@ export default function Home() {
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category) => {
-                    const isHighlighted = category.name === "AI & 프로덕션" || category.name === "개발 & IT 자동화";
+                    const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     const Icon = category.icon;
                     return (
-                      <Link key={category.name} href={`/c/${category.slug}`} className="group">
+                      <Link key={category.slug} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
                             "flex flex-col items-center justify-center p-6 gap-3 h-[140px] sm:h-[160px] transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
@@ -256,7 +249,7 @@ export default function Home() {
         <section id="category-rankings" className="w-full py-12 md:py-20 lg:py-24">
             <div className="container space-y-12">
                 {CATEGORIES.map((category) => (
-                    <div key={category.name}>
+                    <div key={category.slug}>
                         <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">{category.name} 인기 상품</h3>
                          <CategoryCarousel category={category} />
                     </div>
@@ -434,5 +427,3 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
-
-    

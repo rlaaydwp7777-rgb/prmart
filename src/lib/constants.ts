@@ -1,4 +1,3 @@
-
 import type { Category, Prompt } from "./types";
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { CATEGORY_NAMES } from "./string-constants";
@@ -254,5 +253,3 @@ export const FEATURED_PROMPTS: Prompt[] = [
   },
   ...EXAMPLE_PROMPTS,
 ];
-
-    
