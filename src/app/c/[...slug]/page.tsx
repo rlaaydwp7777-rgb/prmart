@@ -3,7 +3,8 @@ import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import Link from "next/link";
 import { MainLayout } from "@/components/layout/main-layout";
-import type { Category, SubCategory, Prompt } from "@/lib/types";
+import type { Category, SubCategory } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   params: {
@@ -33,9 +34,9 @@ export default function CategoryCatchAll({ params }: Props) {
       }
   }
 
-  // Filter prompts by the main category name.
-  // In a real app, this might also filter by subcategory.
-  const prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name);
+  // In a real app, this would be a more complex database query possibly filtering by subcategory as well.
+  // For now, we filter by main category slug.
+  const prompts = FEATURED_PROMPTS.filter(p => p.categorySlug === category?.slug);
   
   const pageTitle = subCategory ? subCategory.name : category.name;
   const pageDescription = `${pageTitle} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;

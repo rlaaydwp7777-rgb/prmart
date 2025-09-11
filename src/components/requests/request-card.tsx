@@ -55,5 +55,3 @@ export function RequestCard({ request }: RequestCardProps) {
     </Link>
   );
 }
-
-    

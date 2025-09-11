@@ -43,7 +43,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   const mockPurchaseStatus = true; 
 
   const categoryData = CATEGORIES.find(c => c.name === prompt.category);
-  const relatedPrompts = FEATURED_PROMPTS.filter(p => p.category === prompt.category && p.id !== prompt.id).slice(0, 4);
+  const relatedPrompts = FEATURED_PROMPTS.filter(p => p.categorySlug === prompt.categorySlug && p.id !== prompt.id).slice(0, 4);
 
   return (
     <MainLayout>
@@ -240,5 +240,3 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
     </MainLayout>
   );
 }
-
-    

@@ -22,8 +22,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn, slugify } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { slugify } from "@/lib/utils";
 
 const heroSlides = [
   { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/1600/900?random=31", aiHint: "AI production", slug: slugify("AI & 프로덕션") },
@@ -98,10 +99,15 @@ const sellerSteps = [
 
 function CategoryCarousel({ category }: { category: typeof CATEGORIES[0] }) {
   const plugin = React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
+  const categoryPrompts = FEATURED_PROMPTS.filter(p => p.categorySlug === category.slug);
+  
+  // To make the carousel loop smoothly, we need enough items.
+  const items = categoryPrompts.length > 5 ? categoryPrompts : [...categoryPrompts, ...categoryPrompts, ...categoryPrompts];
+
   return (
     <Carousel opts={{ align: "start", loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
       <CarouselContent>
-        {FEATURED_PROMPTS.filter(p => p.category === category.name).concat(FEATURED_PROMPTS.filter(p => p.category === category.name)).map((prompt, index) => (
+        {items.map((prompt, index) => (
           <CarouselItem key={`${category.slug}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
             <div className="p-1">
               <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />

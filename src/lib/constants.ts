@@ -252,4 +252,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
     isExample: true,
   },
   ...EXAMPLE_PROMPTS,
-];
+].map(p => ({
+  ...p,
+  categorySlug: CATEGORIES.find(c => c.name === p.category)?.slug || slugify(p.category)
+}));

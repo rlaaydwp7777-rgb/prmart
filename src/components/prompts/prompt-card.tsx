@@ -35,7 +35,7 @@ const RankBadge = ({ rank }: { rank: number }) => {
 
 
 export function PromptCard({ prompt }: PromptCardProps) {
-  const category = CATEGORIES.find(c => c.name === prompt.category);
+  const category = CATEGORIES.find(c => c.slug === prompt.categorySlug);
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300">
@@ -79,5 +79,3 @@ export function PromptCard({ prompt }: PromptCardProps) {
     </Card>
   );
 }
-
-    

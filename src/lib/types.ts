@@ -12,6 +12,7 @@ export interface Prompt {
   aiHint: string;
   rank?: number;
   isExample?: boolean;
+  categorySlug?: string;
 }
 
 export interface IdeaRequest {

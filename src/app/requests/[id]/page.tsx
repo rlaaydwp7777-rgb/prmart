@@ -175,5 +175,3 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
     </MainLayout>
   );
 }
-
-    
