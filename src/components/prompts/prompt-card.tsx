@@ -1,4 +1,3 @@
-
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -38,10 +37,10 @@ export function PromptCard({ prompt }: PromptCardProps) {
   const category = CATEGORIES.find(c => c.slug === prompt.categorySlug);
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300">
-      <Link href={`/p/${prompt.id}`} className="block">
-        <CardContent className="p-0">
-          <div className="relative">
+    <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300 flex flex-col h-full">
+      <CardContent className="p-0 flex flex-col flex-grow">
+        <div className="relative">
+          <Link href={`/p/${prompt.id}`} className="block">
             <Image
               src={prompt.image}
               alt={prompt.title}
@@ -50,32 +49,34 @@ export function PromptCard({ prompt }: PromptCardProps) {
               className="object-cover w-full aspect-video"
               data-ai-hint={prompt.aiHint}
             />
-            {prompt.rank && <RankBadge rank={prompt.rank} />}
-             <div className="absolute top-3 right-3 flex gap-2">
-                {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
-                {category && 
-                    <Link href={`/c/${category.slug}`} className="z-10">
-                        <Badge variant="secondary">{prompt.category}</Badge>
-                    </Link>
-                }
-            </div>
+          </Link>
+          {prompt.rank && <RankBadge rank={prompt.rank} />}
+            <div className="absolute top-3 right-3 flex gap-2">
+              {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
+              {category && 
+                  <Link href={`/c/${category.slug}`} className="z-10" onClick={(e) => e.stopPropagation()}>
+                      <Badge variant="secondary">{prompt.category}</Badge>
+                  </Link>
+              }
           </div>
-          <div className="p-4 space-y-2">
-            <h3 className="font-bold text-lg truncate font-headline">{prompt.title}</h3>
-            <p className="text-muted-foreground text-sm">{PROMPT_CARD_STRINGS.BY} {prompt.author}</p>
-            <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-1">
-                <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                <span className="font-medium">{prompt.rating.toFixed(1)}</span>
-                <span className="text-muted-foreground text-sm">({prompt.reviews.toLocaleString()} {PROMPT_CARD_STRINGS.REVIEWS})</span>
-              </div>
-              <span className="font-bold text-xl text-primary">
-                {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}` : "무료"}
-              </span>
+        </div>
+        <div className="p-4 space-y-2 flex flex-col flex-grow">
+          <Link href={`/p/${prompt.id}`} className="block">
+            <h3 className="font-bold text-lg truncate font-headline hover:underline">{prompt.title}</h3>
+          </Link>
+          <p className="text-muted-foreground text-sm">{PROMPT_CARD_STRINGS.BY} {prompt.author}</p>
+          <div className="flex items-center justify-between pt-1 mt-auto">
+            <div className="flex items-center gap-1">
+              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+              <span className="font-medium">{prompt.rating.toFixed(1)}</span>
+              <span className="text-muted-foreground text-sm">({prompt.reviews.toLocaleString()} {PROMPT_CARD_STRINGS.REVIEWS})</span>
             </div>
+            <span className="font-bold text-xl text-primary">
+              {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}` : "무료"}
+            </span>
           </div>
-        </CardContent>
-      </Link>
+        </div>
+      </CardContent>
     </Card>
   );
 }
