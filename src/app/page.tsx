@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import * as React from "react";
@@ -109,9 +110,9 @@ function CategoryCarousel({ category }: { category: typeof CATEGORIES[0] }) {
     <Carousel opts={{ align: "start", loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
       <CarouselContent>
         {items.map((prompt, index) => (
-          <CarouselItem key={`${category.slug}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
+          <CarouselItem key={prompt.id ? `${prompt.id}-${index}` : index} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
             <div className="p-1">
-              <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
+              <PromptCard prompt={prompt} />
             </div>
           </CarouselItem>
         ))}
@@ -133,7 +134,7 @@ export default function Home() {
           <Carousel plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
             <CarouselContent>
               {heroSlides.map((slide, index) => (
-                <CarouselItem key={index}>
+                <CarouselItem key={slide.slug || index}>
                   <Link href={`/c/${slide.slug}`}>
                     <div className="relative h-[30vh] md:h-[35vh] lg:h-[40vh] w-full">
                       <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
@@ -405,4 +406,5 @@ export default function Home() {
   );
 }
 
+    
     

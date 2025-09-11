@@ -252,11 +252,14 @@ export const FEATURED_PROMPTS: Prompt[] = [
     rank: 4,
     isExample: true,
   },
-  ...EXAMPLE_PROMPTS,
-].map((p, index) => ({ 
+  ...EXAMPLE_PROMPTS.map((p, index) => ({ 
+    ...p, 
+    id: `${p.id}-copy-${index}`, // Ensure unique IDs
+  })),
+].map((p) => ({ 
   ...p, 
-  id: p.isExample ? p.id : `${p.id}-${index}`, // Ensure unique IDs
   categorySlug: slugify(p.category)
 }));
 
+    
     
