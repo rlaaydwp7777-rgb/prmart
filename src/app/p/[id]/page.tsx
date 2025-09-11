@@ -1,3 +1,4 @@
+
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { PromptCard } from "@/components/prompts/prompt-card";
@@ -7,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { FEATURED_PROMPTS } from "@/lib/constants";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -41,6 +42,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   // In a real app, this would be determined by checking the user's purchase history.
   const mockPurchaseStatus = true; 
 
+  const categoryData = CATEGORIES.find(c => c.name === prompt.category);
   const relatedPrompts = FEATURED_PROMPTS.filter(p => p.category === prompt.category && p.id !== prompt.id).slice(0, 4);
 
   return (
@@ -75,7 +77,11 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
             {/* Right Column: Product Details & CTA */}
             <div className="flex flex-col gap-4 md:gap-6">
               <div>
-                <Badge>{prompt.category}</Badge>
+                {categoryData && (
+                  <Link href={`/c/${categoryData.slug}`}>
+                    <Badge>{prompt.category}</Badge>
+                  </Link>
+                )}
                 <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter mt-2">{prompt.title}</h1>
                 <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
                    <Link href="#" className="flex items-center gap-2 hover:text-primary">

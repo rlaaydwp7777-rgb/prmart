@@ -47,3 +47,5 @@ export interface HomePageContent {
   ctaHeadline: string;
   ctaSubheadline: string;
 }
+
+    

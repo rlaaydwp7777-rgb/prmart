@@ -1,21 +1,29 @@
+
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, User } from "lucide-react";
 import type { IdeaRequest } from "@/lib/types";
+import { CATEGORIES } from "@/lib/constants";
 
 interface RequestCardProps {
   request: IdeaRequest;
 }
 
 export function RequestCard({ request }: RequestCardProps) {
+  const category = CATEGORIES.find(c => c.name === request.category);
+
   return (
     <Link href={`/requests/${request.id}`} className="block h-full">
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg duration-300">
             <CardHeader>
                 <div className="flex gap-2">
-                    <Badge variant="secondary" className="w-fit">{request.category}</Badge>
+                    {category && 
+                      <Link href={`/c/${category.slug}`} className="z-10">
+                        <Badge variant="secondary" className="w-fit">{request.category}</Badge>
+                      </Link>
+                    }
                     {request.isExample && <Badge variant="outline">예제</Badge>}
                 </div>
                 <CardTitle className="text-lg font-headline leading-snug group-hover:underline pt-2">
@@ -47,3 +55,5 @@ export function RequestCard({ request }: RequestCardProps) {
     </Link>
   );
 }
+
+    

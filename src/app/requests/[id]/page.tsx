@@ -1,3 +1,4 @@
+
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { notFound } from "next/navigation";
@@ -7,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { FEATURED_PROMPTS } from "@/lib/constants";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import type { IdeaRequest } from "@/lib/types";
 import { MainLayout } from "@/components/layout/main-layout";
+import Link from "next/link";
 
 
 const ideaRequests: IdeaRequest[] = [
@@ -75,6 +77,8 @@ const mockProposals = [
 
 export default async function RequestDetailPage({ params }: { params: { id: string } }) {
   const request = ideaRequests.find((r) => r.id === params.id);
+  const category = CATEGORIES.find(c => c.name === request?.category);
+
 
   if (!request) {
     notFound();
@@ -87,7 +91,11 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
             {/* Request Details */}
             <div className="space-y-4">
               <div className="flex gap-2">
-                <Badge variant="secondary">{request.category}</Badge>
+                 {category && (
+                    <Link href={`/c/${category.slug}`}>
+                      <Badge variant="secondary">{request.category}</Badge>
+                    </Link>
+                 )}
                 {request.isExample && <Badge variant="outline">예제</Badge>}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">{request.title}</h1>

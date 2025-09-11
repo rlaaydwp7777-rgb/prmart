@@ -1,3 +1,4 @@
+
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,6 +7,7 @@ import { Star, Trophy } from "lucide-react";
 import type { Prompt } from "@/lib/types";
 import { PROMPT_CARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
+import { CATEGORIES } from "@/lib/constants";
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -33,6 +35,8 @@ const RankBadge = ({ rank }: { rank: number }) => {
 
 
 export function PromptCard({ prompt }: PromptCardProps) {
+  const category = CATEGORIES.find(c => c.name === prompt.category);
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300">
       <Link href={`/p/${prompt.id}`} className="block">
@@ -49,7 +53,11 @@ export function PromptCard({ prompt }: PromptCardProps) {
             {prompt.rank && <RankBadge rank={prompt.rank} />}
              <div className="absolute top-3 right-3 flex gap-2">
                 {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
-                <Badge variant="secondary">{prompt.category}</Badge>
+                {category && 
+                    <Link href={`/c/${category.slug}`} className="z-10">
+                        <Badge variant="secondary">{prompt.category}</Badge>
+                    </Link>
+                }
             </div>
           </div>
           <div className="p-4 space-y-2">
@@ -71,3 +79,5 @@ export function PromptCard({ prompt }: PromptCardProps) {
     </Card>
   );
 }
+
+    
