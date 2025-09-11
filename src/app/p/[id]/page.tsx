@@ -237,3 +237,5 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
     </div>
   );
 }
+
+    

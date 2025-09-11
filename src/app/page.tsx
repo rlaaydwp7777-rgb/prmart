@@ -436,15 +436,3 @@ const sellerSteps = [
 ];
 
     
-
-    
-
-    
-
-
-
-    
-
-    
-
-    
