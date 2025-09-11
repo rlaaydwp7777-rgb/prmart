@@ -1,46 +1,45 @@
-import { PromptCard } from "@/components/prompts/prompt-card";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { notFound } from "next/navigation";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
+import { PromptCard } from "@/components/prompts/prompt-card";
+import Link from "next/link";
 import { MainLayout } from "@/components/layout/main-layout";
 import type { Category, SubCategory, Prompt } from "@/lib/types";
 
-export default async function CategoryPage({ params }: { params: { slug: string[] } }) {
-  const { slug } = params;
-  
-  if (!slug || slug.length === 0) {
+interface Props {
+  params: {
+    slug?: string[]; // catch-all
+  };
+}
+
+export default function CategoryCatchAll({ params }: Props) {
+  const slugParts = params.slug || [];
+  const categorySlug = slugParts[0] ? decodeURIComponent(slugParts[0]) : null;
+  const subCategorySlug = slugParts[1] ? decodeURIComponent(slugParts[1]) : null;
+
+  if (!categorySlug) {
     notFound();
   }
 
-  const categorySlug = decodeURIComponent(slug[0]);
-  const subCategorySlug = slug.length > 1 ? decodeURIComponent(slug[1]) : null;
-
-  let category: Category | undefined;
-  let subCategory: SubCategory | undefined;
-  let pageTitle = "";
-  let pageDescription = "";
-  let prompts: Prompt[] = [];
-
-  category = CATEGORIES.find(c => c.slug === categorySlug);
-
+  const category = CATEGORIES.find(c => c.slug === categorySlug);
   if (!category) {
     notFound();
   }
-
+  
+  let subCategory: SubCategory | undefined;
   if (subCategorySlug) {
-    subCategory = category.subCategories.find(sc => sc.slug === subCategorySlug);
-    if (subCategory) {
-      pageTitle = subCategory.name;
-      pageDescription = `${subCategory.name} 서브카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
-      // This is a mock filter. In a real app, prompts would have a subCategory field/slug to filter by.
-      prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name).slice(0, 2);
-    } else {
-      notFound();
-    }
-  } else {
-    pageTitle = category.name;
-    pageDescription = `${category.name} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
-    prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name);
+      subCategory = category.subCategories.find(sc => sc.slug === subCategorySlug);
+      if(!subCategory){
+          notFound();
+      }
   }
+
+  // Filter prompts by the main category name.
+  // In a real app, this might also filter by subcategory.
+  const prompts = FEATURED_PROMPTS.filter(p => p.category === category?.name);
+  
+  const pageTitle = subCategory ? subCategory.name : category.name;
+  const pageDescription = `${pageTitle} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;
+
 
   return (
     <MainLayout>
@@ -63,6 +62,9 @@ export default async function CategoryPage({ params }: { params: { slug: string[
           ) : (
             <div className="text-center py-20">
                 <p className="text-muted-foreground text-lg">이 카테고리에는 아직 상품이 없습니다.</p>
+                 <Button asChild variant="link" className="mt-4">
+                    <Link href="/">홈으로 돌아가기</Link>
+                </Button>
             </div>
           )}
         </div>
