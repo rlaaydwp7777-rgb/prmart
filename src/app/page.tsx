@@ -21,9 +21,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getCategories, getProducts } from "@/lib/firebase/services";
 import type { Category, Prompt } from "@/lib/types";
-import { CATEGORY_ICONS } from "@/lib/constants";
+import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { MainLayout } from "@/components/layout/main-layout";
 
 
@@ -120,7 +119,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
     { title: "prmart 추천 아이디어", prompts: prompts.filter(p => (p.stats?.likes ?? 0) > 100) },
   ];
 
-  const heroSlides = categories.slice(0, 10).map((category, index) => ({
+  const heroSlides = categories.slice(0, 10).map((category) => ({
     title: category.name,
     headline: {
         [CATEGORY_NAMES.AI_PRODUCTION]: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
@@ -228,8 +227,8 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {categories.map((category, index) => {
+                    const Icon = CATEGORIES.find(c => c.slug === category.slug)?.icon || Wallet;
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
-                    const Icon = CATEGORY_ICONS[category.name as keyof typeof CATEGORY_ICONS] || Wallet;
                     return (
                       <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
@@ -408,7 +407,8 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
 }
 
 
-export default async function HomePage() {
-  const [prompts, categories] = await Promise.all([getProducts(), getCategories()]);
+export default function HomePage() {
+  const prompts = FEATURED_PROMPTS;
+  const categories = CATEGORIES;
   return <HomeClient prompts={prompts} categories={categories} />;
 }

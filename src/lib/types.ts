@@ -1,3 +1,4 @@
+
 import type { LucideIcon } from "lucide-react";
 import type { Timestamp } from "firebase/firestore";
 
@@ -44,11 +45,10 @@ export interface SubCategory {
 }
 
 export interface Category {
-  id: string;
   name:string;
   slug: string;
-  icon?: string; // Icon name as string
-  subCategories?: SubCategory[];
+  icon: LucideIcon;
+  subCategories: SubCategory[];
 }
 
 export interface HomePageContent {
@@ -61,6 +61,3 @@ export interface HomePageContent {
   ctaHeadline: string;
   ctaSubheadline: string;
 }
-
-    
-

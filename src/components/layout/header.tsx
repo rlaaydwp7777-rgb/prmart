@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { ChevronDown, Sparkles, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -5,12 +6,11 @@ import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { getCategories } from "@/lib/firebase/services";
-import { CATEGORY_ICONS } from "@/lib/constants";
+import { CATEGORIES } from "@/lib/constants";
 
 
-export async function Header() {
-  const categories = await getCategories();
+export function Header() {
+  const categories = CATEGORIES;
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
@@ -31,7 +31,7 @@ export async function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
                     {categories.map((category, catIndex) => {
-                      const Icon = CATEGORY_ICONS[category.name as keyof typeof CATEGORY_ICONS] || Wallet;
+                      const Icon = category.icon || Wallet;
                       if (!category.subCategories || category.subCategories.length === 0) {
                         return (
                           <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
