@@ -2,10 +2,10 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Sparkles, LayoutGrid } from "lucide-react";
+import { ChevronDown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
-import { HEADER_LINKS, ICONS } from "@/lib/string-constants";
+import { HEADER_LINKS } from "@/lib/string-constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,6 +37,50 @@ export function Header({ categories }: HeaderProps) {
               <Link href="/browse" className="font-medium text-muted-foreground transition-colors hover:text-primary">
                 {HEADER_LINKS.VIEW_ALL}
               </Link>
+              
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-0">
+                    {HEADER_LINKS.CATEGORIES}
+                    <ChevronDown className="ml-1 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64">
+                   <DropdownMenuItem asChild>
+                     <Link href="/browse">전체보기</Link>
+                   </DropdownMenuItem>
+                   <DropdownMenuSeparator />
+                  {categories.map((category) => (
+                    <DropdownMenuSub key={category.slug}>
+                      <DropdownMenuSubTrigger>
+                        <span>{category.name}</span>
+                      </DropdownMenuSubTrigger>
+                      <DropdownMenuPortal>
+                        <DropdownMenuSubContent>
+                          <DropdownMenuItem asChild>
+                            <Link href={`/c/${category.slug}`}>
+                              {category.name} 전체
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          {category.subCategories && category.subCategories.length > 0 ? (
+                            category.subCategories.map((sub) => (
+                              <DropdownMenuItem key={sub.slug} asChild>
+                                <Link href={`/c/${category.slug}/${sub.slug}`}>
+                                  {sub.name}
+                                </Link>
+                              </DropdownMenuItem>
+                            ))
+                          ) : (
+                             <DropdownMenuItem disabled>하위 카테고리 없음</DropdownMenuItem>
+                          )}
+                        </DropdownMenuSubContent>
+                      </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
                 {HEADER_LINKS.REQUEST_IDEA}
               </Link>
@@ -53,5 +97,3 @@ export function Header({ categories }: HeaderProps) {
     </header>
   );
 }
-
-    

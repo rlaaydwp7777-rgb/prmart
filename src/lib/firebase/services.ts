@@ -29,7 +29,7 @@ const EXAMPLE_CATEGORIES: Category[] = [
     },
     { 
         id: "cat-2", name: "개발 & IT 자동화", slug: "development-it-automation", icon: "Code",
-        subCategories: generateSubCategories("development-it-automation", ["웹/앱 개발", "데이터 분석 & 시각화", "업무 자동화 스크립트", "클라우드/인프라", "보안/해킹 지식"])
+        subCategories: generateSubCategories("development-it-automation", ["웹/앱 개발", "데이터 분석 & 시각화", "업무 자동화", "클라우드/인프라", "보안/해킹 지식"])
     },
     { 
         id: "cat-3", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart",
@@ -37,11 +37,11 @@ const EXAMPLE_CATEGORIES: Category[] = [
     },
     { 
         id: "cat-4", name: "여행 & 라이프", slug: "travel-life", icon: "Plane",
-        subCategories: generateSubCategories("travel-life", ["국내여행 코스", "해외여행 플랜", "항공·숙박 꿀팁", "여행 사진/영상 노하우", "맛집 리스트"])
+        subCategories: generateSubCategories("travel-life", ["국내여행 코스", "해외여행 플랜", "항공·숙박 꿀팁", "여행 사진/영상 노하우", "소규모 여행 커뮤니티"])
     },
     { 
         id: "cat-5", name: "생활 & 육아 꿀팁", slug: "living-parenting-tips", icon: "Users",
-        subCategories: generateSubCategories("living-parenting-tips", ["육아 노하우", "생활 절약법", "건강/헬스 정보", "집안일 자동화", "반려동물 꿀팁"])
+        subCategories: generateSubCategories("living-parenting-tips", ["육아 노하우", "생활 절약법", "건강/헬스 정보", "집안일 자동화 꿀팁", "음식/레시피 공유"])
     },
     { 
         id: "cat-6", name: "비즈니스 & 마케팅", slug: "business-marketing", icon: "Briefcase",
@@ -49,7 +49,7 @@ const EXAMPLE_CATEGORIES: Category[] = [
     },
     { 
         id: "cat-7", name: "창작 & 디자인", slug: "creation-design", icon: "Brush",
-        subCategories: generateSubCategories("creation-design", ["일러스트·리소스", "UX/UI 디자인 팁", "사진 보정/촬영 기법", "영상 편집 프리셋", "폰트·컬러 팔레트"])
+        subCategories: generateSubCategories("creation-design", ["일러스트·캐릭터 리소스", "UX/UI 디자인 팁", "사진 보정/촬영 기법", "영상 편집 프리셋", "폰트·컬러 팔레트 공유"])
     },
     { 
         id: "cat-8", name: "학습 & 자기계발", slug: "learning-self-development", icon: "BookOpen",
@@ -215,5 +215,3 @@ export async function getCategories(): Promise<Category[]> {
         }
     });
 }
-
-    
