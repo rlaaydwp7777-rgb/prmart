@@ -1,4 +1,3 @@
-
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { notFound } from "next/navigation";
@@ -8,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { Separator } from "@/components/ui/separator";
 import type { IdeaRequest } from "@/lib/types";
 import { MainLayout } from "@/components/layout/main-layout";
 import Link from "next/link";
+import { getCategories, getProducts } from "@/lib/firebase/services";
 
 
 const ideaRequests: IdeaRequest[] = [
@@ -58,13 +57,22 @@ const ideaRequests: IdeaRequest[] = [
   }
 ];
 
-const mockProposals = [
+
+
+export default async function RequestDetailPage({ params }: { params: { id: string } }) {
+  const request = ideaRequests.find((r) => r.id === params.id);
+  
+  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
+
+  const category = categories.find(c => c.name === request?.category);
+
+  const mockProposals = [
     {
         id: "prop-1",
         author: "DevMaster",
         avatar: "https://picsum.photos/100/100?random=1",
         content: "제가 만든 Next.js 보일러플레이트가 딱 맞을 것 같네요! 이걸로 시작하시면 기술 면접 준비 시간을 확 줄일 수 있습니다.",
-        product: FEATURED_PROMPTS[0]
+        product: products[0]
     },
     {
         id: "prop-2",
@@ -73,12 +81,7 @@ const mockProposals = [
         content: "기술 면접 질문만 모아둔 건 아니지만, 제 실전 코딩 테스트 문제 풀이집도 도움이 될 겁니다. 한번 확인해보세요.",
         product: null
     }
-];
-
-export default async function RequestDetailPage({ params }: { params: { id: string } }) {
-  const request = ideaRequests.find((r) => r.id === params.id);
-  const category = CATEGORIES.find(c => c.name === request?.category);
-
+  ];
 
   if (!request) {
     notFound();

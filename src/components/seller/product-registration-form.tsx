@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIES } from "@/lib/constants";
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -22,6 +21,8 @@ import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image a
 import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 import { Switch } from "../ui/switch";
+import { getCategories } from "@/lib/firebase/services";
+import type { Category } from "@/lib/types";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -54,6 +55,15 @@ export function ProductRegistrationForm() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories);
+    }
+    fetchCategories();
+  }, [])
   
   const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -201,7 +211,7 @@ export function ProductRegistrationForm() {
                 <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map(cat => (
+                {categories.map(cat => (
                   <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
                 ))}
               </SelectContent>

@@ -1,13 +1,17 @@
 import Link from "next/link";
-import { ChevronDown, Sparkles } from "lucide-react";
+import { ChevronDown, Sparkles, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { CATEGORIES } from "@/lib/constants";
+import { getCategories } from "@/lib/firebase/services";
+import { CATEGORY_ICONS } from "@/lib/constants";
 
-export function Header() {
+
+export async function Header() {
+  const categories = await getCategories();
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 md:px-6">
@@ -26,8 +30,18 @@ export function Header() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
-                    {CATEGORIES.map((category, catIndex) => {
-                      const Icon = category.icon;
+                    {categories.map((category, catIndex) => {
+                      const Icon = CATEGORY_ICONS[category.name as keyof typeof CATEGORY_ICONS] || Wallet;
+                      if (!category.subCategories || category.subCategories.length === 0) {
+                        return (
+                          <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
+                            <Link href={`/c/${category.slug}`}>
+                              <Icon className="mr-2 h-4 w-4" />
+                              <span>{category.name}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                        )
+                      }
                       return (
                         <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
                           <DropdownMenuSubTrigger>

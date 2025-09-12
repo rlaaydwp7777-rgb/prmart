@@ -4,15 +4,15 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, User } from "lucide-react";
-import type { IdeaRequest } from "@/lib/types";
-import { CATEGORIES } from "@/lib/constants";
+import type { IdeaRequest, Category } from "@/lib/types";
 
 interface RequestCardProps {
   request: IdeaRequest;
+  categories: Category[];
 }
 
-export function RequestCard({ request }: RequestCardProps) {
-  const category = CATEGORIES.find(c => c.name === request.category);
+export function RequestCard({ request, categories }: RequestCardProps) {
+  const category = categories.find(c => c.name === request.category);
 
   return (
     <Link href={`/requests/${request.id}`} className="block h-full">

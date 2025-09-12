@@ -2,18 +2,15 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { RequestCard } from "@/components/requests/request-card";
-import type { IdeaRequest } from "@/lib/types";
+import type { IdeaRequest, Category } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CATEGORIES } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 import { MainLayout } from "@/components/layout/main-layout";
+import { getCategories } from "@/lib/firebase/services";
 
 const ideaRequests: IdeaRequest[] = [
   {
@@ -61,6 +58,15 @@ const ideaRequests: IdeaRequest[] = [
 
 export default function RequestsPage() {
   const [selectedCategory, setSelectedCategory] = useState("전체보기");
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  React.useEffect(() => {
+    async function fetchCategories() {
+      const cats = await getCategories();
+      setCategories(cats);
+    }
+    fetchCategories();
+  }, []);
 
   const filteredRequests = useMemo(() => {
     if (selectedCategory === "전체보기") {
@@ -98,7 +104,7 @@ export default function RequestsPage() {
                       <SelectValue placeholder="카테고리 선택" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map(cat => (
+                      {categories.map(cat => (
                         <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
                       ))}
                     </SelectContent>
@@ -133,7 +139,7 @@ export default function RequestsPage() {
                 >
                     전체보기
                 </Button>
-                {CATEGORIES.map((category) => (
+                {categories.map((category) => (
                     <Button 
                         key={category.name} 
                         variant={selectedCategory === category.name ? "default" : "outline"}
@@ -146,7 +152,7 @@ export default function RequestsPage() {
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredRequests.map((request) => (
-                <RequestCard key={request.id} request={request} />
+                <RequestCard key={request.id} request={request} categories={categories} />
               ))}
             </div>
              {filteredRequests.length === 0 && (

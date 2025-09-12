@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import Link from "next/link";
 import { MainLayout } from "@/components/layout/main-layout";
 import type { Category, SubCategory } from "@/lib/types";
 import { Button } from "@/components/ui/button";
+import { getCategories, getProductsByCategorySlug } from "@/lib/firebase/services";
 
 interface Props {
   params: {
@@ -12,7 +12,7 @@ interface Props {
   };
 }
 
-export default function CategoryCatchAll({ params }: Props) {
+export default async function CategoryCatchAll({ params }: Props) {
   const slugParts = params.slug || [];
   const categorySlug = slugParts[0] ? decodeURIComponent(slugParts[0]) : null;
   const subCategorySlug = slugParts[1] ? decodeURIComponent(slugParts[1]) : null;
@@ -21,22 +21,22 @@ export default function CategoryCatchAll({ params }: Props) {
     notFound();
   }
 
-  const category = CATEGORIES.find(c => c.slug === categorySlug);
+  const allCategories = await getCategories();
+
+  const category = allCategories.find(c => c.slug === categorySlug);
   if (!category) {
     notFound();
   }
   
   let subCategory: SubCategory | undefined;
   if (subCategorySlug) {
-      subCategory = category.subCategories.find(sc => sc.slug === subCategorySlug);
+      subCategory = category.subCategories?.find(sc => sc.slug === subCategorySlug);
       if(!subCategory){
           notFound();
       }
   }
 
-  // In a real app, this would be a more complex database query possibly filtering by subcategory as well.
-  // For now, we filter by main category slug.
-  const prompts = FEATURED_PROMPTS.filter(p => p.categorySlug === category?.slug);
+  const prompts = await getProductsByCategorySlug(category.slug);
   
   const pageTitle = subCategory ? subCategory.name : category.name;
   const pageDescription = `${pageTitle} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;

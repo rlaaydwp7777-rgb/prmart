@@ -1,18 +1,30 @@
 import type { LucideIcon } from "lucide-react";
+import type { Timestamp } from "firebase/firestore";
 
 export interface Prompt {
   id: string;
   title: string;
-  author: string;
+  description: string;
+  author: string; // This should be a seller ID in the future
+  sellerId?: string;
   category: string;
+  categorySlug: string;
   price: number;
-  rating: number;
-  reviews: number;
   image: string;
   aiHint: string;
+  tags?: string[];
   rank?: number;
   isExample?: boolean;
-  categorySlug?: string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  stats?: {
+    views: number;
+    likes: number;
+    sales: number;
+  };
+  // Properties from old structure, for compatibility.
+  rating?: number;
+  reviews?: number;
 }
 
 export interface IdeaRequest {
@@ -32,10 +44,11 @@ export interface SubCategory {
 }
 
 export interface Category {
+  id: string;
   name:string;
   slug: string;
-  icon: LucideIcon;
-  subCategories: SubCategory[];
+  icon?: string; // Icon name as string
+  subCategories?: SubCategory[];
 }
 
 export interface HomePageContent {
@@ -50,3 +63,4 @@ export interface HomePageContent {
 }
 
     
+

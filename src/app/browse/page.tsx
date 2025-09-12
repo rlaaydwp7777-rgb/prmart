@@ -1,17 +1,9 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { FEATURED_PROMPTS } from "@/lib/constants";
 import { MainLayout } from "@/components/layout/main-layout";
+import { getProducts } from "@/lib/firebase/services";
 
 export default async function BrowsePage() {
-  // In the future, this would fetch all products, not just featured ones.
-  // We'll multiply the featured prompts to simulate a larger catalog for now.
-  const allPrompts = [
-    ...FEATURED_PROMPTS, 
-    ...FEATURED_PROMPTS.map(p => ({...p, id: `${p.id}-2`})), 
-    ...FEATURED_PROMPTS.map(p => ({...p, id: `${p.id}-3`}))
-  ];
+  const allPrompts = await getProducts();
 
   return (
     <MainLayout>
@@ -36,5 +28,3 @@ export default async function BrowsePage() {
     </MainLayout>
   );
 }
-
-    

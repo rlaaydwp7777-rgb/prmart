@@ -1,4 +1,3 @@
-
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { PromptCard } from "@/components/prompts/prompt-card";
@@ -8,23 +7,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
 import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MainLayout } from "@/components/layout/main-layout";
-
-async function getPromptDetails(id: string) {
-  // In a real app, you would fetch this from a database.
-  // We'll add more prompts to the search pool to make more products "findable"
-  const allPrompts = [
-    ...FEATURED_PROMPTS, 
-    ...FEATURED_PROMPTS.map(p => ({...p, id: `${p.id}-2`})), 
-    ...FEATURED_PROMPTS.map(p => ({...p, id: `${p.id}-3`}))
-  ];
-  return allPrompts.find((p) => p.id === id);
-}
+import { getProduct, getProductsByCategorySlug, getCategories } from "@/lib/firebase/services";
 
 const mockReviews = [
     { id: 1, author: "김지훈", avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요." },
@@ -33,7 +21,7 @@ const mockReviews = [
 ];
 
 export default async function PromptDetailPage({ params }: { params: { id: string } }) {
-  const prompt = await getPromptDetails(params.id);
+  const prompt = await getProduct(params.id);
 
   if (!prompt) {
     notFound();
@@ -42,8 +30,12 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   // In a real app, this would be determined by checking the user's purchase history.
   const mockPurchaseStatus = true; 
 
-  const categoryData = CATEGORIES.find(c => c.name === prompt.category);
-  const relatedPrompts = FEATURED_PROMPTS.filter(p => p.categorySlug === prompt.categorySlug && p.id !== prompt.id).slice(0, 4);
+  const categories = await getCategories();
+  const categoryData = categories.find(c => c.name === prompt.category);
+  const relatedPrompts = await getProductsByCategorySlug(prompt.categorySlug, 4, prompt.id);
+  
+  const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
+  const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   return (
     <MainLayout>
@@ -93,8 +85,8 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                    </Link>
                    <div className="flex items-center gap-1">
                         <Star className="w-4 h-4 text-amber-400" />
-                        <span className="font-medium">{prompt.rating.toFixed(1)}</span>
-                        <span>({prompt.reviews.toLocaleString()})</span>
+                        <span className="font-medium">{rating.toFixed(1)}</span>
+                        <span>({reviews.toLocaleString()})</span>
                     </div>
                 </div>
               </div>
@@ -149,7 +141,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
                             <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
                             <AccordionContent>
                                 <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
-                                    <p>이 보일러플레이트는 최신 Next.js 14, TypeScript, Tailwind CSS, 그리고 prmart의 디자인 시스템을 기반으로 구축되었습니다. 인증, 데이터베이스 연동, 그리고 서버 컴포넌트의 모범 사례를 포함하여 여러분의 다음 프로젝트를 즉시 시작할 수 있도록 돕습니다. AI 기반 기능 통합을 위한 Genkit 설정이 포함되어 있습니다.</p>
+                                    <p>{prompt.description}</p>
                                     <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
                                     <p>주요 기능:</p>
                                     <ul>

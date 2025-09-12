@@ -6,7 +6,6 @@ import { Star, Trophy } from "lucide-react";
 import type { Prompt } from "@/lib/types";
 import { PROMPT_CARD_STRINGS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
-import { CATEGORIES } from "@/lib/constants";
 
 interface PromptCardProps {
   prompt: Prompt;
@@ -34,7 +33,9 @@ const RankBadge = ({ rank }: { rank: number }) => {
 
 
 export function PromptCard({ prompt }: PromptCardProps) {
-  const category = CATEGORIES.find(c => c.slug === prompt.categorySlug);
+
+  const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
+  const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg hover:-translate-y-1 duration-300 flex flex-col h-full">
@@ -53,8 +54,8 @@ export function PromptCard({ prompt }: PromptCardProps) {
           {prompt.rank && <RankBadge rank={prompt.rank} />}
             <div className="absolute top-3 right-3 flex gap-2">
               {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
-              {category && 
-                  <Link href={`/c/${category.slug}`} className="z-10">
+              {prompt.category && 
+                  <Link href={`/c/${prompt.categorySlug}`} className="z-10">
                       <Badge variant="secondary">{prompt.category}</Badge>
                   </Link>
               }
@@ -68,8 +69,8 @@ export function PromptCard({ prompt }: PromptCardProps) {
           <div className="flex items-center justify-between pt-1 mt-auto">
             <div className="flex items-center gap-1">
               <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-              <span className="font-medium">{prompt.rating.toFixed(1)}</span>
-              <span className="text-muted-foreground text-sm">({prompt.reviews.toLocaleString()} {PROMPT_CARD_STRINGS.REVIEWS})</span>
+              <span className="font-medium">{rating.toFixed(1)}</span>
+              <span className="text-muted-foreground text-sm">({reviews.toLocaleString()} {PROMPT_CARD_STRINGS.REVIEWS})</span>
             </div>
             <span className="font-bold text-xl text-primary">
               {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}` : "무료"}
@@ -80,5 +81,3 @@ export function PromptCard({ prompt }: PromptCardProps) {
     </Card>
   );
 }
-
-    

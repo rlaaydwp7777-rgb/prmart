@@ -1,11 +1,13 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { FEATURED_PROMPTS } from "@/lib/constants";
 import { ACCOUNT_STRINGS } from "@/lib/string-constants";
+import { getProducts } from "@/lib/firebase/services";
 
-export default function WishlistPage() {
-    const wishlistItems = FEATURED_PROMPTS.slice(2, 4);
+export default async function WishlistPage() {
+    // In a real app, this would fetch the user's wishlist from Firestore
+    const allProducts = await getProducts();
+    const wishlistItems = allProducts.slice(2, 4);
 
     return (
         <Card>
