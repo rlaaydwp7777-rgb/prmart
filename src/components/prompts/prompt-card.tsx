@@ -54,7 +54,7 @@ export function PromptCard({ prompt }: PromptCardProps) {
             <div className="absolute top-3 right-3 flex gap-2">
               {prompt.isExample && <Badge variant="outline" className="bg-background/80">예제</Badge>}
               {category && 
-                  <Link href={`/c/${category.slug}`} className="z-10" onClick={(e) => e.stopPropagation()}>
+                  <Link href={`/c/${category.slug}`} className="z-10">
                       <Badge variant="secondary">{prompt.category}</Badge>
                   </Link>
               }
