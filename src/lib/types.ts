@@ -45,9 +45,10 @@ export interface SubCategory {
 }
 
 export interface Category {
+  id: string;
   name:string;
   slug: string;
-  icon: LucideIcon;
+  icon: string; // LucideIcon name as string
   subCategories: SubCategory[];
 }
 

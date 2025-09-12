@@ -1,16 +1,22 @@
 
 import Link from "next/link";
-import { ChevronDown, Sparkles, Wallet } from "lucide-react";
+import { ChevronDown, Sparkles, Wallet, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
-import { CATEGORIES } from "@/lib/constants";
+import type { Category } from "@/lib/types";
 
+const ICONS: { [key: string]: React.FC<any> } = {
+    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home
+};
 
-export function Header() {
-  const categories = CATEGORIES;
+interface HeaderProps {
+    categories: Category[];
+}
+
+export function Header({ categories }: HeaderProps) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
@@ -31,7 +37,7 @@ export function Header() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
                     {categories.map((category, catIndex) => {
-                      const Icon = category.icon || Wallet;
+                      const Icon = ICONS[category.icon as string] || Wallet;
                       if (!category.subCategories || category.subCategories.length === 0) {
                         return (
                           <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>

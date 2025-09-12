@@ -13,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
+import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { BUTTONS, HEADER_LINKS, CATEGORY_NAMES } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -22,10 +22,12 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Category, Prompt } from "@/lib/types";
-import { CATEGORIES } from "@/lib/constants";
 import { MainLayout } from "@/components/layout/main-layout";
 import { getProducts, getCategories } from "@/lib/firebase/services";
 
+const ICONS: { [key: string]: React.FC<any> } = {
+    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home
+};
 
 const testimonials = [
   {
@@ -228,7 +230,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {categories.map((category, index) => {
-                    const Icon = CATEGORIES.find(c => c.slug === category.slug)?.icon || Wallet;
+                    const Icon = ICONS[category.icon as string] || Wallet;
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     return (
                       <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
@@ -261,7 +263,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
                     align: "start",
                     loop: true,
                 }}
-                plugins={[React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true })).current]}
+                plugins={[plugin.current]}
                 className="w-full"
             >
                 <CarouselContent>
@@ -416,5 +418,3 @@ export default async function HomePage() {
 
   return <HomeClient prompts={prompts} categories={categories} />;
 }
-
-    

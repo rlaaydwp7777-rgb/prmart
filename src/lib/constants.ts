@@ -127,10 +127,3 @@ export const CATEGORIES: Category[] = [
     ]
   },
 ];
-
-export const CATEGORY_ICONS = CATEGORIES.reduce((acc, category) => {
-    acc[category.name] = category.icon;
-    return acc;
-}, {} as Record<string, React.FC<any>>);
-
-    
