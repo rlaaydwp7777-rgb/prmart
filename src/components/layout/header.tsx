@@ -9,7 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal
 import type { Category } from "@/lib/types";
 
 const ICONS: { [key: string]: React.FC<any> } = {
-    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home
+    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet
 };
 
 interface HeaderProps {

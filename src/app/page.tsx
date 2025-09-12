@@ -26,7 +26,7 @@ import { MainLayout } from "@/components/layout/main-layout";
 import { getProducts, getCategories } from "@/lib/firebase/services";
 
 const ICONS: { [key: string]: React.FC<any> } = {
-    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home
+    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet
 };
 
 const testimonials = [
@@ -116,51 +116,26 @@ function CategoryCarousel({ category, prompts }: { category: Category, prompts: 
 function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Category[] }) {
   const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
 
+  const featuredPrompts = prompts.filter(p => p.rank && p.rank > 0).sort((a,b) => (a.rank || 99) - (b.rank || 99));
+
   const featuredSlides = [
-    { title: "실시간 인기 TOP 10", prompts: prompts },
-    { title: "새로 등록된 아이디어", prompts: [...prompts].reverse() },
+    { title: "실시간 인기 TOP 10", prompts: featuredPrompts },
+    { title: "새로 등록된 아이디어", prompts: [...prompts].sort((a,b) => (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0)) },
     { title: "prmart 추천 아이디어", prompts: prompts.filter(p => (p.stats?.likes ?? 0) > 100) },
   ];
 
-  const heroSlides = categories.slice(0, 10).map((category) => ({
+  const heroSlides = categories.slice(0, 5).map((category, index) => ({
     title: category.name,
     headline: {
         [CATEGORY_NAMES.AI_PRODUCTION]: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
         [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "작은 코드 한 줄도 아이디어 상품이 됩니다.",
         [CATEGORY_NAMES.INVESTMENT_FINTECH]: "투자 인사이트, 누구나 사고팔 수 있습니다.",
         [CATEGORY_NAMES.TRAVEL_LIFE]: "당신의 특별한 여행 경험을 공유하고 수익을 만드세요.",
-        [CATEGORY_NAMES.LIVING_PARENTING_TIPS]: "생활의 지혜와 육아 꿀팁, 이제는 자산이 됩니다.",
         [CATEGORY_NAMES.BUSINESS_MARKETING]: "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
-        [CATEGORY_NAMES.CREATION_DESIGN]: "당신의 창의력을 판매하고 영감을 얻으세요.",
-        [CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT]: "학습 자료와 성장 노하우를 거래하며 함께 발전하세요.",
-        [CATEGORY_NAMES.MOBILITY_AUTOMOBILE]: "자동차에 대한 모든 것, 전문가의 지식을 만나보세요.",
-        [CATEGORY_NAMES.LIFE_INFRA]: "부동산과 주거에 대한 깊이 있는 정보를 거래하세요.",
     }[category.name] || `${category.name}의 모든 것을 만나보세요.`,
-    bgColor: {
-        [CATEGORY_NAMES.AI_PRODUCTION]: "bg-gradient-to-br from-indigo-500 to-purple-600",
-        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "bg-gradient-to-br from-slate-800 to-slate-600",
-        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "bg-gradient-to-br from-emerald-500 to-green-600",
-        [CATEGORY_NAMES.TRAVEL_LIFE]: "bg-gradient-to-br from-cyan-500 to-teal-600",
-        [CATEGORY_NAMES.LIVING_PARENTING_TIPS]: "bg-gradient-to-br from-amber-500 to-orange-600",
-        [CATEGORY_NAMES.BUSINESS_MARKETING]: "bg-gradient-to-br from-sky-500 to-blue-600",
-        [CATEGORY_NAMES.CREATION_DESIGN]: "bg-gradient-to-br from-rose-500 to-pink-600",
-        [CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT]: "bg-gradient-to-br from-violet-500 to-fuchsia-600",
-        [CATEGORY_NAMES.MOBILITY_AUTOMOBILE]: "bg-gradient-to-br from-neutral-700 to-gray-800",
-        [CATEGORY_NAMES.LIFE_INFRA]: "bg-gradient-to-br from-lime-500 to-yellow-600",
-    }[category.name] || "bg-gradient-to-br from-gray-500 to-gray-600",
+    bgColor: "bg-gradient-to-br from-gray-500 to-gray-600",
     image: `https://picsum.photos/seed/${category.slug}/1600/900`,
-    aiHint: {
-        [CATEGORY_NAMES.AI_PRODUCTION]: "AI production",
-        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "development automation",
-        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "stock graph",
-        [CATEGORY_NAMES.TRAVEL_LIFE]: "beautiful landscape",
-        [CATEGORY_NAMES.LIVING_PARENTING_TIPS]: "happy family",
-        [CATEGORY_NAMES.BUSINESS_MARKETING]: "business meeting",
-        [CATEGORY_NAMES.CREATION_DESIGN]: "digital art",
-        [CATEGORY_NAMES.LEARNING_SELF_DEVELOPMENT]: "person studying",
-        [CATEGORY_NAMES.MOBILITY_AUTOMOBILE]: "modern car",
-        [CATEGORY_NAMES.LIFE_INFRA]: "city apartment",
-    }[category.name] || "abstract background",
+    aiHint: category.name,
     slug: category.slug,
   }));
 
