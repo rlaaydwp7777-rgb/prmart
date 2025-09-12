@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Sparkles, Wallet, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, LayoutGrid } from "lucide-react";
+import { ChevronDown, Sparkles, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS, ICONS } from "@/lib/string-constants";
@@ -42,7 +42,7 @@ export function Header({ categories }: HeaderProps) {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     {categories.map((category, catIndex) => {
-                      const Icon = ICONS[category.icon as keyof typeof ICONS] || Wallet;
+                      const Icon = ICONS[category.icon as keyof typeof ICONS] || ICONS['Wallet'];
                       if (!category.subCategories || category.subCategories.length === 0) {
                         return (
                           <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>

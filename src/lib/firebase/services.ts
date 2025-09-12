@@ -94,48 +94,57 @@ function serializeDoc(doc: any): any {
 
 export async function getProducts(): Promise<Prompt[]> {
     return fetchFromCache('products', async () => {
-        const snapshot = await getDocs(collection(db, "products"));
-        if (snapshot.empty) {
+        try {
+            const snapshot = await getDocs(collection(db, "products"));
+            if (snapshot.empty) {
+                return EXAMPLE_PROMPTS;
+            }
+            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+        } catch (error) {
+            console.error("Error fetching products, returning example data:", error);
             return EXAMPLE_PROMPTS;
         }
-        return snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
     });
 }
 
 export async function getProduct(id: string): Promise<Prompt | null> {
     const cacheKey = `product_${id}`;
     return fetchFromCache(cacheKey, async () => {
-        const docRef = doc(db, "products", id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return serializeDoc(docSnap) as Prompt;
+        try {
+            const docRef = doc(db, "products", id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return serializeDoc(docSnap) as Prompt;
+            }
+        } catch (error) {
+             console.error(`Error fetching product ${id}, falling back to example data:`, error);
         }
-        // Fallback to example data if doc not in DB
-        const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
-        if(exampleProduct) return exampleProduct;
         
-        // Also check products from other categories in example data
-        const allExampleProducts = EXAMPLE_CATEGORIES.flatMap(cat => 
-            EXAMPLE_PROMPTS.filter(p => p.categorySlug === cat.slug)
-        );
-        return allExampleProducts.find(p => p.id === id) || null;
+        // Fallback to example data if doc not in DB or error occurs
+        const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
+        return exampleProduct || null;
     });
 }
 
 export async function getProductsByCategorySlug(slug: string, count?: number, excludeId?: string): Promise<Prompt[]> {
     const cacheKey = `products_by_category_${slug}_${count}_${excludeId}`;
     return fetchFromCache(cacheKey, async () => {
-        let q = query(collection(db, "products"), where("categorySlug", "==", slug));
-        if (count) {
-            q = query(q, limit(count + (excludeId ? 1 : 0)));
-        }
-        const snapshot = await getDocs(q);
-
         let products: Prompt[];
-        if (snapshot.empty) {
+        try {
+            let q = query(collection(db, "products"), where("categorySlug", "==", slug));
+            if (count) {
+                q = query(q, limit(count + (excludeId ? 1 : 0)));
+            }
+            const snapshot = await getDocs(q);
+
+            if (snapshot.empty) {
+                products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
+            } else {
+                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+            }
+        } catch (error) {
+            console.error(`Error fetching products for category ${slug}, returning example data:`, error);
             products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
-        } else {
-            products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
         }
 
         if (excludeId) {
@@ -150,10 +159,15 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
 
 export async function getCategories(): Promise<Category[]> {
     return fetchFromCache('categories', async () => {
-        const snapshot = await getDocs(collection(db, "categories"));
-        if (snapshot.empty) {
+        try {
+            const snapshot = await getDocs(collection(db, "categories"));
+            if (snapshot.empty) {
+                return EXAMPLE_CATEGORIES;
+            }
+            return snapshot.docs.map(doc => serializeDoc(doc) as Category);
+        } catch (error) {
+            console.error("Error fetching categories, returning example data:", error);
             return EXAMPLE_CATEGORIES;
         }
-        return snapshot.docs.map(doc => serializeDoc(doc) as Category);
     });
 }
