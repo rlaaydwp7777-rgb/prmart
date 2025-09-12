@@ -22,7 +22,6 @@ import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { slugify } from "@/lib/utils";
@@ -161,38 +160,6 @@ export default function Home() {
           <div className="container max-w-4xl mx-auto">
             <div className="w-full max-w-2xl mx-auto">
               <div className="relative flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" className="h-14 rounded-full pl-4 pr-2 text-muted-foreground bg-background">
-                      <span className="mr-2">카테고리</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64">
-                    {CATEGORIES.map((category, catIndex) => {
-                      const Icon = category.icon;
-                      return (
-                        <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
-                          <DropdownMenuSubTrigger>
-                            <Icon className="mr-2 h-4 w-4" />
-                            <span>{category.name}</span>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                              {category.subCategories.map((sub, subIndex) => (
-                                <DropdownMenuItem key={`${sub.slug}-${subIndex}`} asChild>
-                                  <Link href={`/c/${category.slug}/${sub.slug}`}>
-                                    {sub.name}
-                                  </Link>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuSubContent>
-                          </DropdownMenuPortal>
-                        </DropdownMenuSub>
-                      );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
                 <div className="relative flex-1">
                   <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                   <Input placeholder="예: 부동산 임장 리포트, 인스타 광고 템플릿, 미드저니 프롬프트" className="pl-12 h-14 text-lg rounded-full shadow-lg w-full" />
@@ -223,7 +190,7 @@ export default function Home() {
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {CATEGORIES.map((category, index) => {
-                    const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
+                    const isHighlighted = category.slug === "ai-production" || category.slug === "development-it-automation";
                     const Icon = category.icon;
                     return (
                       <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
@@ -403,8 +370,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
-    
-
-    
