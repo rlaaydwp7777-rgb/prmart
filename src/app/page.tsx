@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { BUTTONS, HEADER_LINKS, CATEGORY_NAMES, ICONS } from "@/lib/string-constants";
+import { BUTTONS, HEADER_LINKS, ICONS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -116,18 +116,18 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
 
   const featuredSlides = [
     { title: "실시간 인기 TOP 10", prompts: featuredPrompts },
-    { title: "새로 등록된 아이디어", prompts: [...prompts].sort((a,b) => (b.createdAt?.toMillis() ?? 0) - (a.createdAt?.toMillis() ?? 0)) },
+    { title: "새로 등록된 아이디어", prompts: [...prompts].sort((a,b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()) },
     { title: "prmart 추천 아이디어", prompts: prompts.filter(p => (p.stats?.likes ?? 0) > 100) },
   ];
-
-  const heroSlides = categories.slice(0, 5).map((category, index) => ({
+  
+  const heroSlides = categories.slice(0, 5).map((category) => ({
     title: category.name,
     headline: {
-        [CATEGORY_NAMES.AI_PRODUCTION]: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
-        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "작은 코드 한 줄도 아이디어 상품이 됩니다.",
-        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "투자 인사이트, 누구나 사고팔 수 있습니다.",
-        [CATEGORY_NAMES.TRAVEL_LIFE]: "당신의 특별한 여행 경험을 공유하고 수익을 만드세요.",
-        [CATEGORY_NAMES.BUSINESS_MARKETING]: "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
+        "AI & 프로덕션": "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
+        "개발 & IT 자동화": "작은 코드 한 줄도 아이디어 상품이 됩니다.",
+        "재테크 & 투자": "투자 인사이트, 누구나 사고팔 수 있습니다.",
+        "여행 & 라이프": "당신의 특별한 여행 경험을 공유하고 수익을 만드세요.",
+        "비즈니스 & 마케팅": "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
     }[category.name] || `${category.name}의 모든 것을 만나보세요.`,
     bgColor: "bg-gradient-to-br from-gray-500 to-gray-600",
     image: `https://picsum.photos/seed/${category.slug}/1600/900`,

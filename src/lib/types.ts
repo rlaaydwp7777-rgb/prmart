@@ -1,12 +1,11 @@
 
 import type { LucideIcon } from "lucide-react";
-import type { Timestamp } from "firebase/firestore";
 
 export interface Prompt {
   id: string;
   title: string;
-  description: string;
-  author: string; // This should be a seller ID in the future
+  description?: string;
+  author: string; 
   sellerId?: string;
   category: string;
   categorySlug: string;
@@ -16,14 +15,13 @@ export interface Prompt {
   tags?: string[];
   rank?: number;
   isExample?: boolean;
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
+  createdAt?: string; // Changed from Timestamp to string
+  updatedAt?: string; // Changed from Timestamp to string
   stats?: {
     views: number;
     likes: number;
     sales: number;
   };
-  // Properties from old structure, for compatibility.
   rating?: number;
   reviews?: number;
 }
