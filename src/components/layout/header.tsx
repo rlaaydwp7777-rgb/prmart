@@ -2,12 +2,12 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Sparkles, Wallet, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
+import { ChevronDown, Sparkles, Wallet, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS, ICONS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import type { Category } from "@/lib/types";
 
 interface HeaderProps {
@@ -34,6 +34,13 @@ export function Header({ categories }: HeaderProps) {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
+                    <DropdownMenuItem asChild>
+                       <Link href="/browse">
+                        <LayoutGrid className="mr-2 h-4 w-4" />
+                        <span>{HEADER_LINKS.VIEW_ALL}</span>
+                       </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     {categories.map((category, catIndex) => {
                       const Icon = ICONS[category.icon as keyof typeof ICONS] || Wallet;
                       if (!category.subCategories || category.subCategories.length === 0) {

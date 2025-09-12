@@ -23,6 +23,11 @@ const EXAMPLE_CATEGORIES: Category[] = [
     { id: "3", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart", subCategories: [] },
     { id: "4", name: "여행 & 라이프", slug: "travel-life", icon: "Plane", subCategories: [] },
     { id: "5", name: "생활 & 육아 꿀팁", slug: "living-parenting-tips", icon: "Users", subCategories: [] },
+    { id: "6", name: "비즈니스 & 마케팅", slug: "business-marketing", icon: "Briefcase", subCategories: [] },
+    { id: "7", name: "창작 & 디자인", slug: "creation-design", icon: "Brush", subCategories: [] },
+    { id: "8", name: "학습 & 자기계발", slug: "learning-self-development", icon: "BookOpen", subCategories: [] },
+    { id: "9", name: "모빌리티 & 자동차", slug: "mobility-automobile", icon: "Car", subCategories: [] },
+    { id: "10", name: "라이프 인프라", slug: "life-infra", icon: "Home", subCategories: [] }
 ];
 
 const EXAMPLE_PROMPTS: Prompt[] = [
