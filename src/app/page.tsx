@@ -13,7 +13,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
+import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { BUTTONS, HEADER_LINKS, ICONS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";

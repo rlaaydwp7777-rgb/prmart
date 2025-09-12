@@ -1,3 +1,4 @@
+
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Prompt, Category, SubCategory } from "@/lib/types";
@@ -64,13 +65,45 @@ const EXAMPLE_CATEGORIES: Category[] = [
     }
 ];
 
-const EXAMPLE_PROMPTS: Prompt[] = [
-    { id: "ex-1", title: "시네마틱 Midjourney 프롬프트", author: "AI Artist", category: "AI & 프로덕션", categorySlug: "ai-and-production", price: 0, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", rank: 1, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 120, sales: 30, views: 1500 }, rating: 4.9, reviews: 30 },
-    { id: "ex-2", title: "Next.js 보일러플레이트", author: "DevMaster", category: "개발 & IT 자동화", categorySlug: "development-it-automation", price: 0, image: "https://picsum.photos/400/300?random=108", aiHint: "react code", rank: 2, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 250, sales: 80, views: 3000 }, rating: 5.0, reviews: 80 },
-    { id: "ex-3", title: "부동산 수익률 계산기", author: "RealEstatePro", category: "재테크 & 투자", categorySlug: "investment-fintech", price: 0, image: "https://picsum.photos/400/300?random=112", aiHint: "calculator money", rank: 3, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 180, sales: 50, views: 2200 }, rating: 4.8, reviews: 50 },
-    { id: "ex-4", title: "제주도 3박 4일 동쪽 코스", author: "Traveler", category: "여행 & 라이프", categorySlug: "travel-life", price: 0, image: "https://picsum.photos/400/300?random=116", aiHint: "jeju island", rank: 4, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 300, sales: 120, views: 5000 }, rating: 4.9, reviews: 120 },
-    { id: "ex-5", title: "신생아 100일 수면교육법", author: "SuperMom", category: "생활 & 육아 꿀팁", categorySlug: "living-parenting-tips", price: 0, image: "https://picsum.photos/400/300?random=121", aiHint: "sleeping baby", rank: 5, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 450, sales: 200, views: 8000 }, rating: 5.0, reviews: 200 },
-];
+const generateExamplePrompts = (): Prompt[] => {
+    let prompts: Prompt[] = [];
+    let idCounter = 1;
+    EXAMPLE_CATEGORIES.forEach(category => {
+        category.subCategories.forEach((subCategory, subIndex) => {
+            for (let i = 1; i <= 10; i++) {
+                const promptId = `ex-${slugify(subCategory.name)}-${i}`;
+                const rank = (subIndex * 10) + i <= 10 ? (subIndex * 10) + i : undefined;
+                prompts.push({
+                    id: promptId,
+                    title: `${subCategory.name} 예제 상품 #${i}`,
+                    description: `${category.name} > ${subCategory.name} 카테고리에 속한 예제 상품입니다. 이 상품은 ${subCategory.name}에 대한 심도 있는 노하우와 실용적인 템플릿을 제공하여, 사용자가 즉시 업무나 생활에 적용할 수 있도록 돕습니다. 상세 페이지에서는 구체적인 활용 사례와 포함된 파일 목록, 그리고 자주 묻는 질문에 대한 답변을 확인할 수 있습니다.`,
+                    author: "prmart 전문가",
+                    category: category.name,
+                    categorySlug: category.slug,
+                    price: 0,
+                    image: `https://picsum.photos/seed/${promptId}/400/300`,
+                    aiHint: `${category.slug.split('-')[0]} ${subCategory.slug.split('-')[0]}`,
+                    tags: [category.name, subCategory.name, "예제"],
+                    rank: rank,
+                    isExample: true,
+                    createdAt: new Date().toISOString(),
+                    stats: {
+                        views: Math.floor(Math.random() * 2000) + 100,
+                        likes: Math.floor(Math.random() * 300) + 10,
+                        sales: Math.floor(Math.random() * 100) + 5,
+                    },
+                    rating: parseFloat((Math.random() * (5.0 - 4.5) + 4.5).toFixed(1)),
+                    reviews: Math.floor(Math.random() * 50) + 5,
+                });
+                idCounter++;
+            }
+        });
+    });
+    return prompts;
+};
+
+
+const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
 
 function serializeDoc(doc: any): any {
@@ -168,7 +201,16 @@ export async function getCategories(): Promise<Category[]> {
                 console.warn("Firestore 'categories' collection is empty, returning example data.");
                 return EXAMPLE_CATEGORIES;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as Category).filter(c => c);
+            // Ensure subCategories is always an array
+            const categories = snapshot.docs.map(doc => {
+                const data = serializeDoc(doc) as Category;
+                if (!data.subCategories) {
+                    data.subCategories = [];
+                }
+                return data;
+            }).filter(c => c);
+
+            return categories;
         } catch (error) {
             console.error("Error fetching categories, returning example data:", error);
             return EXAMPLE_CATEGORIES;
