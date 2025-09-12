@@ -120,14 +120,19 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
     { title: "prmart 추천 아이디어", prompts: prompts.filter(p => (p.stats?.likes ?? 0) > 100) },
   ];
   
-  const heroSlides = categories.slice(0, 5).map((category) => ({
+  const heroSlides = categories.map((category) => ({
     title: category.name,
     headline: {
         "AI & 프로덕션": "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
         "개발 & IT 자동화": "작은 코드 한 줄도 아이디어 상품이 됩니다.",
         "재테크 & 투자": "투자 인사이트, 누구나 사고팔 수 있습니다.",
         "여행 & 라이프": "당신의 특별한 여행 경험을 공유하고 수익을 만드세요.",
+        "생활 & 육아 꿀팁": "일상의 지혜가 소중한 자산이 되는 곳.",
         "비즈니스 & 마케팅": "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
+        "창작 & 디자인": "세상을 아름답게 만드는 당신의 재능을 펼치세요.",
+        "학습 & 자기계발": "성장을 위한 지식, 여기서 모두 만나보세요.",
+        "모빌리티 & 자동차": "스마트한 이동을 위한 모든 정보와 노하우.",
+        "라이프 인프라": "더 나은 주거와 생활을 위한 필수 정보.",
     }[category.name] || `${category.name}의 모든 것을 만나보세요.`,
     bgColor: "bg-gradient-to-br from-gray-500 to-gray-600",
     image: `https://picsum.photos/seed/${category.slug}/1600/900`,
