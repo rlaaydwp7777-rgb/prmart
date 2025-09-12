@@ -30,19 +30,22 @@ const testimonials = [
     quote: "이 템플릿 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요. 다음 프로젝트에도 무조건 재구매각입니다.",
     author: "김지훈",
     role: "풀스택 개발자",
-    avatar: "https://picsum.photos/100/100?random=10"
+    avatar: "https://picsum.photos/seed/testimonial-1/100/100",
+    aiHint: "person face"
   },
   {
     quote: "prmart에서 판매를 시작하고 월급만큼의 부수입을 얻고 있어요. 제 노하우가 다른 사람에게 도움이 된다는 사실이 정말 뿌듯합니다.",
     author: "박서연",
     role: "마케팅 전문가",
-    avatar: "https://picsum.photos/100/100?random=11"
+    avatar: "https://picsum.photos/seed/testimonial-2/100/100",
+    aiHint: "person face"
   },
   {
     quote: "디자인 리소스 찾느라 시간 낭비할 필요가 없어졌어요. prmart에는 퀄리티 높은 자료가 넘쳐나서 작업 효율이 극대화되었습니다.",
     author: "최민준",
     role: "UI/UX 디자이너",
-    avatar: "https://picsum.photos/100/100?random=12"
+    avatar: "https://picsum.photos/seed/testimonial-3/100/100",
+    aiHint: "person face"
   },
 ];
 
@@ -205,11 +208,11 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
         <section id="categories" className="w-full py-12 md:py-20">
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
-                  {categories.map((category, index) => {
+                  {categories.map((category) => {
                     const Icon = ICONS[category.icon as keyof typeof ICONS] || Wallet;
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     return (
-                      <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
+                      <Link key={category.slug} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
                             "flex flex-col items-center justify-center p-6 gap-3 h-[140px] sm:h-[160px] transition-all duration-300 hover:bg-primary/5 hover:shadow-lg hover:-translate-y-1",
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
@@ -265,8 +268,8 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
         {/* Category Rankings Section */}
         <section id="category-rankings" className="w-full py-12 md:py-20 lg:py-24">
             <div className="container space-y-12">
-                {categories.map((category, index) => (
-                    <div key={`${category.slug}-${index}`}>
+                {categories.map((category) => (
+                    <div key={category.slug}>
                         <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">{category.name} 인기 상품</h3>
                          <CategoryCarousel category={category} prompts={prompts} />
                     </div>
@@ -290,7 +293,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
                                 <p className="mb-4 text-foreground/80">"{testimonial.quote}"</p>
                                 <div className="flex items-center gap-4">
                                     <Avatar>
-                                        <AvatarImage src={testimonial.avatar} alt={testimonial.author} data-ai-hint="person face" />
+                                        <AvatarImage src={testimonial.avatar} alt={testimonial.author} data-ai-hint={testimonial.aiHint} />
                                         <AvatarFallback>{testimonial.author.charAt(0)}</AvatarFallback>
                                     </Avatar>
                                     <div>
@@ -331,10 +334,10 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
                   </div>
                   <TabsContent value="buyer" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {buyerSteps.map((step, index) => {
+                        {buyerSteps.map((step) => {
                           const Icon = step.icon;
                           return (
-                            <Card key={`${step.title}-${index}`} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                                     <Icon className="h-10 w-10" />
                                 </div>
@@ -346,10 +349,10 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
                   </TabsContent>
                    <TabsContent value="seller" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {sellerSteps.map((step, index) => {
+                        {sellerSteps.map((step) => {
                           const Icon = step.icon;
                           return (
-                            <Card key={`${step.title}-${index}`} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                                     <Icon className="h-10 w-10" />
                                 </div>
@@ -398,3 +401,5 @@ export default async function HomePage() {
     </MainLayout>
   );
 }
+
+    

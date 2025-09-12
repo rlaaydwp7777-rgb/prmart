@@ -49,11 +49,11 @@ export function Header({ categories }: HeaderProps) {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {categories.map((category, catIndex) => {
+                  {categories.map((category) => {
                     const Icon = ICONS[category.icon as keyof typeof ICONS] || ICONS["Wallet"];
                     if (!category.subCategories || category.subCategories.length === 0) {
                       return (
-                        <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
+                        <DropdownMenuItem key={category.slug} asChild>
                           <Link href={`/c/${category.slug}`}>
                             <Icon className="mr-2 h-4 w-4" />
                             <span>{category.name}</span>
@@ -62,15 +62,15 @@ export function Header({ categories }: HeaderProps) {
                       );
                     }
                     return (
-                      <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
+                      <DropdownMenuSub key={category.slug}>
                         <DropdownMenuSubTrigger>
                           <Icon className="mr-2 h-4 w-4" />
                           <span>{category.name}</span>
                         </DropdownMenuSubTrigger>
                         <DropdownMenuPortal>
                           <DropdownMenuSubContent>
-                            {category.subCategories.map((sub, subIndex) => (
-                              <DropdownMenuItem key={`${sub.slug}-${subIndex}`} asChild>
+                            {category.subCategories.map((sub) => (
+                              <DropdownMenuItem key={sub.slug} asChild>
                                 <Link href={`/c/${category.slug}/${sub.slug}`}>
                                   {sub.name}
                                 </Link>
@@ -99,3 +99,5 @@ export function Header({ categories }: HeaderProps) {
     </header>
   );
 }
+
+    
