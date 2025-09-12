@@ -128,50 +128,34 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
-export const heroSlides = [
-    { 
-        title: "AI & 프로덕션", 
-        headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", 
-        bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", 
-        image: "https://picsum.photos/1600/900?random=31", 
-        aiHint: "AI production", 
-        slug: slugify("AI & 프로덕션") 
-    },
-    { 
-        title: "개발 & IT 자동화", 
-        headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", 
-        bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", 
-        image: "https://picsum.photos/1600/900?random=32", 
-        aiHint: "development automation", 
-        slug: slugify("개발 & IT 자동화") 
-    },
-    { 
-        title: "재테크 & 투자", 
-        headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", 
-        bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", 
-        image: "https://picsum.photos/1600/900?random=33", 
-        aiHint: "stock graph", 
-        slug: slugify("재테크 & 투자") 
-    },
-    {
-        title: "비즈니스 & 마케팅",
-        headline: "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
-        bgColor: "bg-gradient-to-br from-sky-500 to-blue-600",
-        image: "https://picsum.photos/1600/900?random=34",
-        aiHint: "business meeting",
-        slug: slugify("비즈니스 & 마케팅")
-    },
-    {
-        title: "창작 & 디자인",
-        headline: "당신의 창의력을 판매하고 영감을 얻으세요.",
-        bgColor: "bg-gradient-to-br from-rose-500 to-pink-600",
-        image: "https://picsum.photos/1600/900?random=35",
-        aiHint: "digital art",
-        slug: slugify("창작 & 디자인")
-    }
-];
+export const heroSlides = CATEGORIES.slice(0, 5).map(category => ({
+    title: category.name,
+    headline: {
+        [CATEGORY_NAMES.AI_PRODUCTION]: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.",
+        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "작은 코드 한 줄도 아이디어 상품이 됩니다.",
+        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "투자 인사이트, 누구나 사고팔 수 있습니다.",
+        [CATEGORY_NAMES.BUSINESS_MARKETING]: "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
+        [CATEGORY_NAMES.CREATION_DESIGN]: "당신의 창의력을 판매하고 영감을 얻으세요.",
+    }[category.name] || `${category.name}의 모든 것을 만나보세요.`,
+    bgColor: {
+        [CATEGORY_NAMES.AI_PRODUCTION]: "bg-gradient-to-br from-indigo-500 to-purple-600",
+        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "bg-gradient-to-br from-slate-800 to-slate-600",
+        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "bg-gradient-to-br from-emerald-500 to-green-600",
+        [CATEGORY_NAMES.BUSINESS_MARKETING]: "bg-gradient-to-br from-sky-500 to-blue-600",
+        [CATEGORY_NAMES.CREATION_DESIGN]: "bg-gradient-to-br from-rose-500 to-pink-600",
+    }[category.name] || "bg-gradient-to-br from-gray-500 to-gray-600",
+    image: `https://picsum.photos/seed/${slugify(category.name)}/1600/900`,
+    aiHint: {
+        [CATEGORY_NAMES.AI_PRODUCTION]: "AI production",
+        [CATEGORY_NAMES.DEVELOPMENT_AUTOMATION]: "development automation",
+        [CATEGORY_NAMES.INVESTMENT_FINTECH]: "stock graph",
+        [CATEGORY_NAMES.BUSINESS_MARKETING]: "business meeting",
+        [CATEGORY_NAMES.CREATION_DESIGN]: "digital art",
+    }[category.name] || "abstract background",
+    slug: category.slug,
+}));
 
-const EXAMPLE_PROMPTS: Prompt[] = [
+const EXAMPLE_PROMPTS: Omit<Prompt, 'categorySlug'>[] = [
   // AI & 프로덕션
   { id: "ex-ai-1", title: "시네마틱 룩 Midjourney 프롬프트", author: "AI Artist", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.9, reviews: 15, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", isExample: true },
   { id: "ex-ai-2", title: "ChatGPT 블로그 포스트 자동 생성기", author: "WriterBot", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.8, reviews: 22, image: "https://picsum.photos/400/300?random=102", aiHint: "writing text", isExample: true },
@@ -243,7 +227,7 @@ const EXAMPLE_PROMPTS: Prompt[] = [
   { id: "ex-infra-5", title: "2024년 부동산 정책 해설집", author: "PolicyAnalyst", category: CATEGORY_NAMES.LIFE_INFRA, price: 0, rating: 4.7, reviews: 80, image: "https://picsum.photos/400/300?random=150", aiHint: "government building", isExample: true },
 ];
 
-export const FEATURED_PROMPTS: Prompt[] = [
+const initialPrompts: Omit<Prompt, 'categorySlug'>[] = [
   {
     id: "1",
     title: "Next.js 14 Boilerplate",
@@ -298,12 +282,15 @@ export const FEATURED_PROMPTS: Prompt[] = [
   },
   ...EXAMPLE_PROMPTS.map((p, index) => ({ 
     ...p, 
-    id: `${p.id}-copy-${index}`, // Ensure unique IDs
+    id: `${p.id}-copy-${index}`,
   })),
-].map((p) => ({ 
-  ...p, 
-  categorySlug: slugify(p.category)
+];
+
+export const FEATURED_PROMPTS: Prompt[] = initialPrompts.map(p => ({
+  ...p,
+  categorySlug: slugify(p.category),
 }));
+    
 
     
 

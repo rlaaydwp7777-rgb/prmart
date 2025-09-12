@@ -80,3 +80,5 @@ export function PromptCard({ prompt }: PromptCardProps) {
     </Card>
   );
 }
+
+    
