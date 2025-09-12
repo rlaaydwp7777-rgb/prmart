@@ -393,5 +393,3 @@ export default async function HomePage() {
     </MainLayout>
   );
 }
-
-    
