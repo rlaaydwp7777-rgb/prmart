@@ -1,4 +1,7 @@
 
+
+import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet } from "lucide-react";
+
 export const META = {
     TITLE: "prmart - 당신의 아이디어가 자산이 되는 곳",
     DESCRIPTION: "흩어진 지식을 연결하여 새로운 가치를 조립하세요. prmart는 AI 프롬프트, 개발 소스코드, 디자인 템플릿, 업무 자동화, 투자 전략 등 모든 종류의 디지털 자산을 거래하는 마이크로콘텐츠 마켓플레이스입니다.",
@@ -32,6 +35,10 @@ export const CATEGORY_NAMES = {
     MOBILITY_AUTOMOBILE: "모빌리티 & 자동차",
     LIFE_INFRA: "라이프 인프라 (부동산·주거)",
 }
+
+export const ICONS: { [key: string]: React.FC<any> } = {
+    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet
+};
 
 export const FOOTER_STRINGS = {
     SLOGAN: "흩어진 지식을 연결하여 새로운 가치를 조립하다.",

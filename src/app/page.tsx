@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { BUTTONS, HEADER_LINKS, CATEGORY_NAMES } from "@/lib/string-constants";
+import { BUTTONS, HEADER_LINKS, CATEGORY_NAMES, ICONS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -24,10 +24,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Category, Prompt } from "@/lib/types";
 import { MainLayout } from "@/components/layout/main-layout";
 import { getProducts, getCategories } from "@/lib/firebase/services";
-
-const ICONS: { [key: string]: React.FC<any> } = {
-    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet
-};
 
 const testimonials = [
   {
@@ -141,7 +137,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
 
 
   return (
-    <MainLayout>
+    <>
         <section>
           <Carousel opts={{ loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
             <CarouselContent>
@@ -205,7 +201,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {categories.map((category, index) => {
-                    const Icon = ICONS[category.icon as string] || Wallet;
+                    const Icon = ICONS[category.icon as keyof typeof ICONS] || Wallet;
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     return (
                       <Link key={`${category.slug}-${index}`} href={`/c/${category.slug}`} className="group">
@@ -380,7 +376,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
             </div>
           </div>
         </section>
-    </MainLayout>
+    </>
   );
 }
 
@@ -391,5 +387,10 @@ export default async function HomePage() {
     getCategories()
   ]);
 
-  return <HomeClient prompts={prompts} categories={categories} />;
+  return (
+    <MainLayout>
+      <HomeClient prompts={prompts} categories={categories} />
+    </MainLayout>
+  );
 }
+
