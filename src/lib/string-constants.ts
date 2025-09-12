@@ -33,7 +33,7 @@ export const CATEGORY_NAMES = {
     CREATION_DESIGN: "창작 & 디자인",
     LEARNING_SELF_DEVELOPMENT: "학습 & 자기계발",
     MOBILITY_AUTOMOBILE: "모빌리티 & 자동차",
-    LIFE_INFRA: "라이프 인프라 (부동산·주거)",
+    LIFE_INFRA: "라이프 인프라",
 }
 
 export const ICONS: { [key: string]: React.FC<any> } = {
