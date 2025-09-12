@@ -165,7 +165,7 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
   return (
     <MainLayout>
         <section>
-          <Carousel plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
+          <Carousel opts={{ loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
             <CarouselContent>
               {heroSlides.map((slide, index) => (
                 <CarouselItem key={`${slide.slug}-${index}`}>
