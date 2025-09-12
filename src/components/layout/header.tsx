@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -6,16 +5,24 @@ import { ChevronDown, Sparkles, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { HEADER_LINKS, ICONS } from "@/lib/string-constants";
-import { cn } from "@/lib/utils";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger, DropdownMenuSeparator } from "../ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "../ui/dropdown-menu";
 import type { Category } from "@/lib/types";
 
 interface HeaderProps {
-    categories: Category[];
+  categories: Category[];
 }
 
 export function Header({ categories }: HeaderProps) {
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
       <div className="container mx-auto px-4 md:px-6">
@@ -27,54 +34,54 @@ export function Header({ categories }: HeaderProps) {
             </Link>
             <nav className="hidden md:flex gap-4 lg:gap-6 items-center">
               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-0">
-                      <span className="mr-1">{HEADER_LINKS.CATEGORIES}</span>
-                      <ChevronDown className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-64">
-                    <DropdownMenuItem asChild>
-                       <Link href="/browse">
-                        <LayoutGrid className="mr-2 h-4 w-4" />
-                        <span>{HEADER_LINKS.VIEW_ALL}</span>
-                       </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    {categories.map((category, catIndex) => {
-                      const Icon = ICONS[category.icon as keyof typeof ICONS] || ICONS['Wallet'];
-                      if (!category.subCategories || category.subCategories.length === 0) {
-                        return (
-                          <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
-                            <Link href={`/c/${category.slug}`}>
-                              <Icon className="mr-2 h-4 w-4" />
-                              <span>{category.name}</span>
-                            </Link>
-                          </DropdownMenuItem>
-                        )
-                      }
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-0">
+                    <span className="mr-1">{HEADER_LINKS.CATEGORIES}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-64">
+                  <DropdownMenuItem asChild>
+                    <Link href="/browse">
+                      <LayoutGrid className="mr-2 h-4 w-4" />
+                      <span>{HEADER_LINKS.VIEW_ALL}</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {categories.map((category, catIndex) => {
+                    const Icon = ICONS[category.icon as keyof typeof ICONS] || ICONS["Wallet"];
+                    if (!category.subCategories || category.subCategories.length === 0) {
                       return (
-                        <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
-                          <DropdownMenuSubTrigger>
+                        <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
+                          <Link href={`/c/${category.slug}`}>
                             <Icon className="mr-2 h-4 w-4" />
                             <span>{category.name}</span>
-                          </DropdownMenuSubTrigger>
-                          <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                              {category.subCategories.map((sub, subIndex) => (
-                                <DropdownMenuItem key={`${sub.slug}-${subIndex}`} asChild>
-                                  <Link href={`/c/${category.slug}/${sub.slug}`}>
-                                    {sub.name}
-                                  </Link>
-                                </DropdownMenuItem>
-                              ))}
-                            </DropdownMenuSubContent>
-                          </DropdownMenuPortal>
-                        </DropdownMenuSub>
+                          </Link>
+                        </DropdownMenuItem>
                       );
-                    })}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                    }
+                    return (
+                      <DropdownMenuSub key={`${category.slug}-${catIndex}`}>
+                        <DropdownMenuSubTrigger>
+                          <Icon className="mr-2 h-4 w-4" />
+                          <span>{category.name}</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                          <DropdownMenuSubContent>
+                            {category.subCategories.map((sub, subIndex) => (
+                              <DropdownMenuItem key={`${sub.slug}-${subIndex}`} asChild>
+                                <Link href={`/c/${category.slug}/${sub.slug}`}>
+                                  {sub.name}
+                                </Link>
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                      </DropdownMenuSub>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
               <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
                 {HEADER_LINKS.REQUEST_IDEA}
               </Link>

@@ -1,4 +1,3 @@
-
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Prompt, Category, SubCategory } from "@/lib/types";
@@ -66,15 +65,18 @@ const EXAMPLE_CATEGORIES: Category[] = [
 ];
 
 const EXAMPLE_PROMPTS: Prompt[] = [
-    { id: "ex-1", title: "시네마틱 Midjourney 프롬프트", author: "AI Artist", category: "AI & 프로덕션", categorySlug: "ai-and-production", price: 0, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", rank: 1, isExample: true, createdAt: new Date().toISOString() },
-    { id: "ex-2", title: "Next.js 보일러플레이트", author: "DevMaster", category: "개발 & IT 자동화", categorySlug: "development-it-automation", price: 0, image: "https://picsum.photos/400/300?random=108", aiHint: "react code", rank: 2, isExample: true, createdAt: new Date().toISOString() },
-    { id: "ex-3", title: "부동산 수익률 계산기", author: "RealEstatePro", category: "재테크 & 투자", categorySlug: "investment-fintech", price: 0, image: "https://picsum.photos/400/300?random=112", aiHint: "calculator money", rank: 3, isExample: true, createdAt: new Date().toISOString() },
-    { id: "ex-4", title: "제주도 3박 4일 동쪽 코스", author: "Traveler", category: "여행 & 라이프", categorySlug: "travel-life", price: 0, image: "https://picsum.photos/400/300?random=116", aiHint: "jeju island", rank: 4, isExample: true, createdAt: new Date().toISOString() },
-    { id: "ex-5", title: "신생아 100일 수면교육법", author: "SuperMom", category: "생활 & 육아 꿀팁", categorySlug: "living-parenting-tips", price: 0, image: "https://picsum.photos/400/300?random=121", aiHint: "sleeping baby", rank: 5, isExample: true, createdAt: new Date().toISOString() },
+    { id: "ex-1", title: "시네마틱 Midjourney 프롬프트", author: "AI Artist", category: "AI & 프로덕션", categorySlug: "ai-and-production", price: 0, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", rank: 1, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 120, sales: 30, views: 1500 }, rating: 4.9, reviews: 30 },
+    { id: "ex-2", title: "Next.js 보일러플레이트", author: "DevMaster", category: "개발 & IT 자동화", categorySlug: "development-it-automation", price: 0, image: "https://picsum.photos/400/300?random=108", aiHint: "react code", rank: 2, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 250, sales: 80, views: 3000 }, rating: 5.0, reviews: 80 },
+    { id: "ex-3", title: "부동산 수익률 계산기", author: "RealEstatePro", category: "재테크 & 투자", categorySlug: "investment-fintech", price: 0, image: "https://picsum.photos/400/300?random=112", aiHint: "calculator money", rank: 3, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 180, sales: 50, views: 2200 }, rating: 4.8, reviews: 50 },
+    { id: "ex-4", title: "제주도 3박 4일 동쪽 코스", author: "Traveler", category: "여행 & 라이프", categorySlug: "travel-life", price: 0, image: "https://picsum.photos/400/300?random=116", aiHint: "jeju island", rank: 4, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 300, sales: 120, views: 5000 }, rating: 4.9, reviews: 120 },
+    { id: "ex-5", title: "신생아 100일 수면교육법", author: "SuperMom", category: "생활 & 육아 꿀팁", categorySlug: "living-parenting-tips", price: 0, image: "https://picsum.photos/400/300?random=121", aiHint: "sleeping baby", rank: 5, isExample: true, createdAt: new Date().toISOString(), stats: { likes: 450, sales: 200, views: 8000 }, rating: 5.0, reviews: 200 },
 ];
 
 
 function serializeDoc(doc: any): any {
+    if (!doc.exists()) {
+        return null;
+    }
     const data = doc.data();
     if (!data) return { id: doc.id };
 
@@ -97,9 +99,10 @@ export async function getProducts(): Promise<Prompt[]> {
         try {
             const snapshot = await getDocs(collection(db, "products"));
             if (snapshot.empty) {
+                console.warn("Firestore 'products' collection is empty, returning example data.");
                 return EXAMPLE_PROMPTS;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(p => p);
         } catch (error) {
             console.error("Error fetching products, returning example data:", error);
             return EXAMPLE_PROMPTS;
@@ -140,7 +143,7 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
             if (snapshot.empty) {
                 products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
             } else {
-                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(p => p);
             }
         } catch (error) {
             console.error(`Error fetching products for category ${slug}, returning example data:`, error);
@@ -162,9 +165,10 @@ export async function getCategories(): Promise<Category[]> {
         try {
             const snapshot = await getDocs(collection(db, "categories"));
             if (snapshot.empty) {
+                console.warn("Firestore 'categories' collection is empty, returning example data.");
                 return EXAMPLE_CATEGORIES;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as Category);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Category).filter(c => c);
         } catch (error) {
             console.error("Error fetching categories, returning example data:", error);
             return EXAMPLE_CATEGORIES;
