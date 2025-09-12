@@ -5,8 +5,7 @@ import Link from "next/link";
 import { MainLayout } from "@/components/layout/main-layout";
 import type { Category, SubCategory } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { getCategories, getProducts, getProductsByCategorySlug } from "@/lib/firebase/services";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
+import { getCategories, getProductsByCategorySlug } from "@/lib/firebase/services";
 
 interface Props {
   params: {
@@ -23,7 +22,7 @@ export default async function CategoryCatchAll({ params }: Props) {
     notFound();
   }
 
-  const allCategories = CATEGORIES;
+  const allCategories = await getCategories();
 
   const category = allCategories.find(c => c.slug === categorySlug);
   if (!category) {
@@ -38,7 +37,8 @@ export default async function CategoryCatchAll({ params }: Props) {
       }
   }
 
-  const prompts = FEATURED_PROMPTS.filter(p => p.categorySlug === categorySlug);
+  // In a real app, this would be a more complex database query possibly filtering by subcategory as well.
+  const prompts = await getProductsByCategorySlug(categorySlug);
   
   const pageTitle = subCategory ? subCategory.name : category.name;
   const pageDescription = `${pageTitle} 카테고리의 모든 디지털 자산을 확인하고 당신의 다음 프로젝트에 영감을 더하세요.`;

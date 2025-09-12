@@ -22,8 +22,9 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Category, Prompt } from "@/lib/types";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
+import { CATEGORIES } from "@/lib/constants";
 import { MainLayout } from "@/components/layout/main-layout";
+import { getProducts, getCategories } from "@/lib/firebase/services";
 
 
 const testimonials = [
@@ -407,8 +408,11 @@ function HomeClient({ prompts, categories }: { prompts: Prompt[], categories: Ca
 }
 
 
-export default function HomePage() {
-  const prompts = FEATURED_PROMPTS;
-  const categories = CATEGORIES;
+export default async function HomePage() {
+  const [prompts, categories] = await Promise.all([
+    getProducts(),
+    getCategories()
+  ]);
+
   return <HomeClient prompts={prompts} categories={categories} />;
 }
