@@ -282,8 +282,8 @@ export default function Home() {
         {/* Category Rankings Section */}
         <section id="category-rankings" className="w-full py-12 md:py-20 lg:py-24">
             <div className="container space-y-12">
-                {CATEGORIES.map((category) => (
-                    <div key={category.slug}>
+                {CATEGORIES.map((category, index) => (
+                    <div key={`${category.slug}-${index}`}>
                         <h3 className="text-2xl md:text-3xl font-bold font-headline tracking-tight mb-6">{category.name} 인기 상품</h3>
                          <CategoryCarousel category={category} />
                     </div>
@@ -348,10 +348,10 @@ export default function Home() {
                   </div>
                   <TabsContent value="buyer" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {buyerSteps.map((step) => {
+                        {buyerSteps.map((step, index) => {
                           const Icon = step.icon;
                           return (
-                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                            <Card key={`${step.title}-${index}`} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                                     <Icon className="h-10 w-10" />
                                 </div>
@@ -363,10 +363,10 @@ export default function Home() {
                   </TabsContent>
                    <TabsContent value="seller" className="pt-8">
                      <div className="mx-auto grid gap-6 md:grid-cols-3">
-                        {sellerSteps.map((step) => {
+                        {sellerSteps.map((step, index) => {
                           const Icon = step.icon;
                           return (
-                            <Card key={step.title} className="flex flex-col items-center p-8 text-center bg-muted/50">
+                            <Card key={`${step.title}-${index}`} className="flex flex-col items-center p-8 text-center bg-muted/50">
                                 <div className="p-4 rounded-full bg-primary/10 text-primary mb-4">
                                     <Icon className="h-10 w-10" />
                                 </div>
