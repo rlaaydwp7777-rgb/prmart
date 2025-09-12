@@ -15,22 +15,15 @@ import {
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search as SearchIcon, ChevronDown, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
+import { ArrowRight, Search as SearchIcon, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
-import { CATEGORIES, FEATURED_PROMPTS } from "@/lib/constants";
+import { CATEGORIES, FEATURED_PROMPTS, heroSlides } from "@/lib/constants";
 import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { slugify } from "@/lib/utils";
-
-const heroSlides = [
-  { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/1600/900?random=31", aiHint: "AI production", slug: slugify("AI & 프로덕션") },
-  { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/1600/900?random=32", aiHint: "development automation", slug: slugify("개발 & IT 자동화") },
-  { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/1600/900?random=33", aiHint: "stock graph", slug: slugify("재테크 & 투자") },
-];
 
 const featuredSlides = [
   { title: "실시간 인기 TOP 10", prompts: FEATURED_PROMPTS },
@@ -370,3 +363,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

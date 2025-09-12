@@ -128,6 +128,49 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
+export const heroSlides = [
+    { 
+        title: "AI & 프로덕션", 
+        headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", 
+        bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", 
+        image: "https://picsum.photos/1600/900?random=31", 
+        aiHint: "AI production", 
+        slug: slugify("AI & 프로덕션") 
+    },
+    { 
+        title: "개발 & IT 자동화", 
+        headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", 
+        bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", 
+        image: "https://picsum.photos/1600/900?random=32", 
+        aiHint: "development automation", 
+        slug: slugify("개발 & IT 자동화") 
+    },
+    { 
+        title: "재테크 & 투자", 
+        headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", 
+        bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", 
+        image: "https://picsum.photos/1600/900?random=33", 
+        aiHint: "stock graph", 
+        slug: slugify("재테크 & 투자") 
+    },
+    {
+        title: "비즈니스 & 마케팅",
+        headline: "당신의 전문 지식이 최고의 비즈니스 자산입니다.",
+        bgColor: "bg-gradient-to-br from-sky-500 to-blue-600",
+        image: "https://picsum.photos/1600/900?random=34",
+        aiHint: "business meeting",
+        slug: slugify("비즈니스 & 마케팅")
+    },
+    {
+        title: "창작 & 디자인",
+        headline: "당신의 창의력을 판매하고 영감을 얻으세요.",
+        bgColor: "bg-gradient-to-br from-rose-500 to-pink-600",
+        image: "https://picsum.photos/1600/900?random=35",
+        aiHint: "digital art",
+        slug: slugify("창작 & 디자인")
+    }
+];
+
 const EXAMPLE_PROMPTS: Prompt[] = [
   // AI & 프로덕션
   { id: "ex-ai-1", title: "시네마틱 룩 Midjourney 프롬프트", author: "AI Artist", category: CATEGORY_NAMES.AI_PRODUCTION, price: 0, rating: 4.9, reviews: 15, image: "https://picsum.photos/400/300?random=101", aiHint: "cinematic photo", isExample: true },
@@ -261,5 +304,7 @@ export const FEATURED_PROMPTS: Prompt[] = [
   ...p, 
   categorySlug: slugify(p.category)
 }));
+
+    
 
     
