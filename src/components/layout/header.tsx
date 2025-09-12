@@ -10,12 +10,9 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "../ui/dropdown-menu";
 import type { Category } from "@/lib/types";
 
@@ -40,44 +37,34 @@ export function Header({ categories }: HeaderProps) {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-0">
+                  <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-2">
                     {HEADER_LINKS.CATEGORIES}
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-64">
-                   <DropdownMenuItem asChild>
-                     <Link href="/browse">전체보기</Link>
-                   </DropdownMenuItem>
-                   <DropdownMenuSeparator />
-                  {categories.map((category) => (
-                    <DropdownMenuSub key={category.slug}>
-                      <DropdownMenuSubTrigger>
-                        <span>{category.name}</span>
-                      </DropdownMenuSubTrigger>
-                      <DropdownMenuPortal>
-                        <DropdownMenuSubContent>
-                          <DropdownMenuItem asChild>
-                            <Link href={`/c/${category.slug}`}>
-                              {category.name} 전체
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          {category.subCategories && category.subCategories.length > 0 ? (
-                            category.subCategories.map((sub) => (
-                              <DropdownMenuItem key={sub.slug} asChild>
-                                <Link href={`/c/${category.slug}/${sub.slug}`}>
-                                  {sub.name}
-                                </Link>
-                              </DropdownMenuItem>
-                            ))
-                          ) : (
-                             <DropdownMenuItem disabled>하위 카테고리 없음</DropdownMenuItem>
-                          )}
-                        </DropdownMenuSubContent>
-                      </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                  ))}
+                <DropdownMenuContent className="w-screen max-w-5xl" align="start">
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-6 p-4">
+                      {categories.map((category) => (
+                        <div key={category.slug} className="space-y-2">
+                          <DropdownMenuLabel className="p-0">
+                             <Link href={`/c/${category.slug}`} className="font-semibold hover:underline">{category.name}</Link>
+                          </DropdownMenuLabel>
+                          <div className="flex flex-col items-start space-y-1">
+                              {category.subCategories.map((sub) => (
+                                <DropdownMenuItem key={sub.slug} asChild className="p-0 w-full">
+                                    <Link href={`/c/${category.slug}/${sub.slug}`} className="text-muted-foreground hover:text-foreground text-sm font-normal p-2 w-full justify-start h-auto rounded-sm">
+                                        {sub.name}
+                                    </Link>
+                                </DropdownMenuItem>
+                              ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuItem asChild>
+                        <Link href="/browse" className="font-semibold">전체 상품 둘러보기</Link>
+                     </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
