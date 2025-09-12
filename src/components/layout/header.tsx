@@ -1,16 +1,14 @@
 
+"use client";
+
 import Link from "next/link";
 import { ChevronDown, Sparkles, Wallet, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AuthButtons } from "@/components/auth/auth-buttons";
-import { HEADER_LINKS } from "@/lib/string-constants";
+import { HEADER_LINKS, ICONS } from "@/lib/string-constants";
 import { cn } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "../ui/dropdown-menu";
 import type { Category } from "@/lib/types";
-
-const ICONS: { [key: string]: React.FC<any> } = {
-    Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet
-};
 
 interface HeaderProps {
     categories: Category[];
@@ -37,7 +35,7 @@ export function Header({ categories }: HeaderProps) {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-64">
                     {categories.map((category, catIndex) => {
-                      const Icon = ICONS[category.icon as string] || Wallet;
+                      const Icon = ICONS[category.icon as keyof typeof ICONS] || Wallet;
                       if (!category.subCategories || category.subCategories.length === 0) {
                         return (
                           <DropdownMenuItem key={`${category.slug}-${catIndex}`} asChild>
