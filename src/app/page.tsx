@@ -3,7 +3,7 @@ import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Search as SearchIcon, ChevronDown, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
+import { ArrowRight, Search as SearchIcon, ChevronDown, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck, Sparkles, Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home as HomeIcon } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import { BUTTONS, HEADER_LINKS } from "@/lib/string-constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -76,6 +76,10 @@ const sellerSteps = [
       description: "판매 수익을 원하는 방식으로 안전하고 빠르게 정산받을 수 있습니다.",
     },
 ];
+
+const iconMap: { [key: string]: React.FC<any> } = {
+  Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home: HomeIcon, Wallet, Sparkles
+};
 
 
 export default async function Home() {
@@ -163,6 +167,7 @@ export default async function Home() {
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
                   {categories.map((category) => {
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
+                    const Icon = iconMap[category.icon] || Sparkles;
                     return (
                       <Link key={category.slug} href={`/c/${category.slug}`} className="group">
                           <Card className={cn(
@@ -170,7 +175,7 @@ export default async function Home() {
                             isHighlighted && "border-primary/50 shadow-lg hover:shadow-primary/20"
                           )}>
                               <div className="p-3 rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                                  <span className="h-6 w-6" />
+                                  <Icon className="h-6 w-6" />
                               </div>
                               <span className="font-semibold text-sm text-center">{category.name}</span>
                           </Card>
@@ -315,3 +320,5 @@ export default async function Home() {
     </>
   );
 }
+
+    
