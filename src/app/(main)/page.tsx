@@ -398,3 +398,5 @@ export default async function HomePage() {
     <HomeClient prompts={prompts} categories={categories} />
   );
 }
+
+    
