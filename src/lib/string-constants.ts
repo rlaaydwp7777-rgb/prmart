@@ -99,7 +99,7 @@ export const SELLER_DASHBOARD_STRINGS = {
 
 export const AUTH_STRINGS = {
     WELCOME_BACK: "다시 오신 것을 환영합니다",
-    LOGIN_DESCRIPTION: "대시보드와 구매 내역에 접근하려면 로그인하세요.",
+    LOGIN_DESCRIPTION: "계정에 로그인하여 계속 진행하세요.",
     SIGNUP_TITLE: "prmart에 오신 것을 환영합니다",
     SIGNUP_DESCRIPTION: "단 몇 초 만에 가입하고 당신의 아이디어를 판매해보세요.",
     EMAIL_LABEL: "이메일",

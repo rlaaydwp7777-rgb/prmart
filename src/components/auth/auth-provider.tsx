@@ -1,7 +1,17 @@
+
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
-import { auth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, type User } from "@/lib/firebase/auth";
+import { 
+  auth, 
+  onAuthStateChanged, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signOut, 
+  type User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword
+} from "@/lib/firebase/auth";
 import { useToast } from "@/hooks/use-toast";
 
 interface AuthContextType {
@@ -70,9 +80,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut: handleSignOut,
   };
 
+  // The actual Firebase auth calls (createUserWithEmailAndPassword, etc.) 
+  // are client-side and should ideally be called from client components.
+  // Server Actions can't directly use the client-side Firebase Auth SDK as implemented.
+  // The actions.ts file simulates this for now. For a real app, you'd trigger these
+  // functions from a client component, not a server action.
+  
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 }

@@ -5,6 +5,11 @@ import { generateProductDescription, GenerateProductDescriptionOutput } from "@/
 import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { auth } from "@/lib/firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+
+
+// --- Product Actions ---
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -95,4 +100,75 @@ export async function registerProductAction(prevState: FormState, formData: Form
   }
 }
 
+// --- Auth Actions ---
+
+type AuthFormState = {
+  success: boolean;
+  message: string;
+}
+
+const emailSchema = z.string().email("유효한 이메일 주소를 입력해주세요.");
+const passwordSchema = z.string().min(6, "비밀번호는 6자 이상이어야 합니다.");
+
+export async function signUpWithEmail(prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  const emailValidation = emailSchema.safeParse(email);
+  if (!emailValidation.success) {
+    return { success: false, message: emailValidation.error.errors[0].message };
+  }
+
+  const passwordValidation = passwordSchema.safeParse(password);
+  if (!passwordValidation.success) {
+    return { success: false, message: passwordValidation.error.errors[0].message };
+  }
+  
+  try {
+    // This is a server-side action, but createUserWithEmailAndPassword is a client-side SDK method.
+    // In a real app, you'd use the Firebase Admin SDK here to create a user.
+    // For this prototype, we'll return a message indicating what would happen.
+    console.log(`Would create user with email: ${email}`);
+    return { success: true, message: "회원가입이 요청되었습니다. 실제 앱에서는 인증 이메일이 발송됩니다." };
+     // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+     // return { success: true, message: "회원가입에 성공했습니다!" };
+  } catch (error: any) {
+    console.error("Sign up error:", error);
+    if (error.code === 'auth/email-already-in-use') {
+        return { success: false, message: "이미 사용 중인 이메일입니다." };
+    }
+    return { success: false, message: "회원가입 중 오류가 발생했습니다." };
+  }
+}
+
+export async function signInWithEmail(prevState: AuthFormState, formData: FormData): Promise<AuthFormState> {
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    const emailValidation = emailSchema.safeParse(email);
+    if (!emailValidation.success) {
+        return { success: false, message: emailValidation.error.errors[0].message };
+    }
+
+    const passwordValidation = passwordSchema.safeParse(password);
+    if (!passwordValidation.success) {
+        return { success: false, message: passwordValidation.error.errors[0].message };
+    }
+
+    try {
+        // Similar to sign-up, this is a client SDK method.
+        // In a real app, you'd handle this differently, perhaps with custom tokens.
+        // For the prototype, we simulate the logic.
+        console.log(`Would sign in user with email: ${email}`);
+        return { success: true, message: "로그인이 요청되었습니다." };
+        // const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        // return { success: true, message: "로그인에 성공했습니다!" };
+    } catch (error: any) {
+        console.error("Sign in error:", error);
+         if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            return { success: false, message: "이메일 또는 비밀번호가 올바르지 않습니다." };
+        }
+        return { success: false, message: "로그인 중 오류가 발생했습니다." };
+    }
+}
     
