@@ -15,7 +15,6 @@ import type { Category } from "@/lib/types";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { useState } from "react";
-import { AuthButtons } from "../auth/auth-buttons";
 
 interface HeaderProps {
   categories: Category[];
@@ -86,9 +85,6 @@ export function Header({ categories }: HeaderProps) {
           </div>
           
           <div className="flex items-center gap-4">
-             <div className="hidden md:block">
-              <AuthButtons />
-            </div>
             <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">
@@ -105,9 +101,6 @@ export function Header({ categories }: HeaderProps) {
                   <nav className="flex flex-col gap-4 text-lg">
                     {navLinks}
                   </nav>
-                  <div className="mt-auto">
-                    <AuthButtons />
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>

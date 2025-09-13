@@ -13,32 +13,18 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy, LogIn } from "lucide-react";
+import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy } from "lucide-react";
 import { SIDEBAR_STRINGS } from "@/lib/string-constants";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { useAuth } from "@/components/auth/auth-provider";
-import { UserMenu } from "@/components/auth/user-menu";
-import { redirect } from "next/navigation";
 
 function SellerHeader() {
-  const { user, loading } = useAuth();
-
   return (
      <div className="flex items-center justify-between md:justify-end mb-4">
         <div className="md:hidden">
             <SidebarTrigger/>
         </div>
         <div>
-          {loading ? (
-            <Skeleton className="h-8 w-24" />
-          ) : user ? (
-            <UserMenu user={user} />
-          ) : (
-            <Button asChild>
-                <Link href="/login">로그인</Link>
-            </Button>
-          )}
+           {/* Auth buttons removed */}
         </div>
     </div>
   )
@@ -49,20 +35,6 @@ export default function SellerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
-  
-  if (loading) {
-      return (
-        <div className="flex items-center justify-center h-screen">
-            <p className="text-muted-foreground">인증 정보를 불러오는 중...</p>
-        </div>
-      )
-  }
-
-  if (!user) {
-    redirect('/login');
-  }
-  
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
