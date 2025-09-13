@@ -102,7 +102,7 @@ export const AUTH_STRINGS = {
     SIGNUP: "회원가입",
     WELCOME_BACK: "다시 오신 것을 환영합니다",
     LOGIN_DESCRIPTION: "계정에 로그인하여 계속 진행하세요.",
-    SIGNUP_TITLE: "prmart에 오신 것을 환영합니다",
+    SIGNUP_TITLE: "당신의 아이디어가 자산이 되는 곳",
     SIGNUP_DESCRIPTION: "단 몇 초 만에 가입하고 당신의 아이디어를 판매해보세요.",
     EMAIL_LABEL: "이메일",
     EMAIL_PLACEHOLDER: "project@prmart.ai",
@@ -114,6 +114,7 @@ export const AUTH_STRINGS = {
     DASHBOARD_LINK: "대시보드",
     SETTINGS_LINK: "설정",
     LOGOUT_LINK: "로그아웃",
+    HERO_TITLE: "당신의 지식을 자산으로 만드세요",
 }
 
 export const HEADER_LINKS = {
