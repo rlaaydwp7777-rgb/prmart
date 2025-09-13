@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/sidebar";
 import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy } from "lucide-react";
 import { SIDEBAR_STRINGS } from "@/lib/string-constants";
-import { Button } from "@/components/ui/button";
+import { AuthButtons } from "@/components/auth/auth-buttons";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function SellerHeader() {
   return (
@@ -24,7 +28,7 @@ function SellerHeader() {
             <SidebarTrigger/>
         </div>
         <div>
-           {/* Auth buttons removed */}
+           <AuthButtons />
         </div>
     </div>
   )
@@ -35,6 +39,26 @@ export default function SellerLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
+
+  if (loading || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+          <div className="space-y-4">
+              <p className="text-center text-muted-foreground">인증 정보를 확인하는 중입니다...</p>
+              <Skeleton className="h-10 w-64" />
+          </div>
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">

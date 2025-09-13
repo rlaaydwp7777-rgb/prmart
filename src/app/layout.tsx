@@ -3,7 +3,10 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { META } from '@/lib/string-constants';
-import { MainLayout } from '@/components/layout/main-layout';
+import { AuthProvider } from '@/components/auth/auth-provider';
+import { getCategories } from '@/lib/firebase/services';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
@@ -14,16 +17,24 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: META.ICON_URL }]
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const categories = await getCategories();
+
   return (
     <html lang="ko">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
-        {children}
-        <Toaster />
+        <AuthProvider>
+          <div className="flex flex-col min-h-screen">
+            <Header categories={categories} />
+            <main className="flex-1 pt-16">{children}</main>
+            <Footer />
+          </div>
+          <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
