@@ -98,6 +98,8 @@ export const SELLER_DASHBOARD_STRINGS = {
 }
 
 export const AUTH_STRINGS = {
+    LOGIN: "로그인",
+    SIGNUP: "회원가입",
     WELCOME_BACK: "다시 오신 것을 환영합니다",
     LOGIN_DESCRIPTION: "계정에 로그인하여 계속 진행하세요.",
     SIGNUP_TITLE: "prmart에 오신 것을 환영합니다",
@@ -107,11 +109,8 @@ export const AUTH_STRINGS = {
     PASSWORD_LABEL: "비밀번호",
     PASSWORD_PLACEHOLDER: "••••••••",
     CONFIRM_PASSWORD_LABEL: "비밀번호 확인",
-    REFERRAL_CODE_LABEL: "추천인 코드 (선택 사항)",
-    REFERRAL_CODE_PLACEHOLDER: "추천 코드가 있다면 입력하세요",
     ALREADY_HAVE_ACCOUNT: "이미 계정이 있으신가요?",
     USER_MENU_GREETING: "prmart user",
-    USER_MENU_EMAIL: "prmart@example.com",
     DASHBOARD_LINK: "대시보드",
     SETTINGS_LINK: "설정",
     LOGOUT_LINK: "로그아웃",

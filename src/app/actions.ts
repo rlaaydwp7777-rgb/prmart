@@ -5,6 +5,112 @@ import { generateProductDescription, GenerateProductDescriptionOutput } from "@/
 import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
+import { FirebaseError } from "firebase/app";
+
+
+// --- Auth Actions ---
+
+const getFirebaseAuthErrorMessage = (error: FirebaseError) => {
+    switch (error.code) {
+        case 'auth/email-already-in-use':
+            return '이미 사용 중인 이메일입니다.';
+        case 'auth/invalid-email':
+            return '유효하지 않은 이메일 형식입니다.';
+        case 'auth/weak-password':
+            return '비밀번호는 6자리 이상이어야 합니다.';
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+             return '이메일 또는 비밀번호를 잘못 입력했습니다.';
+        case 'auth/popup-closed-by-user':
+            return 'Google 로그인 팝업이 닫혔습니다. 다시 시도해주세요.';
+        default:
+            return '인증 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
+    }
+}
+
+
+export type AuthState = {
+    message: string;
+    success: boolean;
+    error?: string | null;
+}
+
+const signUpSchema = z.object({
+  email: z.string().email({ message: "유효한 이메일을 입력해주세요." }),
+  password: z.string().min(6, { message: "비밀번호는 6자 이상이어야 합니다." }),
+  confirmPassword: z.string()
+}).refine(data => data.password === data.confirmPassword, {
+  message: "비밀번호가 일치하지 않습니다.",
+  path: ["confirmPassword"],
+});
+
+
+export async function signUpWithEmailAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+    const validatedFields = signUpSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: "입력 값을 다시 확인해주세요.",
+            error: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
+        };
+    }
+    
+    const { email, password } = validatedFields.data;
+
+    try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        return { success: true, message: "회원가입에 성공했습니다! 대시보드로 이동합니다." };
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+             return { success: false, message: "회원가입 실패", error: getFirebaseAuthErrorMessage(error) };
+        }
+        return { success: false, message: "회원가입 실패", error: "알 수 없는 오류가 발생했습니다." };
+    }
+}
+
+const signInSchema = z.object({
+  email: z.string().email({ message: "유효한 이메일을 입력해주세요." }),
+  password: z.string().min(1, { message: "비밀번호를 입력해주세요." }),
+});
+
+export async function signInWithEmailAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+     const validatedFields = signInSchema.safeParse(Object.fromEntries(formData.entries()));
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: "입력 값을 다시 확인해주세요.",
+            error: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
+        };
+    }
+    
+    const { email, password } = validatedFields.data;
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        return { success: true, message: "로그인에 성공했습니다! 대시보드로 이동합니다." };
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+             return { success: false, message: "로그인 실패", error: getFirebaseAuthErrorMessage(error) };
+        }
+        return { success: false, message: "로그인 실패", error: "알 수 없는 오류가 발생했습니다." };
+    }
+}
+
+
+export async function signInWithGoogleAction(): Promise<AuthState> {
+    try {
+        await signInWithGoogle();
+        return { success: true, message: "Google 계정으로 로그인했습니다." };
+    } catch (error) {
+         if (error instanceof FirebaseError) {
+             return { success: false, message: "Google 로그인 실패", error: getFirebaseAuthErrorMessage(error) };
+        }
+        return { success: false, message: "Google 로그인 실패", error: "알 수 없는 오류가 발생했습니다." };
+    }
+}
 
 
 // --- Product Actions ---
