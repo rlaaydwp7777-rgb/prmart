@@ -18,8 +18,8 @@ import { SIDEBAR_STRINGS } from "@/lib/string-constants";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/components/auth/auth-provider";
-import { AuthDialog } from "@/components/auth/auth-dialog";
 import { UserMenu } from "@/components/auth/user-menu";
+import { redirect } from "next/navigation";
 
 function SellerHeader() {
   const { user, loading } = useAuth();
@@ -35,7 +35,9 @@ function SellerHeader() {
           ) : user ? (
             <UserMenu user={user} />
           ) : (
-            <AuthDialog />
+            <Button asChild>
+                <Link href="/login">로그인</Link>
+            </Button>
           )}
         </div>
     </div>
@@ -48,6 +50,18 @@ export default function SellerLayout({
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
+  
+  if (loading) {
+      return (
+        <div className="flex items-center justify-center h-screen">
+            <p className="text-muted-foreground">인증 정보를 불러오는 중...</p>
+        </div>
+      )
+  }
+
+  if (!user) {
+    redirect('/login');
+  }
   
   return (
     <SidebarProvider>
@@ -119,19 +133,7 @@ export default function SellerLayout({
         <SidebarInset>
           <div className="p-4 sm:p-6 lg:p-8">
             <SellerHeader />
-             {loading ? (
-                <div className="flex items-center justify-center h-[calc(100vh-10rem)]">
-                    <p className="text-muted-foreground">인증 정보를 불러오는 중...</p>
-                </div>
-             ) : user ? (
-                children
-             ) : (
-                <div className="flex flex-col items-center justify-center h-[calc(100vh-10rem)] text-center">
-                    <h2 className="text-2xl font-bold font-headline mb-2">접근 권한이 없습니다</h2>
-                    <p className="text-muted-foreground mb-4">판매자 대시보드를 보려면 로그인이 필요합니다.</p>
-                    <AuthDialog />
-                </div>
-             )}
+            {children}
           </div>
         </SidebarInset>
       </div>

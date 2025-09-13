@@ -24,9 +24,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <AuthProvider>
-          <MainLayout>
             {children}
-          </MainLayout>
           <Toaster />
         </AuthProvider>
       </body>

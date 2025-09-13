@@ -65,7 +65,7 @@ export function Header({ categories }: HeaderProps) {
       <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
         {HEADER_LINKS.REQUEST_IDEA}
       </Link>
-      <Link href="/seller/dashboard" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+      <Link href="/seller" className="font-medium text-muted-foreground transition-colors hover:text-primary">
         {HEADER_LINKS.START_SELLING}
       </Link>
     </>
@@ -105,7 +105,9 @@ export function Header({ categories }: HeaderProps) {
                   <nav className="flex flex-col gap-4 text-lg">
                     {navLinks}
                   </nav>
-                  <AuthButtons />
+                  <div className="mt-auto">
+                    <AuthButtons />
+                  </div>
                 </div>
               </SheetContent>
             </Sheet>
