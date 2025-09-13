@@ -30,9 +30,13 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   // In a real app, this would be determined by checking the user's purchase history.
   const mockPurchaseStatus = true; 
 
-  const categories = await getCategories();
+  const [categories, relatedPrompts] = await Promise.all([
+      getCategories(),
+      getProductsByCategorySlug(prompt.categorySlug, 4, prompt.id)
+  ]);
+  
   const categoryData = categories.find(c => c.name === prompt.category);
-  const relatedPrompts = await getProductsByCategorySlug(prompt.categorySlug, 4, prompt.id);
+
   
   const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;

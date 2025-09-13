@@ -1,18 +1,7 @@
 
-
-"use client";
-
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Autoplay from "embla-carousel-autoplay";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Search as SearchIcon, ChevronDown, Wallet, Download, Upload, BadgeDollarSign, Banknote, Quote, ShieldCheck } from "lucide-react";
 import { PromptCard } from "@/components/prompts/prompt-card";
@@ -21,16 +10,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { cn, slugify } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getCategories, getProducts } from "@/lib/firebase/services";
 import type { Prompt, Category } from "@/lib/types";
+import { HeroCarousel } from "@/components/layout/hero-carousel";
+import { FeaturedCarousel } from "@/components/layout/featured-carousel";
+import { CategoryCarousel } from "@/components/layout/category-carousel";
 
-const heroSlides = [
-  { title: "AI & 프로덕션", headline: "누구나 만든 프롬프트가 작품이 되어 거래됩니다.", bgColor: "bg-gradient-to-br from-indigo-500 to-purple-600", image: "https://picsum.photos/1600/900?random=31", aiHint: "AI production", slug: "ai-and-production" },
-  { title: "개발 & IT 자동화", headline: "작은 코드 한 줄도 아이디어 상품이 됩니다.", bgColor: "bg-gradient-to-br from-slate-800 to-slate-600", image: "https://picsum.photos/1600/900?random=32", aiHint: "development automation", slug: "development-it-automation" },
-  { title: "재테크 & 투자", headline: "투자 인사이트, 누구나 사고팔 수 있습니다.", bgColor: "bg-gradient-to-br from-emerald-500 to-green-600", image: "https://picsum.photos/1600/900?random=33", aiHint: "stock graph", slug: "investment-fintech" },
-];
 
 const testimonials = [
   {
@@ -91,49 +78,11 @@ const sellerSteps = [
 ];
 
 
-function CategoryCarousel({ category, prompts }: { category: Category, prompts: Prompt[] }) {
-  const plugin = React.useRef(Autoplay({ delay: 3000, stopOnInteraction: true }));
-  const categoryPrompts = prompts.filter(p => p.category === category.name);
-  
-  // To make the carousel loop smoothly, we need enough items.
-  const items = categoryPrompts.length > 5 ? categoryPrompts : [...categoryPrompts, ...categoryPrompts, ...categoryPrompts];
-
-  if(items.length === 0) return null;
-
-  return (
-    <Carousel opts={{ align: "start", loop: true }} plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
-      <CarouselContent>
-        {items.map((prompt, index) => (
-          <CarouselItem key={`${category.slug}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
-            <div className="p-1">
-              <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
-            </div>
-          </CarouselItem>
-        ))}
-      </CarouselContent>
-      <CarouselPrevious />
-      <CarouselNext />
-    </Carousel>
-  );
-}
-
-export default function Home() {
-  const plugin = React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true }));
-
-  const [categories, setCategories] = React.useState<Category[]>([]);
-  const [products, setProducts] = React.useState<Prompt[]>([]);
-
-  React.useEffect(() => {
-    async function fetchData() {
-      const [cats, prods] = await Promise.all([
-        getCategories(),
-        getProducts()
-      ]);
-      setCategories(cats);
-      setProducts(prods);
-    }
-    fetchData();
-  }, []);
+export default async function Home() {
+  const [categories, products] = await Promise.all([
+    getCategories(),
+    getProducts()
+  ]);
 
   const featuredSlides = [
     { title: "실시간 인기 TOP 10", prompts: products.sort((a,b) => (b.rank ?? 99) - (a.rank ?? 99)).slice(0,10) },
@@ -144,31 +93,7 @@ export default function Home() {
   return (
     <>
         <section className="pt-16">
-          <Carousel plugins={[plugin.current]} onMouseEnter={() => plugin.current.stop()} onMouseLeave={() => plugin.current.reset()} className="w-full">
-            <CarouselContent>
-              {heroSlides.map((slide, index) => (
-                <CarouselItem key={index}>
-                  <Link href={`/c/${slide.slug}`}>
-                    <div className="relative h-[30vh] md:h-[35vh] lg:h-[40vh] w-full">
-                      <div className={cn("absolute inset-0 w-full h-full", slide.bgColor)}>
-                        <Image src={slide.image} alt={slide.title} fill priority={index === 0} className="object-cover opacity-30" data-ai-hint={slide.aiHint} />
-                      </div>
-                      <div className="relative z-10 h-full w-full flex flex-col items-center justify-center bg-black/40 md:bg-black/50 px-4 text-white">
-                        <div className="container flex flex-col items-center justify-center h-full">
-                          <div className="text-center space-y-4">
-                            <h1 className="text-4xl md:text-5xl font-bold font-headline tracking-tight text-shadow-lg">{slide.title}</h1>
-                            <p className="mt-4 text-lg md:text-xl text-shadow-md">{slide.headline}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex" />
-            <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-20 hidden sm:flex" />
-          </Carousel>
+          <HeroCarousel />
         </section>
 
         {/* Search Section */}
@@ -264,31 +189,7 @@ export default function Home() {
                 <p className="max-w-[900px] text-muted-foreground md:text-xl">prmart 전문가들이 엄선한 인기 상품들을 만나보세요.</p>
             </div>
             
-             <Carousel
-                opts={{
-                    align: "start",
-                    loop: true,
-                }}
-                plugins={[React.useRef(Autoplay({ delay: 4000, stopOnInteraction: true })).current]}
-                className="w-full"
-            >
-                <CarouselContent>
-                    {featuredSlides.map((slide, index) => (
-                        <CarouselItem key={index}>
-                            <div className="space-y-4">
-                                <h3 className="text-2xl font-bold text-center">{slide.title}</h3>
-                                <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                    {slide.prompts.slice(0, 4).map((prompt) => (
-                                        <PromptCard key={prompt.id} prompt={prompt} />
-                                    ))}
-                                </div>
-                            </div>
-                        </CarouselItem>
-                    ))}
-                </CarouselContent>
-                <CarouselPrevious className="absolute left-[-50px] top-1/2 -translate-y-1/2 z-10 hidden xl:flex" />
-                <CarouselNext className="absolute right-[-50px] top-1/2 -translate-y-1/2 z-10 hidden xl:flex" />
-            </Carousel>
+             <FeaturedCarousel featuredSlides={featuredSlides} />
           </div>
         </section>
 
