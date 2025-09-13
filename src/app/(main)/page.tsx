@@ -22,7 +22,6 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { Category, Prompt } from "@/lib/types";
-import { MainLayout } from "@/components/layout/main-layout";
 import { getProducts, getCategories } from "@/lib/firebase/services";
 
 const testimonials = [
@@ -396,10 +395,6 @@ export default async function HomePage() {
   ]);
 
   return (
-    <MainLayout>
-      <HomeClient prompts={prompts} categories={categories} />
-    </MainLayout>
+    <HomeClient prompts={prompts} categories={categories} />
   );
 }
-
-    

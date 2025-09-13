@@ -1,6 +1,6 @@
 import { MainLayout } from "@/components/layout/main-layout";
 
-export default function RootMainLayout({
+export default async function RootMainLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -11,5 +11,3 @@ export default function RootMainLayout({
     </MainLayout>
   );
 }
-
-    
