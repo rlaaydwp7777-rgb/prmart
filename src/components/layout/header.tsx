@@ -1,17 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { AuthButtons } from "@/components/auth/auth-buttons";
+import { Sparkles } from "lucide-react";
 import { HEADER_LINKS } from "@/lib/string-constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuSeparator
 } from "../ui/dropdown-menu";
 import type { Category } from "@/lib/types";
 
@@ -36,10 +34,9 @@ export function Header({ categories }: HeaderProps) {
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="font-medium text-muted-foreground transition-colors hover:text-primary px-2">
+                   <button className="font-medium text-muted-foreground transition-colors hover:text-primary flex items-center">
                     {HEADER_LINKS.CATEGORIES}
-                    <ChevronDown className="ml-1 h-4 w-4" />
-                  </Button>
+                  </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-screen max-w-5xl" align="start">
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-6 p-4">
@@ -74,9 +71,6 @@ export function Header({ categories }: HeaderProps) {
                 {HEADER_LINKS.START_SELLING}
               </Link>
             </nav>
-          </div>
-          <div className="flex items-center gap-2">
-            <AuthButtons />
           </div>
         </div>
       </div>
