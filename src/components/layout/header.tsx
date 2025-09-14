@@ -39,13 +39,13 @@ export function Header({ categories }: HeaderProps) {
         <DropdownMenuContent className="w-screen max-w-5xl" align="start">
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-x-4 gap-y-6 p-4">
             {categories.map((category) => (
-                <div key={category.slug} className="space-y-2">
+                <div key={category.id} className="space-y-2">
                 <DropdownMenuLabel className="p-0">
                     <Link href={`/c/${category.slug}`} className="font-semibold hover:underline">{category.name}</Link>
                 </DropdownMenuLabel>
                 <div className="flex flex-col items-start space-y-1">
                     {category.subCategories?.map((sub) => (
-                        <DropdownMenuItem key={sub.slug} asChild className="p-0 w-full">
+                        <DropdownMenuItem key={sub.id} asChild className="p-0 w-full">
                             <Link href={`/c/${category.slug}/${sub.slug}`} className="text-muted-foreground hover:text-foreground text-sm font-normal p-2 w-full justify-start h-auto rounded-sm">
                                 {sub.name}
                             </Link>
