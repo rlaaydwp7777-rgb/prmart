@@ -6,7 +6,7 @@ export interface Prompt {
   title: string;
   description?: string;
   author: string; 
-  sellerId?: string;
+  sellerId: string; // sellerId is now mandatory
   category: string; // 카테고리 이름
   categorySlug: string; // 카테고리 슬러그
   subCategorySlug?: string; // 하위 카테고리 슬러그
@@ -16,15 +16,15 @@ export interface Prompt {
   tags?: string[];
   rank?: number;
   isExample?: boolean;
-  createdAt?: string; // Changed from Timestamp to string
+  createdAt: string; // Changed from Timestamp to string
   updatedAt?: string; // Changed from Timestamp to string
-  stats?: {
+  stats: {
     views: number;
     likes: number;
     sales: number;
   };
-  rating?: number;
-  reviews?: number;
+  rating: number;
+  reviews: number;
 }
 
 export interface IdeaRequest {
@@ -83,4 +83,12 @@ export interface SellerStats {
     productCount: number;
     averageRating: number;
     reviewCount: number;
+}
+
+export interface SellerProfile {
+    sellerName: string;
+    sellerBio: string;
+    bankName: string;
+    accountNumber: string;
+    accountHolder: string;
 }

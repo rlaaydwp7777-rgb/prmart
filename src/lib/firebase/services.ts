@@ -1,7 +1,7 @@
 
-import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats } from "@/lib/types";
+import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, any>();
@@ -11,7 +11,7 @@ async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>): Promis
     const data = await fetcher();
     if (process.env.NODE_ENV === 'development') {
         requestCache.set(key, data);
-        setTimeout(() => requestCache.delete(key), 2000); // 2-second cache in dev
+        setTimeout(() => requestCache.delete(key), 1000); // 1-second cache in dev
     }
     return data;
   }
@@ -136,12 +136,7 @@ export const EXAMPLE_CATEGORIES: Category[] = [
           { id: "sub-9-5", name: "기타 모빌리티 및 자동차", slug: "mobility" },
         ]
       },
-      { 
-        id: "cat-10",
-        name: "문서 & 서식", 
-        slug: "documents-templates",
-        icon: "Home",
-        subCategories: [
+      { id: "cat-10", name: "문서 & 서식", slug: "documents-templates", icon: "Home", subCategories: [
           { id: "sub-10-1", name: "부동산 계약서", slug: "real-estate-contract" },
           { id: "sub-10-2", name: "법률/행정 서식", slug: "legal-form" },
           { id: "sub-10-3", name: "각종 보고서 템플릿", slug: "report-template" },
@@ -180,7 +175,7 @@ const generateExamplePrompts = (): Prompt[] => {
             { title: "Looker Studio 매출 대시보드 템플릿", desc: "GA4 데이터를 연동하여 실시간 매출, 사용자 유입 경로를 한 눈에 파악할 수 있는 대시보드입니다." },
             { title: "Python 주식 데이터 분석 스크립트", desc: "특정 종목의 과거 주가 데이터를 분석하고 이동평균선 등 기술적 지표를 시각화하는 코드입니다." },
         ],
-        "automation-script": [
+         "automation-script": [
              { title: "Python 이메일 자동 분류 및 응답", desc: "Gmail API를 사용하여 특정 키워드가 포함된 이메일을 자동으로 분류하고 템플릿에 따라 회신합니다." },
              { title: "구글 시트 데이터 자동 취합 스크립트", desc: "여러 구글 시트 파일에 나뉘어 있는 데이터를 하나의 마스터 시트로 매일 새벽 자동으로 취합하고 정리합니다." },
         ],
@@ -230,6 +225,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     title: idea.title,
                     description: idea.desc,
                     author: authors[promptIdCounter % authors.length],
+                    sellerId: `seller-${promptIdCounter % authors.length}`,
                     category: category.name,
                     categorySlug: category.slug,
                     subCategorySlug: subCategory.slug,
@@ -306,7 +302,7 @@ function serializeDoc(doc: any): any {
 export async function getProducts(): Promise<Prompt[]> {
     return fetchFromCache('products', async () => {
         try {
-            const snapshot = await getDocs(collection(db, "products"));
+            const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
             if (snapshot.empty) {
                 console.warn("Firestore 'products' collection is empty, returning example data.");
                 return EXAMPLE_PROMPTS;
@@ -318,6 +314,20 @@ export async function getProducts(): Promise<Prompt[]> {
         }
     });
 }
+
+export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
+    return fetchFromCache(`products_by_seller_${sellerId}`, async () => {
+         try {
+            const q = query(collection(db, "products"), where("sellerId", "==", sellerId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
+        } catch (error) {
+            console.error(`Error fetching products for seller ${sellerId}:`, error);
+            return [];
+        }
+    });
+}
+
 
 export async function getProduct(id: string): Promise<Prompt | null> {
     const cacheKey = `product_${id}`;
@@ -441,21 +451,17 @@ export async function getSellerDashboardData(sellerId: string) {
     return fetchFromCache(cacheKey, async () => {
         try {
             // 1. Fetch products by seller
-            const productsQuery = query(collection(db, "products"), where("sellerId", "==", sellerId));
-            const productsSnapshot = await getDocs(productsQuery);
-            const sellerProducts = productsSnapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+            const sellerProducts = await getProductsBySeller(sellerId);
 
             // 2. Fetch orders for those products
             const productIds = sellerProducts.map(p => p.id);
             const orders: Order[] = [];
             if (productIds.length > 0) {
-                 // Firestore 'in' query is limited to 30 elements. We might need to chunk this for sellers with many products.
-                 // For now, assuming a reasonable number of products.
-                const ordersQuery = query(collection(db, "orders"), where("productId", "in", productIds), orderBy("orderDate", "desc"));
-                const ordersSnapshot = await getDocs(ordersQuery);
-                ordersSnapshot.forEach(doc => {
-                    orders.push(serializeDoc(doc) as Order);
-                });
+                 const ordersQuery = query(collection(db, "orders"), where("productId", "in", productIds), orderBy("orderDate", "desc"));
+                 const ordersSnapshot = await getDocs(ordersQuery);
+                 ordersSnapshot.forEach(doc => {
+                     orders.push(serializeDoc(doc) as Order);
+                 });
             }
 
             // 3. Calculate stats
@@ -485,12 +491,12 @@ export async function getSellerDashboardData(sellerId: string) {
                     return { ...product, ...salesByProduct[productId] };
                 })
                 .sort((a, b) => b.sales - a.sales)
-                .slice(0, 5) as (Prompt & { sales: number, revenue: number })[];
+                .slice(0, 3) as (Prompt & { sales: number, revenue: number })[];
             
             // 6. Aggregate sales by month for the graph
             const salesByMonth: { name: string, total: number }[] = Array.from({ length: 12 }, (_, i) => {
-                const month = new Date(0, i).toLocaleString('default', { month: 'short' });
-                return { name: `${i+1}월`, total: 0 };
+                const month = new Date(0, i).toLocaleString('ko-KR', { month: 'short' });
+                return { name: month, total: 0 };
             });
 
             orders.forEach(order => {
@@ -512,4 +518,18 @@ export async function getSellerDashboardData(sellerId: string) {
             };
         }
     });
+}
+
+export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
+    const docRef = doc(db, 'sellers', userId);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        return serializeDoc(docSnap) as SellerProfile;
+    }
+    return null;
+}
+
+export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
+    const docRef = doc(db, 'sellers', userId);
+    await setDoc(docRef, profile, { merge: true });
 }

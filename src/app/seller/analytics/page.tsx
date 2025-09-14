@@ -3,39 +3,84 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Package, CreditCard, Users } from "lucide-react"
+import { DollarSign, Package, CreditCard, Users, ShoppingBag } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Image from "next/image"
 import { SELLER_STRINGS } from "@/lib/string-constants"
+import { useAuth } from "@/components/auth/auth-provider"
+import { useState, useEffect, useCallback } from "react"
+import { getSellerDashboardData } from "@/lib/firebase/services"
+import type { SellerStats, Prompt } from "@/lib/types"
+import { Skeleton } from "@/components/ui/skeleton"
+import { RecentSales } from "@/components/seller/recent-sales"
 
-const data = [
-  { name: "1월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "2월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "3월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "4월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "5월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "6월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "7월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "8월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "9월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "10월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "11월", total: Math.floor(Math.random() * 5000) + 1000 },
-  { name: "12월", total: Math.floor(Math.random() * 5000) + 1000 },
-]
+interface AnalyticsData {
+    stats: SellerStats;
+    recentSales: any[];
+    bestSellers: (Prompt & { sales: number; revenue: number })[];
+    salesByMonth: { name: string; total: number }[];
+}
 
-const recentSales = [
-  { id: "1", product: "Next.js 14 Boilerplate", user: "Ken", email: "ken@example.com", amount: "25,000" },
-  { id: "2", product: "Minimalist UI Kit", user: "Barbie", email: "barbie@example.com", amount: "35,000" },
-  { id: "3", product: "Email Marketing Sequences", user: "Pikachu", email: "pikachu@example.com", amount: "18,000" },
-];
-
-const topProducts = [
-    { name: "Next.js 14 Boilerplate", sales: 123, image: "https://picsum.photos/400/300?random=1" },
-    { name: "Minimalist UI Kit", sales: 98, image: "https://picsum.photos/400/300?random=2" },
-    { name: "Email Marketing Sequences", sales: 72, image: "https://picsum.photos/400/300?random=3" },
-]
+function AnalyticsSkeleton() {
+    return (
+         <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Skeleton className="lg:col-span-4 h-96" />
+                <Skeleton className="lg:col-span-3 h-96" />
+            </div>
+             <Skeleton className="h-96" />
+        </div>
+    )
+}
 
 export default function SellerAnalyticsPage() {
+  const { user, loading: authLoading } = useAuth();
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchAnalyticsData = useCallback(async () => {
+    if (user) {
+        setLoading(true);
+        const dashboardData = await getSellerDashboardData(user.uid);
+        setData(dashboardData);
+        setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+        fetchAnalyticsData();
+    } else if (!authLoading) {
+        setLoading(false);
+    }
+  }, [user, authLoading, fetchAnalyticsData]);
+
+
+  if(loading || authLoading) {
+    return (
+        <div className="space-y-6">
+            <CardHeader className="p-0">
+                <CardTitle>{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
+                <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
+            </CardHeader>
+            <AnalyticsSkeleton />
+        </div>
+    )
+  }
+
+  if(!data) {
+    return <p>데이터를 불러오는 중 오류가 발생했습니다.</p>;
+  }
+
+  const { stats, recentSales, bestSellers, salesByMonth } = data;
+  const hasSales = stats.totalSales > 0;
+
   return (
     <div className="space-y-6">
       <CardHeader className="p-0">
@@ -50,18 +95,16 @@ export default function SellerAnalyticsPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₩5,832,900</div>
-            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +20.1%</p>
+            <div className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_ORDERS}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +180.1%</p>
+            <div className="text-2xl font-bold">+{stats.totalSales.toLocaleString()}</div>
           </CardContent>
         </Card>
         <Card>
@@ -70,18 +113,16 @@ export default function SellerAnalyticsPage() {
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₩24,821</div>
-            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +12.4%</p>
+            <div className="text-2xl font-bold">₩{stats.totalSales > 0 ? Math.round(stats.totalRevenue / stats.totalSales).toLocaleString() : 0}</div>
           </CardContent>
         </Card>
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.UNIQUE_VISITORS}</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_PRODUCTS}</CardTitle>
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1,234명</div>
-            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +5.2%</p>
+            <div className="text-2xl font-bold">{stats.productCount}개</div>
           </CardContent>
         </Card>
       </div>
@@ -92,25 +133,31 @@ export default function SellerAnalyticsPage() {
             <CardTitle>{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-             <ResponsiveContainer width="100%" height={350}>
-              <BarChart data={data}>
-                <XAxis
-                  dataKey="name"
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="#888888"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `₩${value / 1000}k`}
-                />
-                <Bar dataKey="total" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
-              </BarChart>
-            </ResponsiveContainer>
+            {hasSales ? (
+                 <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={salesByMonth}>
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value) => `₩${value / 1000}k`}
+                    />
+                    <Bar dataKey="total" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
+                  </BarChart>
+                </ResponsiveContainer>
+            ): (
+                <div className="h-[350px] flex items-center justify-center text-center">
+                    <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_SALES_DATA}</p>
+                </div>
+            )}
           </CardContent>
         </Card>
 
@@ -120,17 +167,13 @@ export default function SellerAnalyticsPage() {
             <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
-                {recentSales.map((sale) => (
-                    <div key={sale.id} className="flex items-center">
-                        <div className="ml-4 space-y-1">
-                            <p className="text-sm font-medium leading-none">{sale.product}</p>
-                            <p className="text-sm text-muted-foreground">{sale.user} ({sale.email})</p>
-                        </div>
-                        <div className="ml-auto font-medium">+₩{sale.amount}</div>
-                    </div>
-                ))}
-            </div>
+            {recentSales.length > 0 ? (
+                <RecentSales sales={recentSales} />
+            ) : (
+                <div className="text-center py-10">
+                    <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_ORDER_DATA}</p>
+                </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -140,27 +183,33 @@ export default function SellerAnalyticsPage() {
             <CardDescription>{SELLER_STRINGS.TOP_PRODUCTS_DESC}</CardDescription>
         </CardHeader>
         <CardContent>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_PRODUCT}</TableHead>
-                        <TableHead className="text-right">{SELLER_STRINGS.PRODUCT_TABLE_SALES}</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {topProducts.map((product) => (
-                        <TableRow key={product.name}>
-                            <TableCell>
-                                <div className="flex items-center gap-4">
-                                    <Image src={product.image} alt={product.name} width={64} height={48} className="rounded-md object-cover" data-ai-hint="abstract design" />
-                                    <span className="font-medium">{product.name}</span>
-                                </div>
-                            </TableCell>
-                            <TableCell className="text-right">{product.sales.toLocaleString()}개</TableCell>
+            {bestSellers.length > 0 ? (
+                 <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_PRODUCT}</TableHead>
+                            <TableHead className="text-right">{SELLER_STRINGS.PRODUCT_TABLE_SALES}</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {bestSellers.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell>
+                                    <div className="flex items-center gap-4">
+                                        <Image src={product.image} alt={product.title} width={64} height={48} className="rounded-md object-cover" data-ai-hint="abstract design" />
+                                        <span className="font-medium">{product.title}</span>
+                                    </div>
+                                </TableCell>
+                                <TableCell className="text-right">{product.sales.toLocaleString()}개</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            ) : (
+                 <div className="text-center py-10">
+                    <p className="text-muted-foreground">아직 판매된 상품이 없습니다.</p>
+                </div>
+            )}
         </CardContent>
        </Card>
 
