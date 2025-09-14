@@ -22,6 +22,7 @@ import { signUpWithEmailAction, signInWithGoogleAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useAuth } from "@/components/auth/auth-provider";
 
 function GoogleSignInButton() {
     const { pending } = useFormStatus();
@@ -53,18 +54,27 @@ export default function SignUpPage() {
     const [emailState, emailAction] = useActionState(signUpWithEmailAction, null);
     const { toast } = useToast();
     const router = useRouter();
+    const { user, loading } = useAuth();
+
+
+    useEffect(() => {
+        if (!loading && user) {
+            router.push("/");
+        }
+    }, [user, loading, router]);
 
 
     useEffect(() => {
         const state = emailState || googleState;
         if(state?.success) {
             toast({ title: "성공", description: state.message });
-            router.push("/seller/dashboard");
+            router.push("/");
         } else if (state?.error) {
             toast({ title: "오류", description: state.error, variant: "destructive" });
         }
-    }, [emailState, googleState, toast, router])
+    }, [emailState, googleState, toast, router]);
 
+    if(loading || user) return null;
 
   return (
      <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
@@ -129,4 +139,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-

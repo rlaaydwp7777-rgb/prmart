@@ -1,4 +1,6 @@
 
+'use client'
+
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -8,9 +10,13 @@ import { Separator } from "@/components/ui/separator";
 import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { getProduct, getProductsByCategorySlug, getCategories } from "@/lib/firebase/services";
 import { PromptCard } from "@/components/prompts/prompt-card";
+import { useEffect, useState } from "react";
+import type { Category, Prompt } from "@/lib/types";
+import { useAuth } from "@/components/auth/auth-provider";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const mockReviews = [
     { id: 1, author: "김지훈", avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요." },
@@ -18,27 +24,87 @@ const mockReviews = [
     { id: 3, author: "최민준", avatar: "https://picsum.photos/100/100?random=12", rating: 5, content: "AI 기능 연동이 정말 쉬워서 놀랐습니다. 강력 추천!" },
 ];
 
-export default async function PromptDetailPage({ params }: { params: { id: string } }) {
-  const prompt = await getProduct(params.id);
+
+function ProductPageSkeleton() {
+    return (
+        <div className="container px-4 md:px-6">
+             <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+                 <div className="grid gap-4">
+                     <Skeleton className="w-full aspect-[4/3] rounded-lg" />
+                     <div className="grid grid-cols-5 gap-2">
+                         {[...Array(5)].map((_, i) => <Skeleton key={i} className="w-full aspect-[4/3] rounded-md" />)}
+                    </div>
+                 </div>
+                 <div className="flex flex-col gap-4 md:gap-6">
+                     <Skeleton className="h-6 w-24" />
+                     <Skeleton className="h-10 w-full" />
+                     <Skeleton className="h-8 w-48" />
+                     <Separator />
+                     <Skeleton className="h-12 w-32" />
+                      <div className="flex flex-col gap-2 mt-auto">
+                          <div className="flex flex-col sm:flex-row gap-2">
+                              <Skeleton className="h-12 w-full" />
+                              <Skeleton className="h-12 w-full" />
+                          </div>
+                          <Skeleton className="h-12 w-full" />
+                      </div>
+                 </div>
+             </div>
+        </div>
+    )
+}
+
+export default function PromptDetailPage({ params }: { params: { id: string } }) {
+  const [prompt, setPrompt] = useState<Prompt | null>(null);
+  const [relatedPrompts, setRelatedPrompts] = useState<Prompt[]>([]);
+  const [categoryData, setCategoryData] = useState<Category | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const { user } = useAuth();
+  const router = useRouter();
+  
+  useEffect(() => {
+    async function fetchData() {
+        try {
+            setLoading(true);
+            const fetchedPrompt = await getProduct(params.id);
+            if (!fetchedPrompt) {
+                notFound();
+                return;
+            }
+            setPrompt(fetchedPrompt);
+            
+            const [categories, related] = await Promise.all([
+                getCategories(),
+                getProductsByCategorySlug(fetchedPrompt.categorySlug, 4, fetchedPrompt.id)
+            ]);
+            
+            setRelatedPrompts(related);
+            setCategoryData(categories.find(c => c.name === fetchedPrompt.category) || null);
+            
+        } catch (error) {
+            console.error(error);
+            notFound();
+        } finally {
+            setLoading(false);
+        }
+    }
+    fetchData();
+  }, [params.id]);
+
+
+  if (loading) {
+    return <ProductPageSkeleton />;
+  }
 
   if (!prompt) {
-    notFound();
+    return null;
   }
-  
-  // In a real app, this would be determined by checking the user's purchase history.
-  // For this version, we will differentiate based on price (free vs paid).
-  const isPurchased = prompt.price === 0; 
-
-  const [categories, relatedPrompts] = await Promise.all([
-      getCategories(),
-      getProductsByCategorySlug(prompt.categorySlug, 4, prompt.id)
-  ]);
-  
-  const categoryData = categories.find(c => c.name === prompt.category);
-
   
   const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
+
+  const isFree = prompt.price === 0;
 
   return (
       <div className="container px-4 md:px-6">
@@ -96,37 +162,44 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
             <Separator />
             
             <div className="text-4xl font-bold font-headline text-primary">
-              {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}`: "무료"}
+              {isFree ? "무료" : `₩${prompt.price.toLocaleString()}`}
             </div>
 
-            {isPurchased ? (
-              <div className="flex flex-col gap-2 mt-auto">
-                 <Button size="lg" className="w-full">
-                      <Eye className="mr-2"/>
-                      콘텐츠 보기
-                  </Button>
-                  <Button size="lg" variant="outline" className="w-full">
-                      <Download className="mr-2"/>
-                      다운로드
-                  </Button>
-              </div>
+            { isFree ? (
+                <div className="flex flex-col gap-2 mt-auto">
+                    <Button size="lg" className="w-full">
+                        <Eye className="mr-2"/>
+                        콘텐츠 보기
+                    </Button>
+                    <Button size="lg" variant="outline" className="w-full">
+                        <Download className="mr-2"/>
+                        다운로드
+                    </Button>
+                </div>
+            ) : user ? (
+                <div className="flex flex-col gap-2 mt-auto">
+                    <div className="flex flex-col sm:flex-row gap-2">
+                        <Button size="lg" variant="outline" className="w-full">
+                            <Heart className="mr-2"/>
+                            위시리스트
+                        </Button>
+                        <Button size="lg" variant="outline" className="w-full">
+                            <ShoppingCart className="mr-2"/>
+                            장바구니
+                        </Button>
+                    </div>
+                    <Button size="lg" className="w-full text-lg h-12">
+                        <Zap className="mr-2"/>
+                        바로 구매
+                    </Button>
+                </div>
             ) : (
-              <div className="flex flex-col gap-2 mt-auto">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                      <Button size="lg" variant="outline" className="w-full">
-                          <Heart className="mr-2"/>
-                          위시리스트
-                      </Button>
-                      <Button size="lg" variant="outline" className="w-full">
-                          <ShoppingCart className="mr-2"/>
-                          장바구니
-                      </Button>
-                  </div>
-                  <Button size="lg" className="w-full text-lg h-12">
-                      <Zap className="mr-2"/>
-                      바로 구매
-                  </Button>
-              </div>
+                 <div className="flex flex-col gap-2 mt-auto">
+                      <Button size="lg" className="w-full text-lg h-12" onClick={() => router.push('/login')}>
+                        <Zap className="mr-2"/>
+                        로그인 후 구매
+                    </Button>
+                 </div>
             )}
           </div>
         </div>
@@ -233,5 +306,3 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
       </div>
   );
 }
-
-    
