@@ -51,7 +51,7 @@ function EmailSignInButton() {
 
 export default function LoginPage() {
     const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
-    const [emailState, emailAction] = useActionState(signInWithEmailAction, null);
+    const [emailState, emailAction] = useActionState(signInWithEmailAction, { message: "", success: false });
     const { toast } = useToast();
     const router = useRouter();
     const { user, loading } = useAuth();

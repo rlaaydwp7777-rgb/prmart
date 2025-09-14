@@ -20,10 +20,12 @@ const getFirebaseAuthErrorMessage = (error: FirebaseError) => {
             return '비밀번호는 6자리 이상이어야 합니다.';
         case 'auth/user-not-found':
         case 'auth/wrong-password':
+        case 'auth/invalid-credential':
              return '이메일 또는 비밀번호를 잘못 입력했습니다.';
         case 'auth/popup-closed-by-user':
             return 'Google 로그인 팝업이 닫혔습니다. 다시 시도해주세요.';
         default:
+            console.error("Firebase Auth Error:", error.code, error.message);
             return '인증 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
     }
 }
