@@ -41,7 +41,7 @@ export default async function CategoryCatchAll({ params }: Props) {
 
 
   return (
-      <div className="container px-4 md:px-6">
+      <div className="container px-4 md:px-6 pt-8">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8 md:mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
             {pageTitle}
@@ -59,4 +59,3 @@ export default async function CategoryCatchAll({ params }: Props) {
       </div>
   );
 }
-
