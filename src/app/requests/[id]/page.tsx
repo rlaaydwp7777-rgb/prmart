@@ -9,7 +9,7 @@ import { PromptCard } from "@/components/prompts/prompt-card";
 import { Separator } from "@/components/ui/separator";
 import { MainLayout } from "@/components/layout/main-layout";
 import Link from "next/link";
-import { getCategories, getProducts, getIdeaRequest } from "@/lib/firebase/services";
+import { getProducts, getIdeaRequest } from "@/lib/firebase/services";
 
 
 export default async function RequestDetailPage({ params }: { params: { id: string } }) {
@@ -19,9 +19,7 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
     notFound();
   }
 
-  const [categories, products] = await Promise.all([getCategories(), getProducts()]);
-
-  const category = categories.find(c => c.name === request?.category);
+  const products = await getProducts();
 
   const mockProposals = [
     {
@@ -47,8 +45,8 @@ export default async function RequestDetailPage({ params }: { params: { id: stri
             {/* Request Details */}
             <div className="space-y-4">
               <div className="flex gap-2">
-                 {category && (
-                    <Link href={`/c/${category.slug}`}>
+                 {request.category && (
+                    <Link href={`/c/${request.categorySlug}`}>
                       <Badge variant="secondary">{request.category}</Badge>
                     </Link>
                  )}

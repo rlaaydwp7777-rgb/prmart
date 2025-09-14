@@ -32,6 +32,7 @@ export interface IdeaRequest {
     description: string;
     author: string;
     category: string;
+    categorySlug: string;
     budget: number;
     proposals: number;
     isExample?: boolean;

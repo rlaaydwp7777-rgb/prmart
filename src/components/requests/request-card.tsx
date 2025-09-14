@@ -4,23 +4,21 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MessageSquare, User } from "lucide-react";
-import type { IdeaRequest, Category } from "@/lib/types";
+import type { IdeaRequest } from "@/lib/types";
 
 interface RequestCardProps {
   request: IdeaRequest;
-  categories: Category[];
 }
 
-export function RequestCard({ request, categories }: RequestCardProps) {
-  const category = categories.find(c => c.name === request.category);
+export function RequestCard({ request }: RequestCardProps) {
 
   return (
     <Link href={`/requests/${request.id}`} className="block h-full">
         <Card className="flex flex-col h-full overflow-hidden transition-all hover:shadow-lg duration-300">
             <CardHeader>
                 <div className="flex gap-2">
-                    {category && 
-                      <Link href={`/c/${category.slug}`} className="z-10">
+                    {request.category && 
+                      <Link href={`/c/${request.categorySlug}`} className="z-10">
                         <Badge variant="secondary" className="w-fit">{request.category}</Badge>
                       </Link>
                     }
