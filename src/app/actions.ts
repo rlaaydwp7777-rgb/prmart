@@ -61,7 +61,7 @@ export async function signUpWithEmailAction(prevState: AuthState, formData: Form
 
     try {
         await createUserWithEmailAndPassword(auth, email, password);
-        return { success: true, message: "회원가입에 성공했습니다! 대시보드로 이동합니다." };
+        return { success: true, message: "회원가입에 성공했습니다! 메인 페이지로 이동합니다." };
     } catch (error) {
         if (error instanceof FirebaseError) {
              return { success: false, message: "회원가입 실패", error: getFirebaseAuthErrorMessage(error) };
@@ -90,7 +90,7 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
 
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        return { success: true, message: "로그인에 성공했습니다! 대시보드로 이동합니다." };
+        return { success: true, message: "로그인에 성공했습니다! 메인 페이지로 이동합니다." };
     } catch (error) {
         if (error instanceof FirebaseError) {
              return { success: false, message: "로그인 실패", error: getFirebaseAuthErrorMessage(error) };
