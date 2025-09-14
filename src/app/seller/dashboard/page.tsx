@@ -1,39 +1,88 @@
 
+"use client";
+
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { DollarSign, Package, BarChart, Star, Trophy, Info, LineChart } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { getSellerDashboardData } from "@/lib/firebase/services";
-import { auth } from "@/lib/firebase/auth";
-import Link from "next/link";
+import { DollarSign, Package, BarChart, Star, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecentSales } from "@/components/seller/recent-sales";
 import { Overview } from "@/components/seller/overview";
+import type { SellerStats, Order, Prompt } from "@/lib/types";
+import { getSellerDashboardData } from "@/lib/firebase/services";
+import { useAuth } from "@/components/auth/auth-provider";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 
-// Mock data - in a real app, this would be fetched for the logged-in user.
-const hasSales = false; // Simulate a new user
+interface DashboardData {
+    stats: SellerStats;
+    recentSales: Order[];
+    bestSellers: (Prompt & { sales: number; revenue: number })[];
+    salesByMonth: { name: string; total: number }[];
+}
 
-
-export default async function SellerDashboardPage() {
-  const sellerId = auth.currentUser?.uid;
-  if (!sellerId) {
-    // This should be handled by the layout's auth protection, but as a fallback:
+function DashboardSkeleton() {
     return (
-        <div className="flex flex-col items-center justify-center h-full text-center">
-            <h1 className="text-2xl font-bold font-headline">인증 오류</h1>
-            <p className="text-muted-foreground">판매자 정보를 불러올 수 없습니다. 다시 로그인해주세요.</p>
-             <Button asChild className="mt-4">
-                <Link href="/login">로그인</Link>
-            </Button>
-        </div>
-    );
-  }
+        <div className="space-y-6">
+             <div>
+                <Skeleton className="h-9 w-1/2" />
+                <Skeleton className="h-4 w-3/4 mt-2" />
+            </div>
 
-  const { stats, recentSales, bestSellers, salesByMonth } = await getSellerDashboardData(sellerId);
-  const hasProducts = stats.productCount > 0;
+             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+                <Skeleton className="h-28" />
+            </div>
+            <div className="grid gap-6 grid-cols-1">
+                 <Skeleton className="h-96" />
+            </div>
+        </div>
+    )
+}
+
+
+export default function SellerDashboardPage() {
+    const { user, loading: authLoading } = useAuth();
+    const [data, setData] = useState<DashboardData | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user) {
+            getSellerDashboardData(user.uid).then((dashboardData) => {
+                setData(dashboardData);
+                setLoading(false);
+            });
+        } else if (!authLoading) {
+            setLoading(false);
+        }
+    }, [user, authLoading]);
+
+    if (loading || authLoading) {
+        return <DashboardSkeleton />;
+    }
+
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full text-center">
+                <h1 className="text-2xl font-bold font-headline">인증 오류</h1>
+                <p className="text-muted-foreground">판매자 정보를 불러올 수 없습니다. 다시 로그인해주세요.</p>
+                <Button asChild className="mt-4">
+                    <Link href="/login">로그인</Link>
+                </Button>
+            </div>
+        );
+    }
+    
+    if (!data) {
+       return <p>데이터를 불러오는 중 오류가 발생했습니다.</p>;
+    }
+
+    const { stats, recentSales, salesByMonth } = data;
+    const hasProducts = stats.productCount > 0;
 
   return (
     <div className="space-y-6">
@@ -149,3 +198,5 @@ export default async function SellerDashboardPage() {
     </div>
   )
 }
+
+    
