@@ -21,24 +21,73 @@ async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>): Promis
 
 export const EXAMPLE_CATEGORIES: Category[] = [
     { 
-        id: "ai-and-production", name: "AI & 생산성", slug: "ai-and-production", icon: "Rocket", 
+        id: "cat-1", name: "AI & 생산성", slug: "ai-and-production", icon: "Rocket", 
         subCategories: [
-            { id: "ai-tools", name: "AI 도구", slug: "ai-tools" },
-            { id: "productivity", name: "생산성", slug: "productivity" }
+            { id: "sub-1-1", name: "이미지 프롬프트", slug: "image-prompt" },
+            { id: "sub-1-2", name: "영상 프롬프트", slug: "video-prompt" },
         ]
     },
     { 
-        id: "development-it-automation", name: "개발 & IT 자동화", slug: "development-it-automation", icon: "Code",
+        id: "cat-2", name: "개발 & IT 자동화", slug: "development-it-automation", icon: "Code",
         subCategories: [
-            { id: "web-dev", name: "웹/앱 개발", slug: "web-dev" },
-            { id: "automation-script", name: "업무 자동화", slug: "automation-script" }
+            { id: "sub-2-1", name: "웹/앱 개발", slug: "web-dev" },
+            { id: "sub-2-2", name: "업무 자동화", slug: "automation-script" }
         ]
     },
     { 
-        id: "investment-fintech", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart",
+        id: "cat-3", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart",
         subCategories: [
-            { id: "stock-report", name: "주식/ETF 리포트", slug: "stock-report" },
-            { id: "real-estate", name: "부동산 전략", slug: "real-estate" }
+            { id: "sub-3-1", name: "주식/ETF 리포트", slug: "stock-report" },
+            { id: "sub-3-2", name: "부동산 전략", slug: "real-estate" }
+        ]
+    },
+    { 
+        id: "cat-4", name: "여행 & 라이프", slug: "travel-life", icon: "Plane",
+        subCategories: [
+            { id: "sub-4-1", name: "국내여행", slug: "korea-travel" },
+            { id: "sub-4-2", name: "해외여행", slug: "overseas-travel" }
+        ]
+    },
+    { 
+        id: "cat-5", name: "생활 & 육아 꿀팁", slug: "living-parenting-tips", icon: "Users",
+        subCategories: [
+            { id: "sub-5-1", name: "육아 노하우", slug: "parenting" },
+            { id: "sub-5-2", name: "생활 절약법", slug: "life-hacks" }
+        ]
+    },
+    { 
+        id: "cat-6", name: "비즈니스 & 마케팅", slug: "business-marketing", icon: "Briefcase",
+        subCategories: [
+            { id: "sub-6-1", name: "SNS 마케팅", slug: "sns-marketing" },
+            { id: "sub-6-2", name: "브랜딩", slug: "branding" }
+        ]
+    },
+    { 
+        id: "cat-7", name: "창작 & 디자인", slug: "creation-design", icon: "Brush",
+        subCategories: [
+            { id: "sub-7-1", name: "일러스트", slug: "illustration" },
+            { id: "sub-7-2", name: "UX/UI", slug: "ux-ui" }
+        ]
+    },
+    { 
+        id: "cat-8", name: "학습 & 자기계발", slug: "learning-self-development", icon: "BookOpen",
+        subCategories: [
+            { id: "sub-8-1", name: "외국어 학습", slug: "language-learning" },
+            { id: "sub-8-2", name: "자격증 대비", slug: "certification" }
+        ]
+    },
+    { 
+        id: "cat-9", name: "모빌리티 & 자동차", slug: "mobility-automobile", icon: "Car",
+        subCategories: [
+            { id: "sub-9-1", name: "차량 구매 가이드", slug: "car-buying-guide" },
+            { id: "sub-9-2", name: "전기차 트렌드", slug: "ev-trends" }
+        ]
+    },
+    { 
+        id: "cat-10", name: "라이프 인프라", slug: "life-infra", icon: "Home",
+        subCategories: [
+            { id: "sub-10-1", name: "아파트 시세 리포트", slug: "apartment-report" },
+            { id: "sub-10-2", name: "인테리어", slug: "interior" }
         ]
     },
 ];
@@ -175,7 +224,7 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
             console.error(`Error fetching products for category ${slug}, returning example data:`, error);
             const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
             let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : exampleProducts;
-            return count ? filteredExamples.slice(0, count) : filteredExamples;
+            return count ? filteredExamples.slice(0, count) : [];
         }
     });
 }
