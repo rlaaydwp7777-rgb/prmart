@@ -8,94 +8,70 @@ import { slugify } from "../utils";
 const requestCache = new Map<string, any>();
 
 async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
-  if (requestCache.has(key)) {
-    return requestCache.get(key);
+  if (process.env.NODE_ENV !== 'development' || !requestCache.has(key)) {
+    const data = await fetcher();
+    if (process.env.NODE_ENV === 'development') {
+        requestCache.set(key, data);
+        setTimeout(() => requestCache.delete(key), 2000); // 2-second cache in dev
+    }
+    return data;
   }
-  const data = await fetcher();
-  requestCache.set(key, data);
-  // Clear cache after a short period to allow for new data in subsequent server-side renders.
-  setTimeout(() => requestCache.delete(key), 500);
-  return data;
+  return requestCache.get(key);
 }
-
-const generateSubCategories = (parentSlug: string, names: string[]): SubCategory[] => {
-    return names.map(name => ({ name, slug: slugify(name) }));
-};
 
 export const EXAMPLE_CATEGORIES: Category[] = [
     { 
-        id: "cat-1", name: "AI & 프로덕션", slug: "ai-and-production", icon: "Rocket", 
-        subCategories: generateSubCategories("ai-and-production", ["이미지 프롬프트", "영상 프롬프트", "텍스트·문서 작성", "AI 업무 자동화", "AI 툴 리뷰 & 비교"])
+        id: "ai-and-production", name: "AI & 생산성", slug: "ai-and-production", icon: "Rocket", 
+        subCategories: [
+            { id: "ai-tools", name: "AI 도구", slug: "ai-tools" },
+            { id: "productivity", name: "생산성", slug: "productivity" }
+        ]
     },
     { 
-        id: "cat-2", name: "개발 & IT 자동화", slug: "development-it-automation", icon: "Code",
-        subCategories: generateSubCategories("development-it-automation", ["웹/앱 개발", "데이터 분석 & 시각화", "업무 자동화", "클라우드/인프라", "보안/해킹 지식"])
+        id: "development-it-automation", name: "개발 & IT 자동화", slug: "development-it-automation", icon: "Code",
+        subCategories: [
+            { id: "web-dev", name: "웹/앱 개발", slug: "web-dev" },
+            { id: "automation-script", name: "업무 자동화", slug: "automation-script" }
+        ]
     },
     { 
-        id: "cat-3", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart",
-        subCategories: generateSubCategories("investment-fintech", ["주식/ETF 리포트", "부동산 임장/투자 전략", "코인/블록체인 분석", "절세·짠테크", "금융 트렌드 리포트"])
+        id: "investment-fintech", name: "재테크 & 투자", slug: "investment-fintech", icon: "LineChart",
+        subCategories: [
+            { id: "stock-report", name: "주식/ETF 리포트", slug: "stock-report" },
+            { id: "real-estate", name: "부동산 전략", slug: "real-estate" }
+        ]
     },
-    { 
-        id: "cat-4", name: "여행 & 라이프", slug: "travel-life", icon: "Plane",
-        subCategories: generateSubCategories("travel-life", ["국내여행 코스", "해외여행 플랜", "항공·숙박 꿀팁", "여행 사진/영상 노하우", "소규모 여행 커뮤니티"])
-    },
-    { 
-        id: "cat-5", name: "생활 & 육아 꿀팁", slug: "living-parenting-tips", icon: "Users",
-        subCategories: generateSubCategories("living-parenting-tips", ["육아 노하우", "생활 절약법", "건강/헬스 정보", "집안일 자동화 꿀팁", "음식/레시피 공유"])
-    },
-    { 
-        id: "cat-6", name: "비즈니스 & 마케팅", slug: "business-marketing", icon: "Briefcase",
-        subCategories: generateSubCategories("business-marketing", ["SNS 마케팅", "브랜딩 & 디자인", "세일즈/영업 전략", "템플릿·문서 양식", "스타트업/창업 노하우"])
-    },
-    { 
-        id: "cat-7", name: "창작 & 디자인", slug: "creation-design", icon: "Brush",
-        subCategories: generateSubCategories("creation-design", ["일러스트·캐릭터 리소스", "UX/UI 디자인 팁", "사진 보정/촬영 기법", "영상 편집 프리셋", "폰트·컬러 팔레트 공유"])
-    },
-    { 
-        id: "cat-8", name: "학습 & 자기계발", slug: "learning-self-development", icon: "BookOpen",
-        subCategories: generateSubCategories("learning-self-development", ["외국어 학습법", "자격증 대비", "글쓰기/스피치", "뇌과학·학습법", "온라인 강의 추천"])
-    },
-    { 
-        id: "cat-9", name: "모빌리티 & 자동차", slug: "mobility-automobile", icon: "Car",
-        subCategories: generateSubCategories("mobility-automobile", ["차량 구매 가이드", "중고차 체크리스트", "전기차/신기술 트렌드", "자동차 관리/정비", "튜닝·액세서리"])
-    },
-    { 
-        id: "cat-10", name: "라이프 인프라", slug: "life-infra", icon: "Home",
-        subCategories: generateSubCategories("life-infra", ["아파트 시세/임장 리포트", "전월세 계약 꿀팁", "인테리어 노하우", "지역별 생활 정보", "부동산 정책 해설"])
-    }
 ];
 
 const generateExamplePrompts = (): Prompt[] => {
     let prompts: Prompt[] = [];
     let rankCounter = 1;
     EXAMPLE_CATEGORIES.forEach(category => {
-        category.subCategories.forEach((subCategory) => {
-            for (let i = 1; i <= 10; i++) {
-                const promptId = `ex-${category.slug}-${subCategory.slug}-${i}`;
-                prompts.push({
-                    id: promptId,
-                    title: `${subCategory.name} 예제 상품 #${i}`,
-                    description: `이 상품은 '${subCategory.name}'에 대한 심도 있는 노하우와 실용적인 템플릿을 제공합니다. ${category.name} 분야의 전문가가 제작한 이 콘텐츠는 사용자가 관련 작업을 즉시 시작하거나 개선하는 데 도움을 줄 수 있습니다. 상세 페이지에서는 구체적인 활용 사례와 포함된 파일 목록, 그리고 자주 묻는 질문에 대한 답변을 확인할 수 있습니다. 구매 후에는 바로 다운로드하여 사용 가능하며, 지속적인 업데이트가 제공될 수 있습니다.`,
-                    author: "prmart 전문가",
-                    category: category.name,
-                    categorySlug: category.slug,
-                    price: 0,
-                    image: `https://picsum.photos/seed/${promptId}/400/300`,
-                    aiHint: `${category.slug.split('-')[0]} ${subCategory.slug.split('-')[0]}`,
-                    tags: [category.name, subCategory.name, "예제"],
-                    rank: rankCounter <= 10 ? rankCounter++ : undefined,
-                    isExample: true,
-                    createdAt: new Date().toISOString(),
-                    stats: {
-                        views: Math.floor(Math.random() * 2000) + 100,
-                        likes: Math.floor(Math.random() * 300) + 10,
-                        sales: Math.floor(Math.random() * 100) + 5,
-                    },
-                    rating: parseFloat((Math.random() * (5.0 - 4.5) + 4.5).toFixed(1)),
-                    reviews: Math.floor(Math.random() * 50) + 5,
-                });
-            }
-        });
+        for (let i = 1; i <= 5; i++) {
+            const promptId = `ex-${category.slug}-${i}`;
+            prompts.push({
+                id: promptId,
+                title: `${category.name} 예제 상품 #${i}`,
+                description: `이 상품은 '${category.name}'에 대한 심도 있는 노하우와 실용적인 템플릿을 제공합니다.`,
+                author: "prmart 전문가",
+                category: category.name,
+                categorySlug: category.slug,
+                price: Math.floor(Math.random() * 30000) + 10000,
+                image: `https://picsum.photos/seed/${promptId}/400/300`,
+                aiHint: `${category.slug.split('-')[0]} content`,
+                tags: [category.name, "예제"],
+                rank: rankCounter <= 10 ? rankCounter++ : undefined,
+                isExample: true,
+                createdAt: new Date().toISOString(),
+                stats: {
+                    views: Math.floor(Math.random() * 2000) + 100,
+                    likes: Math.floor(Math.random() * 300) + 10,
+                    sales: Math.floor(Math.random() * 100) + 5,
+                },
+                rating: parseFloat((Math.random() * (5.0 - 4.5) + 4.5).toFixed(1)),
+                reviews: Math.floor(Math.random() * 50) + 5,
+            });
+        }
     });
     return prompts;
 };
@@ -104,10 +80,8 @@ const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
 const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, index) => {
     const examples = [
-        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", budget: 50000, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요. 포토샵 없이도 고퀄리티 디자인이 가능하면 좋겠습니다." },
-        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", budget: 20000, description: "매매가, 보증금, 월세, 대출금리, 보유세 등 기본 정보만 입력하면 연간/월간 수익률, ROI, 현금흐름을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
-        { title: "반려동물 건강상태 체크 AI 프롬프트", author: "집사일기", budget: 0, description: "반려동물의 사진과 사료 종류, 활동량 등 간단한 정보를 입력하면 AI가 건강 상태에 대한 기본적인 조언을 해주는 프롬프트를 구합니다. (주의: 의료적 진단을 대체하는 것이 아님)" },
-        { title: "개발자 기술면접 질문 모음 & 답변 가이드", author: "취준생", budget: 30000, description: "Next.js, TypeScript, Node.js 분야의 주요 기술면접 질문과 모범 답변, 관련 CS 지식이 정리된 PDF 또는 노션 템플릿을 요청합니다." },
+        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", budget: 50000, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
+        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", budget: 20000, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
     ];
     const example = examples[index % examples.length];
     return {
@@ -153,7 +127,7 @@ export async function getProducts(): Promise<Prompt[]> {
                 console.warn("Firestore 'products' collection is empty, returning example data.");
                 return EXAMPLE_PROMPTS;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(p => p);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
         } catch (error) {
             console.error("Error fetching products, returning example data:", error);
             return EXAMPLE_PROMPTS;
@@ -174,7 +148,6 @@ export async function getProduct(id: string): Promise<Prompt | null> {
              console.error(`Error fetching product ${id}, falling back to example data:`, error);
         }
         
-        // Fallback to example data if doc not in DB or error occurs
         const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
         return exampleProduct || null;
     });
@@ -183,31 +156,27 @@ export async function getProduct(id: string): Promise<Prompt | null> {
 export async function getProductsByCategorySlug(slug: string, count?: number, excludeId?: string): Promise<Prompt[]> {
     const cacheKey = `products_by_category_${slug}_${count}_${excludeId}`;
     return fetchFromCache(cacheKey, async () => {
-        let products: Prompt[];
         try {
+            let products: Prompt[];
             let q = query(collection(db, "products"), where("categorySlug", "==", slug));
-            if (count) {
-                q = query(q, limit(count + (excludeId ? 1 : 0)));
-            }
             const snapshot = await getDocs(q);
 
             if (snapshot.empty) {
+                // No real data, fallback to examples for this category
                 products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
             } else {
-                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(p => p);
+                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
             }
+            
+            let filteredProducts = excludeId ? products.filter(p => p.id !== excludeId) : products;
+            return count ? filteredProducts.slice(0, count) : filteredProducts;
+
         } catch (error) {
             console.error(`Error fetching products for category ${slug}, returning example data:`, error);
-            products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
+            const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
+            let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : exampleProducts;
+            return count ? filteredExamples.slice(0, count) : filteredExamples;
         }
-
-        if (excludeId) {
-            products = products.filter(p => p.id !== excludeId);
-        }
-        if (count) {
-            return products.slice(0, count);
-        }
-        return products;
     });
 }
 
@@ -219,14 +188,11 @@ export async function getCategories(): Promise<Category[]> {
                 console.warn("Firestore 'categories' collection is empty, returning example data.");
                 return EXAMPLE_CATEGORIES;
             }
-            // Ensure subCategories is always an array
             const categories = snapshot.docs.map(doc => {
                 const data = serializeDoc(doc) as Category;
-                if (!data.subCategories) {
-                    data.subCategories = [];
-                }
+                data.subCategories = data.subCategories || [];
                 return data;
-            }).filter(c => c);
+            }).filter(Boolean);
 
             return categories;
         } catch (error) {
@@ -244,7 +210,7 @@ export async function getIdeaRequests(): Promise<IdeaRequest[]> {
                 console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
                 return EXAMPLE_IDEA_REQUESTS;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(r => r);
+            return snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
         } catch (error) {
             console.error("Error fetching idea requests, returning example data:", error);
             return EXAMPLE_IDEA_REQUESTS;
