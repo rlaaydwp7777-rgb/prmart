@@ -4,17 +4,17 @@
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { DollarSign, Package, BarChart, Star, Info } from "lucide-react";
+import { DollarSign, Package, BarChart, Star, Info, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RecentSales } from "@/components/seller/recent-sales";
 import { Overview } from "@/components/seller/overview";
 import type { SellerStats, Order, Prompt } from "@/lib/types";
 import { getSellerDashboardData } from "@/lib/firebase/services";
 import { useAuth } from "@/components/auth/auth-provider";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
-
+import Image from "next/image";
 
 interface DashboardData {
     stats: SellerStats;
@@ -50,16 +50,22 @@ export default function SellerDashboardPage() {
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
 
+    const fetchDashboardData = useCallback(async () => {
+        if (user) {
+            setLoading(true);
+            const dashboardData = await getSellerDashboardData(user.uid);
+            setData(dashboardData);
+            setLoading(false);
+        }
+    }, [user]);
+
     useEffect(() => {
         if (user) {
-            getSellerDashboardData(user.uid).then((dashboardData) => {
-                setData(dashboardData);
-                setLoading(false);
-            });
+            fetchDashboardData();
         } else if (!authLoading) {
             setLoading(false);
         }
-    }, [user, authLoading]);
+    }, [user, authLoading, fetchDashboardData]);
 
     if (loading || authLoading) {
         return <DashboardSkeleton />;
@@ -81,8 +87,11 @@ export default function SellerDashboardPage() {
        return <p>데이터를 불러오는 중 오류가 발생했습니다.</p>;
     }
 
-    const { stats, recentSales, salesByMonth } = data;
+    const { stats, recentSales, bestSellers, salesByMonth } = data;
     const hasProducts = stats.productCount > 0;
+    const hasSales = stats.totalSales > 0;
+    const hasMonthlySales = salesByMonth.some(month => month.total > 0);
+
 
   return (
     <div className="space-y-6">
@@ -104,7 +113,7 @@ export default function SellerDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_SALES}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+{stats.totalSales.toLocaleString()}</div>
@@ -113,11 +122,10 @@ export default function SellerDashboardPage() {
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_PRODUCTS}</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.productCount}개</div>
-            <p className="text-xs text-muted-foreground">첫 상품을 등록해보세요!</p>
           </CardContent>
         </Card>
         <Card>
@@ -126,8 +134,15 @@ export default function SellerDashboardPage() {
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.averageRating.toFixed(1)} / 5.0</div>
-             <p className="text-xs text-muted-foreground">{stats.reviewCount.toLocaleString()}개 리뷰 기준</p>
+             {stats.reviewCount > 0 ? (
+                <>
+                    <div className="text-2xl font-bold">{stats.averageRating.toFixed(1)} / 5.0</div>
+                    <p className="text-xs text-muted-foreground">{stats.reviewCount.toLocaleString()}개 리뷰 기준</p>
+                </>
+             ) : (
+                <div className="text-2xl font-bold">-</div>
+                
+             )}
           </CardContent>
         </Card>
       </div>
@@ -140,7 +155,7 @@ export default function SellerDashboardPage() {
                     <CardDescription>당신의 첫 상품을 등록하고 수익 창출의 기회를 만드세요.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                     <ProductRegistrationForm />
+                     <ProductRegistrationForm onProductRegistered={fetchDashboardData} />
                 </CardContent>
             </Card>
           ) : (
@@ -150,49 +165,63 @@ export default function SellerDashboardPage() {
                     <CardDescription>{SELLER_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ProductRegistrationForm />
+                    <ProductRegistrationForm onProductRegistered={fetchDashboardData} />
                 </CardContent>
             </Card>
           )}
         
-        {hasProducts ? (
+        {hasProducts && (
              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <Card className="lg:col-span-4">
                   <CardHeader>
-                    <CardTitle>개요</CardTitle>
+                    <CardTitle className="text-xl">{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
+                    <CardDescription>{SELLER_STRINGS.MONTHLY_OVERVIEW_DESC}</CardDescription>
                   </CardHeader>
                   <CardContent className="pl-2">
-                    <Overview data={salesByMonth} />
+                    {hasMonthlySales ? (
+                        <Overview data={salesByMonth} />
+                    ) : (
+                        <div className="h-[350px] flex items-center justify-center text-center">
+                            <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_SALES_DATA}</p>
+                        </div>
+                    )}
                   </CardContent>
                 </Card>
                 <Card className="lg:col-span-3">
                     <CardHeader>
-                        <CardTitle>{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
-                        <CardDescription>최근 5건의 판매 내역입니다.</CardDescription>
+                        <CardTitle className="text-xl">{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
+                        <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {recentSales.length > 0 ? (
                         <RecentSales sales={recentSales} />
                       ) : (
                          <div className="text-center py-10">
-                            <p className="text-muted-foreground">아직 판매 내역이 없습니다.</p>
+                            <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_ORDER_DATA}</p>
                         </div>
                       )}
                     </CardContent>
                 </Card>
             </div>
-        ) : (
+        )}
+        {bestSellers.length > 0 && (
              <Card>
-                <CardHeader className="flex-row items-center gap-2">
-                    <Info className="w-5 h-5 text-muted-foreground" />
-                    <CardTitle className="text-lg">시작하기</CardTitle>
+                <CardHeader>
+                    <CardTitle className="text-xl">{SELLER_STRINGS.BEST_SELLERS_TITLE}</CardTitle>
+                    <CardDescription>{SELLER_STRINGS.BEST_SELLERS_DESC}</CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground">
-                        아직 판매 내역이 없습니다. 첫 상품을 등록하고 판매를 시작하면 이 곳에서 최근 주문 내역과 베스트셀러 상품을 확인할 수 있습니다.
-                    </p>
+                <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {bestSellers.map(product => (
+                        <Card key={product.id} className="flex gap-4 p-4">
+                            <Image src={product.image} alt={product.title} width={80} height={60} className="rounded-md object-cover aspect-video" />
+                            <div className="space-y-1 text-sm">
+                                <p className="font-semibold line-clamp-2">{product.title}</p>
+                                <p className="text-muted-foreground">{product.sales} 판매</p>
+                            </div>
+                        </Card>
+                    ))}
                 </CardContent>
-            </Card>
+             </Card>
         )}
       </div>
     </div>

@@ -52,7 +52,11 @@ function SubmitButton() {
   );
 }
 
-export function ProductRegistrationForm() {
+interface ProductRegistrationFormProps {
+    onProductRegistered?: () => void;
+}
+
+export function ProductRegistrationForm({ onProductRegistered }: ProductRegistrationFormProps) {
   const [formState, formAction] = useActionState(registerProductAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -105,6 +109,7 @@ export function ProductRegistrationForm() {
         price: 0,
         sellOnce: false,
       });
+      onProductRegistered?.();
     } else if (formState.fields) {
       // Re-populate form with previous data on server-side validation failure
       const { title, description, category, tags, price, sellOnce } = formState.fields;
@@ -117,7 +122,7 @@ export function ProductRegistrationForm() {
         sellOnce: !!sellOnce
       });
     }
-  }, [formState, toast, reset]);
+  }, [formState, toast, reset, onProductRegistered]);
 
 
   const handleGenerateDescription = async () => {
@@ -274,3 +279,5 @@ export function ProductRegistrationForm() {
     </>
   );
 }
+
+    
