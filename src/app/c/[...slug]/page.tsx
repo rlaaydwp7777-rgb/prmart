@@ -1,10 +1,8 @@
 
 import { notFound } from "next/navigation";
-import { PromptCard } from "@/components/prompts/prompt-card";
-import Link from "next/link";
-import type { Category, SubCategory } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { getCategories, getProductsByCategorySlug } from "@/lib/firebase/services";
+import type { Category, SubCategory } from "@/lib/types";
+import { ProductFilters } from "@/components/browse/product-filters";
 
 interface Props {
   params: {
@@ -36,7 +34,6 @@ export default async function CategoryCatchAll({ params }: Props) {
       }
   }
 
-  // In a real app, this would be a more complex database query possibly filtering by subcategory as well.
   const prompts = await getProductsByCategorySlug(categorySlug);
   
   const pageTitle = subCategory ? subCategory.name : category.name;
@@ -45,7 +42,7 @@ export default async function CategoryCatchAll({ params }: Props) {
 
   return (
       <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8 md:mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
             {pageTitle}
           </h1>
@@ -54,22 +51,11 @@ export default async function CategoryCatchAll({ params }: Props) {
           </p>
         </div>
         
-        {prompts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {prompts.map((prompt) => (
-              <PromptCard key={prompt.id} prompt={prompt} />
-              ))}
-          </div>
-        ) : (
-          <div className="text-center py-20">
-              <p className="text-muted-foreground text-lg">이 카테고리에는 아직 상품이 없습니다.</p>
-               <Button asChild variant="link" className="mt-4">
-                  <Link href="/">홈으로 돌아가기</Link>
-              </Button>
-          </div>
-        )}
+        <ProductFilters 
+          initialPrompts={prompts}
+          category={category}
+          activeSubCategorySlug={subCategorySlug}
+        />
       </div>
   );
 }
-
-    

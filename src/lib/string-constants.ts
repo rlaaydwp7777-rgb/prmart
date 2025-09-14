@@ -49,7 +49,7 @@ export const FOOTER_STRINGS = {
     ECOMMERCE_NUMBER: "통신판매업신고번호",
     ECOMMERCE_NUMBER_VALUE: "2024-부산해운대-1234",
     ADDRESS: "주소",
-    ADDRESS_VALUE: "부산광역시 기장군 일광읍 삼성2길 6, 5층 2호(일광시장회센타)",
+    ADDRESS_VALUE: "부산광역시 기장군 일광읍 삼성2길 6, 5층 2호",
     EMAIL: "이메일",
     EMAIL_VALUE: "prmart7777@gmail.com",
     COPYRIGHT: `© ${new Date().getFullYear()} prmart. All Rights Reserved.`,
