@@ -9,6 +9,7 @@ export interface Prompt {
   sellerId?: string;
   category: string; // 카테고리 이름
   categorySlug: string; // 카테고리 슬러그
+  subCategorySlug?: string; // 하위 카테고리 슬러그
   price: number;
   image: string;
   aiHint: string;
@@ -62,3 +63,5 @@ export interface HomePageContent {
   ctaHeadline: string;
   ctaSubheadline: string;
 }
+
+    
