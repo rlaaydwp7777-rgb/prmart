@@ -6,6 +6,8 @@ import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-
 import { z } from "zod";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app";
+import { saveProduct, getCategories } from "@/lib/firebase/services";
+import { revalidatePath } from "next/cache";
 
 
 // --- Auth Actions ---
@@ -114,6 +116,8 @@ const productSchema = z.object({
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
   sellOnce: z.boolean().optional(),
+  sellerId: z.string().min(1, "판매자 정보가 필요합니다."),
+  author: z.string().min(1, "판매자 이름이 필요합니다."),
 });
 
 export type FormState = {
@@ -146,7 +150,9 @@ export async function registerProductAction(prevState: FormState, formData: Form
     category: rawData.category,
     tags: rawData.tags,
     price: rawData.price,
-    sellOnce: rawData.sellOnce === 'on'
+    sellOnce: rawData.sellOnce === 'on',
+    sellerId: rawData.sellerId,
+    author: rawData.author
   });
 
   if (!validatedFields.success) {
@@ -167,16 +173,34 @@ export async function registerProductAction(prevState: FormState, formData: Form
     });
 
     if (qualityResult.isApproved) {
-        // Here you would typically save the product to the database.
-        // For this demo, we'll just simulate success.
-        console.log("Product approved and would be saved:", validatedFields.data);
+        const { title, description, category, tags, price, sellOnce, sellerId, author } = validatedFields.data;
+        
+        const categories = await getCategories();
+        const categorySlug = categories.find(c => c.name === category)?.slug || "";
+        const subCategorySlug = categories.flatMap(c => c.subCategories).find(sc => sc.name === category)?.slug || "";
+
+        await saveProduct({
+          title,
+          description,
+          category,
+          categorySlug,
+          subCategorySlug,
+          tags: tags.split(',').map(tag => tag.trim()),
+          price: Number(price),
+          image: `https://picsum.photos/seed/${new Date().getTime()}/400/300`, // Placeholder image
+          aiHint: tags.split(',').map(tag => tag.trim()).slice(0,2).join(' '),
+          author,
+          sellerId,
+        });
+
+        revalidatePath('/seller/dashboard');
+
         return { 
             success: true,
             message: "상품이 성공적으로 제출되어 승인되었습니다!",
             qualityResult: qualityResult,
         };
     } else {
-        // Product is not approved, send it to human review queue.
         console.log("Product not approved, sending to review queue:", validatedFields.data);
         return { 
             success: false,
@@ -186,13 +210,15 @@ export async function registerProductAction(prevState: FormState, formData: Form
         };
     }
   } catch (error) {
-    console.error("Error assessing content quality:", error);
+    console.error("Error in registerProductAction:", error);
     return {
       success: false,
-      message: "AI 품질 검수 중 오류가 발생했습니다. 다시 시도해주세요.",
+      message: "상품 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
       fields: validatedFields.data
     };
   }
 }
+
+    
 
     

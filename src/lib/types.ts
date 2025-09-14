@@ -64,4 +64,23 @@ export interface HomePageContent {
   ctaSubheadline: string;
 }
 
-    
+export interface Order {
+    id: string;
+    orderDate: string; // ISO string
+    productId: string;
+    productTitle: string;
+    sellerId: string;
+    buyerId: string;
+    buyerName: string;
+    buyerEmail: string;
+    amount: number;
+    status: 'paid' | 'refunded';
+}
+
+export interface SellerStats {
+    totalRevenue: number;
+    totalSales: number;
+    productCount: number;
+    averageRating: number;
+    reviewCount: number;
+}

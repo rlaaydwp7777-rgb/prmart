@@ -1,7 +1,7 @@
 
-import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Prompt, Category, SubCategory, IdeaRequest } from "@/lib/types";
+import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, any>();
@@ -358,7 +358,7 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
         } catch (error) {
             console.error(`Error fetching products for category ${slug}, returning example data:`, error);
             const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
-            let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : exampleProducts;
+            let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : [];
             return count ? filteredExamples.slice(0, count) : [];
         }
     });
@@ -420,4 +420,96 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     });
 }
 
-    
+export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'stats' | 'rating' | 'reviews'>) {
+    try {
+        const docRef = await addDoc(collection(db, "products"), {
+            ...productData,
+            createdAt: Timestamp.now(),
+            stats: { views: 0, likes: 0, sales: 0 },
+            rating: 0,
+            reviews: 0,
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error("Error saving product: ", error);
+        throw new Error("상품을 데이터베이스에 저장하는 데 실패했습니다.");
+    }
+}
+
+export async function getSellerDashboardData(sellerId: string) {
+    const cacheKey = `seller_dashboard_${sellerId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            // 1. Fetch products by seller
+            const productsQuery = query(collection(db, "products"), where("sellerId", "==", sellerId));
+            const productsSnapshot = await getDocs(productsQuery);
+            const sellerProducts = productsSnapshot.docs.map(doc => serializeDoc(doc) as Prompt);
+
+            // 2. Fetch orders for those products
+            const productIds = sellerProducts.map(p => p.id);
+            const orders: Order[] = [];
+            if (productIds.length > 0) {
+                 // Firestore 'in' query is limited to 30 elements. We might need to chunk this for sellers with many products.
+                 // For now, assuming a reasonable number of products.
+                const ordersQuery = query(collection(db, "orders"), where("productId", "in", productIds), orderBy("orderDate", "desc"));
+                const ordersSnapshot = await getDocs(ordersQuery);
+                ordersSnapshot.forEach(doc => {
+                    orders.push(serializeDoc(doc) as Order);
+                });
+            }
+
+            // 3. Calculate stats
+            const stats: SellerStats = {
+                totalRevenue: orders.reduce((sum, order) => sum + order.amount, 0),
+                totalSales: orders.length,
+                productCount: sellerProducts.length,
+                averageRating: sellerProducts.length > 0 ? sellerProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / sellerProducts.filter(p => p.rating && p.rating > 0).length || 0 : 0,
+                reviewCount: sellerProducts.reduce((sum, p) => sum + (p.reviews || 0), 0),
+            };
+
+            // 4. Get recent sales (last 5)
+            const recentSales = orders.slice(0, 5);
+
+            // 5. Get best sellers
+            const salesByProduct: { [key: string]: { sales: number, revenue: number } } = {};
+            orders.forEach(order => {
+                if (!salesByProduct[order.productId]) {
+                    salesByProduct[order.productId] = { sales: 0, revenue: 0 };
+                }
+                salesByProduct[order.productId].sales++;
+                salesByProduct[order.productId].revenue += order.amount;
+            });
+            const bestSellers = Object.keys(salesByProduct)
+                .map(productId => {
+                    const product = sellerProducts.find(p => p.id === productId);
+                    return { ...product, ...salesByProduct[productId] };
+                })
+                .sort((a, b) => b.sales - a.sales)
+                .slice(0, 5) as (Prompt & { sales: number, revenue: number })[];
+            
+            // 6. Aggregate sales by month for the graph
+            const salesByMonth: { name: string, total: number }[] = Array.from({ length: 12 }, (_, i) => {
+                const month = new Date(0, i).toLocaleString('default', { month: 'short' });
+                return { name: `${i+1}월`, total: 0 };
+            });
+
+            orders.forEach(order => {
+                const monthIndex = new Date(order.orderDate).getMonth();
+                salesByMonth[monthIndex].total += order.amount;
+            });
+
+
+            return { stats, recentSales, bestSellers, salesByMonth };
+
+        } catch (error) {
+            console.error("Error fetching seller dashboard data: ", error);
+            // Return empty/default data on error
+            return {
+                stats: { totalRevenue: 0, totalSales: 0, productCount: 0, averageRating: 0, reviewCount: 0 },
+                recentSales: [],
+                bestSellers: [],
+                salesByMonth: Array.from({ length: 12 }, (_, i) => ({ name: `${i+1}월`, total: 0 }))
+            };
+        }
+    });
+}

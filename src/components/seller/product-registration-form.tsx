@@ -22,6 +22,7 @@ import { BUTTONS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
 import type { Category } from "@/lib/types";
+import { useAuth } from "../auth/auth-provider";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -30,6 +31,8 @@ const productSchema = z.object({
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
   sellOnce: z.boolean().optional(),
+  sellerId: z.string().optional(),
+  author: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -55,6 +58,7 @@ export function ProductRegistrationForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchCategories() {
@@ -160,6 +164,9 @@ export function ProductRegistrationForm() {
   return (
     <>
       <form ref={formRef} action={formAction} className="space-y-6">
+        <input type="hidden" {...register("sellerId")} value={user?.uid || ''} />
+        <input type="hidden" {...register("author")} value={user?.displayName || user?.email || 'prmart seller'} />
+        
         <div className="space-y-2">
           <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
           <Input id="title" placeholder={SELLER_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
