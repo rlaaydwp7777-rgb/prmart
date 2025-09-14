@@ -2,7 +2,6 @@
 import { notFound } from "next/navigation";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import Link from "next/link";
-import { MainLayout } from "@/components/layout/main-layout";
 import type { Category, SubCategory } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { getCategories, getProductsByCategorySlug } from "@/lib/firebase/services";
@@ -45,32 +44,30 @@ export default async function CategoryCatchAll({ params }: Props) {
 
 
   return (
-    <MainLayout>
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
-              {pageTitle}
-            </h1>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl">
-              {pageDescription}
-            </p>
-          </div>
-          
-          {prompts.length > 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {prompts.map((prompt) => (
-                <PromptCard key={prompt.id} prompt={prompt} />
-                ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-                <p className="text-muted-foreground text-lg">이 카테고리에는 아직 상품이 없습니다.</p>
-                 <Button asChild variant="link" className="mt-4">
-                    <Link href="/">홈으로 돌아가기</Link>
-                </Button>
-            </div>
-          )}
+      <div className="container px-4 md:px-6">
+        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
+            {pageTitle}
+          </h1>
+          <p className="max-w-[900px] text-muted-foreground md:text-xl">
+            {pageDescription}
+          </p>
         </div>
-    </MainLayout>
+        
+        {prompts.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {prompts.map((prompt) => (
+              <PromptCard key={prompt.id} prompt={prompt} />
+              ))}
+          </div>
+        ) : (
+          <div className="text-center py-20">
+              <p className="text-muted-foreground text-lg">이 카테고리에는 아직 상품이 없습니다.</p>
+               <Button asChild variant="link" className="mt-4">
+                  <Link href="/">홈으로 돌아가기</Link>
+              </Button>
+          </div>
+        )}
+      </div>
   );
 }
