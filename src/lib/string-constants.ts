@@ -24,16 +24,16 @@ export const PROMPT_CARD_STRINGS = {
 }
 
 export const CATEGORY_NAMES = {
-    AI_PRODUCTION: "AI & 프로덕션",
-    DEVELOPMENT_AUTOMATION: "개발 & IT 자동화",
+    AI_PRODUCTION: "AI & 생산성",
+    DEVELOPMENT_AUTOMATION: "개발 & IT",
     INVESTMENT_FINTECH: "재테크 & 투자",
     TRAVEL_LIFE: "여행 & 라이프",
-    LIVING_PARENTING_TIPS: "생활 & 육아 꿀팁",
+    LIVING_PARENTING_TIPS: "생활 & 노하우",
     BUSINESS_MARKETING: "비즈니스 & 마케팅",
     CREATION_DESIGN: "창작 & 디자인",
     LEARNING_SELF_DEVELOPMENT: "학습 & 자기계발",
     MOBILITY_AUTOMOBILE: "모빌리티 & 자동차",
-    LIFE_INFRA: "라이프 인프라",
+    DOCUMENTS_TEMPLATES: "문서 & 서식",
 }
 
 export const ICONS: { [key: string]: React.FC<any> } = {
@@ -180,3 +180,5 @@ export const ACCOUNT_STRINGS = {
     SETTINGS_NOTI_SECURITY: "보안 알림",
     SETTINGS_NOTI_SECURITY_DESC: "계정 관련 중요 변경사항에 대한 알림입니다.",
 }
+
+    
