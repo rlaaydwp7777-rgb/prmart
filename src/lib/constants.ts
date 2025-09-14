@@ -51,7 +51,7 @@ export const CATEGORIES: Category[] = [
     subCategories: [
         { id: "sub-4-1", name: "콘텐츠/SNS 마케팅", slug: slugify("콘텐츠/SNS 마케팅") },
         { id: "sub-4-2", name: "광고 운영 (GA, 메타)", slug: slugify("광고 운영 (GA, 메타)") },
-        { id: "sub-4-3", "name": "사업 계획서/제안서", "slug": slugify("사업 계획서/제안서") },
+        { id: "sub-4-3", name: "사업 계획서/제안서", slug: slugify("사업 계획서/제안서") },
         { id: "sub-4-4", name: "브랜딩/퍼스널 브랜딩", slug: slugify("브랜딩/퍼스널 브랜딩") },
         { id: "sub-4-5", name: "기타", slug: slugify("기타 비즈니스 마케팅") },
     ]
@@ -171,3 +171,4 @@ const generateExamplePrompts = (): Prompt[] => {
 
 export const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
+    
