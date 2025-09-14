@@ -10,7 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
-import { getCategories } from '@/lib/firebase/services';
+import { getCategories, EXAMPLE_CATEGORIES } from '@/lib/firebase/services';
 
 const GenerateProductDescriptionInputSchema = z.object({
   productTitle: z.string().describe('The title of the product.'),
@@ -41,7 +41,13 @@ const generateProductDescriptionFlow = ai.defineFlow(
     outputSchema: GenerateProductDescriptionOutputSchema,
   },
   async input => {
-    const categories = await getCategories();
+    let categories;
+    try {
+      categories = await getCategories();
+    } catch (error) {
+      console.error("Failed to fetch categories from Firestore, using example data.", error);
+      categories = EXAMPLE_CATEGORIES;
+    }
     const categoryNames = categories.map(c => c.name);
 
     const prompt = ai.definePrompt({
