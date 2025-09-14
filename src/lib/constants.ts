@@ -43,7 +43,7 @@ export const CATEGORIES: Category[] = [
         { id: "sub-3-5", name: "기타", slug: slugify("기타 재테크 투자") },
     ]
   },
-  { 
+    { 
     id: "cat-4",
     name: CATEGORY_NAMES.BUSINESS_MARKETING, 
     slug: "business-marketing",
@@ -171,4 +171,3 @@ const generateExamplePrompts = (): Prompt[] => {
 
 export const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
-    
