@@ -59,3 +59,4 @@ export default async function CategoryCatchAll({ params }: Props) {
       </div>
   );
 }
+
