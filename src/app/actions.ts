@@ -4,7 +4,6 @@
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
 import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
-import { revalidatePath } from "next/cache";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app";
 
@@ -178,7 +177,6 @@ export async function registerProductAction(prevState: FormState, formData: Form
         // Here you would typically save the product to the database.
         // For this demo, we'll just simulate success.
         console.log("Product approved and would be saved:", validatedFields.data);
-        revalidatePath('/seller/dashboard'); // To clear cache and show updated product list
         return { 
             success: true,
             message: "상품이 성공적으로 제출되어 승인되었습니다!",
