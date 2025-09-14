@@ -97,7 +97,7 @@ export default async function Home() {
   return (
     <>
         <section className="pt-16">
-          <HeroCarousel />
+          <HeroCarousel categories={categories} />
         </section>
 
         {/* Search Section */}
@@ -320,5 +320,3 @@ export default async function Home() {
     </>
   );
 }
-
-    
