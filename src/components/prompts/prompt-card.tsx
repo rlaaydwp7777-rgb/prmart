@@ -22,7 +22,7 @@ const RankBadge = ({ rank }: { rank: number }) => {
 
   return (
     <div className={cn(
-      "absolute top-3 left-3 flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-bold",
+      "absolute top-3 left-3 z-10 flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-bold",
       rankColors[rank] || "bg-muted text-muted-foreground border-border"
     )}>
       <Trophy className="h-3 w-3" />

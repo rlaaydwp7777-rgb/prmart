@@ -157,17 +157,17 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
     const cacheKey = `products_by_category_${slug}_${count}_${excludeId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
-            let products: Prompt[];
-            let q = query(collection(db, "products"), where("categorySlug", "==", slug));
+            const q = query(collection(db, "products"), where("categorySlug", "==", slug));
             const snapshot = await getDocs(q);
 
             if (snapshot.empty) {
-                // No real data, fallback to examples for this category
-                products = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
-            } else {
-                products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            }
+                console.warn(`Firestore 'products' collection has no items for slug '${slug}', returning example data.`);
+                const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
+                 let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : exampleProducts;
+                 return count ? filteredExamples.slice(0, count) : filteredExamples;
+            } 
             
+            const products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
             let filteredProducts = excludeId ? products.filter(p => p.id !== excludeId) : products;
             return count ? filteredProducts.slice(0, count) : filteredProducts;
 
@@ -194,7 +194,7 @@ export async function getCategories(): Promise<Category[]> {
                 return data;
             }).filter(Boolean);
 
-            return categories;
+            return categories.length > 0 ? categories : EXAMPLE_CATEGORIES;
         } catch (error) {
             console.error("Error fetching categories, returning example data:", error);
             return EXAMPLE_CATEGORIES;
