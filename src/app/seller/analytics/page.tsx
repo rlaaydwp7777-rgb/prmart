@@ -3,7 +3,7 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Package, CreditCard, Users, ShoppingBag } from "lucide-react"
+import { DollarSign, Package, CreditCard, Users, ShoppingBag, PlusCircle } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Image from "next/image"
 import { SELLER_STRINGS } from "@/lib/string-constants"
@@ -13,6 +13,8 @@ import { getSellerDashboardData } from "@/lib/firebase/services"
 import type { SellerStats, Prompt } from "@/lib/types"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RecentSales } from "@/components/seller/recent-sales"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 interface AnalyticsData {
     stats: SellerStats;
@@ -172,6 +174,12 @@ export default function SellerAnalyticsPage() {
             ) : (
                 <div className="text-center py-10">
                     <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_ORDER_DATA}</p>
+                     <Button asChild className="mt-4">
+                        <Link href="/seller/dashboard">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            첫 상품 등록하기
+                        </Link>
+                    </Button>
                 </div>
             )}
           </CardContent>
@@ -189,6 +197,7 @@ export default function SellerAnalyticsPage() {
                         <TableRow>
                             <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_PRODUCT}</TableHead>
                             <TableHead className="text-right">{SELLER_STRINGS.PRODUCT_TABLE_SALES}</TableHead>
+                            <TableHead className="text-right">{SELLER_STRINGS.PRODUCT_TABLE_REVENUE}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -201,6 +210,7 @@ export default function SellerAnalyticsPage() {
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">{product.sales.toLocaleString()}개</TableCell>
+                                 <TableCell className="text-right">₩{product.revenue.toLocaleString()}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

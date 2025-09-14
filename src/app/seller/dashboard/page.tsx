@@ -140,7 +140,7 @@ export default function SellerDashboardPage() {
                     <p className="text-xs text-muted-foreground">{stats.reviewCount.toLocaleString()}개 리뷰 기준</p>
                 </>
              ) : (
-                <div className="text-2xl font-bold">-</div>
+                <div className="text-muted-foreground text-sm pt-2">아직 등록된 리뷰가 없습니다.</div>
                 
              )}
           </CardContent>
@@ -227,5 +227,3 @@ export default function SellerDashboardPage() {
     </div>
   )
 }
-
-    

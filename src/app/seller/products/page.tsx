@@ -162,7 +162,9 @@ export default function SellerProductsPage() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{SELLER_STRINGS.PRODUCT_TABLE_HEADER_ACTIONS}</DropdownMenuLabel>
-                        <DropdownMenuItem>{SELLER_STRINGS.EDIT}</DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                           <Link href={`/seller/products/${product.id}/edit`}>{SELLER_STRINGS.EDIT}</Link>
+                        </DropdownMenuItem>
                         <DropdownMenuItem>{SELLER_STRINGS.DUPLICATE}</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
                             {SELLER_STRINGS.DELETE}
