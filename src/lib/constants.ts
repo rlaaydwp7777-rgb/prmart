@@ -1,7 +1,7 @@
 
 import type { Category, Prompt } from "./types";
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home } from "lucide-react";
-import { CATEGORY_NAMES } from "./string-constants";
+import { CATEGORY_NAMES } from "@/lib/string-constants";
 import { slugify } from "./utils";
 
 export const CATEGORIES: Category[] = [
