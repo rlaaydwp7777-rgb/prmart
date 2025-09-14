@@ -87,17 +87,8 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
         };
     }
     
-    const { email, password } = validatedFields.data;
-
-    try {
-        await signInWithEmailAndPassword(auth, email, password);
-        return { success: true, message: "로그인에 성공했습니다! 메인 페이지로 이동합니다." };
-    } catch (error) {
-        if (error instanceof FirebaseError) {
-             return { success: false, message: "로그인 실패", error: getFirebaseAuthErrorMessage(error) };
-        }
-        return { success: false, message: "로그인 실패", error: "알 수 없는 오류가 발생했습니다." };
-    }
+    // This server action now only validates the form. The actual sign-in is done on the client.
+    return { success: true, message: "유효성 검사 성공." };
 }
 
 
@@ -203,3 +194,5 @@ export async function registerProductAction(prevState: FormState, formData: Form
     };
   }
 }
+
+    

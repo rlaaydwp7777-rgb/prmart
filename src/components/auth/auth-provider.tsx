@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
-import { Skeleton } from "../ui/skeleton";
+import { usePathname, useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +19,8 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -29,6 +31,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!loading) {
+      const isAuthPage = pathname === '/login' || pathname === '/signup';
+      if (user && isAuthPage) {
+        // User is logged in and on an auth page, redirect to home.
+        router.push('/');
+      } else if (!user && !isAuthPage && pathname.startsWith('/account')) {
+        // User is not logged in and trying to access a protected account page.
+        router.push('/login');
+      }
+    }
+  }, [user, loading, pathname, router]);
+
   return (
     <AuthContext.Provider value={{ user, loading }}>
       {children}
@@ -37,3 +52,5 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+
+    

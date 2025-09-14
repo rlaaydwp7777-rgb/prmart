@@ -15,14 +15,16 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { AUTH_STRINGS, BUTTONS, FOOTER_STRINGS } from "@/lib/string-constants";
 import Link from "next/link";
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2, Sparkles } from "lucide-react";
 import { signInWithEmailAction, signInWithGoogleAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/auth";
+import { FirebaseError } from "firebase/app";
 
 function GoogleSignInButton() {
     const { pending } = useFormStatus();
@@ -51,30 +53,58 @@ function EmailSignInButton() {
 
 export default function LoginPage() {
     const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
-    const [emailState, emailAction] = useActionState(signInWithEmailAction, { message: "", success: false });
     const { toast } = useToast();
-    const router = useRouter();
     const { user, loading } = useAuth();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const formRef = useRef<HTMLFormElement>(null);
+
+    const handleEmailSignIn = async (formData: FormData) => {
+        setIsSubmitting(true);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+
+        if (!email || !password) {
+            toast({ title: "오류", description: "이메일과 비밀번호를 입력해주세요.", variant: "destructive" });
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            toast({ title: "성공", description: "로그인에 성공했습니다." });
+            // AuthProvider will handle redirection
+        } catch (error) {
+             if (error instanceof FirebaseError) {
+                const message = error.code === 'auth/invalid-credential' 
+                    ? '이메일 또는 비밀번호를 잘못 입력했습니다.'
+                    : '로그인에 실패했습니다. 다시 시도해주세요.';
+                toast({ title: "로그인 실패", description: message, variant: "destructive" });
+            } else {
+                toast({ title: "오류", description: "알 수 없는 오류가 발생했습니다.", variant: "destructive" });
+            }
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
 
     useEffect(() => {
-        if (!loading && user) {
-            router.push("/");
+        if(googleState?.success) {
+            toast({ title: "성공", description: googleState.message });
+            // AuthProvider will handle redirection
+        } else if (googleState?.error) {
+            toast({ title: "오류", description: googleState.error, variant: "destructive" });
         }
-    }, [user, loading, router]);
+    }, [googleState, toast]);
 
-
-    useEffect(() => {
-        const state = emailState || googleState;
-        if(state?.success) {
-            toast({ title: "성공", description: state.message });
-            router.push("/");
-        } else if (state?.error) {
-            toast({ title: "오류", description: state.error, variant: "destructive" });
-        }
-    }, [emailState, googleState, toast, router]);
-
-    if(loading || user) return null;
+    if(loading || user) {
+      // AuthProvider is checking for user or user exists, show loading or let AuthProvider redirect.
+      return (
+         <div className="w-full min-h-screen flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin" />
+        </div>
+      );
+    }
 
 
   return (
@@ -105,7 +135,7 @@ export default function LoginPage() {
                 <span className="text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1" />
             </div>
-            <form action={emailAction} className="space-y-4">
+            <form ref={formRef} action={handleEmailSignIn} className="space-y-4">
                 <div className="space-y-2">
                 <Label htmlFor="email">{AUTH_STRINGS.EMAIL_LABEL}</Label>
                 <Input
@@ -120,7 +150,10 @@ export default function LoginPage() {
                 <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
                 <Input id="password" type="password" name="password" placeholder="••••••••" required />
                 </div>
-                <EmailSignInButton />
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {AUTH_STRINGS.LOGIN}
+                </Button>
             </form>
             </CardContent>
             <CardFooter className="justify-center text-sm">
@@ -136,3 +169,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
