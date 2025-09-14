@@ -1,6 +1,6 @@
 
 
-import { useMemo } from "react";
+import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,62 +9,19 @@ import { RequestCard } from "@/components/requests/request-card";
 import type { IdeaRequest, Category } from "@/lib/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MainLayout } from "@/components/layout/main-layout";
-import { getCategories } from "@/lib/firebase/services";
+import { getCategories, getIdeaRequests } from "@/lib/firebase/services";
 
-const ideaRequests: IdeaRequest[] = [
-  {
-    id: "req-1",
-    title: "유튜브 채널아트 & 썸네일 자동 생성기",
-    author: "크리에이터준",
-    category: "AI & 프로덕션",
-    budget: 0,
-    proposals: 5,
-    description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요. 포토샵 없이도 고퀄리티 디자인이 가능하면 좋겠습니다.",
-    isExample: true,
-  },
-  {
-    id: "req-2",
-    title: "부동산 월세 수익률 계산기 (엑셀 템플릿)",
-    author: "재테크왕",
-    category: "재테크 & 투자",
-    budget: 0,
-    proposals: 12,
-    description: "매매가, 보증금, 월세, 대출금리, 보유세 등 기본 정보만 입력하면 연간/월간 수익률, ROI, 현금흐름을 자동으로 계산해주는 엑셀 대시보드가 필요합니다.",
-    isExample: true,
-  },
-  {
-    id: "req-3",
-    title: "반려동물 건강상태 체크 AI 프롬프트",
-    author: "집사일기",
-    category: "생활 & 육아 꿀팁",
-    budget: 0,
-    proposals: 8,
-    description: "반려동물의 사진과 사료 종류, 활동량 등 간단한 정보를 입력하면 AI가 건강 상태에 대한 기본적인 조언을 해주는 프롬프트를 구합니다. (주의: 의료적 진단을 대체하는 것이 아님)",
-    isExample: true,
-  },
-  {
-    id: "req-4",
-    title: "개발자 기술면접 질문 모음 & 답변 가이드",
-    author: "취준생",
-    category: "개발 & IT 자동화",
-    budget: 0,
-    proposals: 2,
-    description: "Next.js, TypeScript, Node.js 분야의 주요 기술면접 질문과 모범 답변, 관련 CS 지식이 정리된 PDF 또는 노션 템플릿을 요청합니다.",
-    isExample: true,
-  }
-];
-
-function RequestFilters({ categories }: { categories: Category[] }) {
+function RequestFilters({ categories, initialRequests }: { categories: Category[], initialRequests: IdeaRequest[] }) {
     "use client";
 
     const [selectedCategory, setSelectedCategory] = React.useState("전체보기");
 
-    const filteredRequests = useMemo(() => {
+    const filteredRequests = React.useMemo(() => {
         if (selectedCategory === "전체보기") {
-        return ideaRequests;
+            return initialRequests;
         }
-        return ideaRequests.filter(request => request.category === selectedCategory);
-    }, [selectedCategory]);
+        return initialRequests.filter(request => request.category === selectedCategory);
+    }, [selectedCategory, initialRequests]);
 
     return (
         <div className="space-y-8">
@@ -103,12 +60,14 @@ function RequestFilters({ categories }: { categories: Category[] }) {
             )}
         </div>
     )
-
 }
 
 
 export default async function RequestsPage() {
-  const categories = await getCategories();
+  const [categories, ideaRequests] = await Promise.all([
+    getCategories(),
+    getIdeaRequests()
+  ]);
 
   return (
     <MainLayout>
@@ -161,7 +120,7 @@ export default async function RequestsPage() {
 
           <Separator className="my-12 md:my-16" />
 
-          <RequestFilters categories={categories} />
+          <RequestFilters categories={categories} initialRequests={ideaRequests} />
         </div>
     </MainLayout>
   );
