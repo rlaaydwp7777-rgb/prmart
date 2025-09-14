@@ -5,11 +5,12 @@ import {
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  User
+  User,
+  type Auth
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
 
-export const auth = getAuth(app);
+export const auth: Auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async (): Promise<User> => {
