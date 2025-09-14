@@ -1,3 +1,4 @@
+
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +26,8 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
   }
   
   // In a real app, this would be determined by checking the user's purchase history.
-  const mockPurchaseStatus = true; 
+  // For this version, we will differentiate based on price (free vs paid).
+  const isPurchased = prompt.price === 0; 
 
   const [categories, relatedPrompts] = await Promise.all([
       getCategories(),
@@ -97,7 +99,7 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
               {prompt.price > 0 ? `₩${prompt.price.toLocaleString()}`: "무료"}
             </div>
 
-            {mockPurchaseStatus ? (
+            {isPurchased ? (
               <div className="flex flex-col gap-2 mt-auto">
                  <Button size="lg" className="w-full">
                       <Eye className="mr-2"/>
@@ -231,3 +233,5 @@ export default async function PromptDetailPage({ params }: { params: { id: strin
       </div>
   );
 }
+
+    
