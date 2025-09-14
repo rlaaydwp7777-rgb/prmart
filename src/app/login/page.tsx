@@ -13,12 +13,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { AUTH_STRINGS, BUTTONS, FOOTER_STRINGS } from "@/lib/string-constants";
+import { AUTH_STRINGS, BUTTONS } from "@/lib/string-constants";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2, Sparkles } from "lucide-react";
-import { signInWithEmailAction, signInWithGoogleAction } from "../actions";
+import { signInWithGoogleAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -39,17 +39,6 @@ function GoogleSignInButton() {
         </Button>
     )
 }
-
-function EmailSignInButton() {
-     const { pending } = useFormStatus();
-     return (
-        <Button type="submit" className="w-full" disabled={pending}>
-            {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {AUTH_STRINGS.LOGIN}
-        </Button>
-     )
-}
-
 
 export default function LoginPage() {
     const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
@@ -100,7 +89,7 @@ export default function LoginPage() {
     if(loading || user) {
       // AuthProvider is checking for user or user exists, show loading or let AuthProvider redirect.
       return (
-         <div className="w-full min-h-screen flex items-center justify-center">
+         <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
         </div>
       );
@@ -108,19 +97,14 @@ export default function LoginPage() {
 
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-muted lg:flex flex-col items-center justify-center p-8 text-center">
-        <div className="max-w-md">
-            <Sparkles className="h-12 w-12 text-primary mx-auto" />
-            <h1 className="mt-4 text-3xl font-bold font-headline">
-                {AUTH_STRINGS.HERO_TITLE}
-            </h1>
-            <p className="mt-4 text-muted-foreground">
-                {FOOTER_STRINGS.SLOGAN}
-            </p>
-        </div>
-      </div>
-      <div className="flex items-center justify-center py-12">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col">
+       <header className="py-4 px-4 sm:px-6">
+        <Link href="/" className="flex items-center gap-2">
+            <Sparkles className="h-6 w-6 text-primary" />
+            <span className="font-bold text-lg font-headline tracking-tight">prmart</span>
+        </Link>
+       </header>
+       <main className="flex-1 flex items-center justify-center py-12">
         <Card className="w-full max-w-sm mx-auto">
             <CardHeader className="text-center">
             <CardTitle className="text-2xl font-headline">{AUTH_STRINGS.WELCOME_BACK}</CardTitle>
@@ -165,7 +149,7 @@ export default function LoginPage() {
             </p>
             </CardFooter>
         </Card>
-      </div>
+      </main>
     </div>
   );
 }
