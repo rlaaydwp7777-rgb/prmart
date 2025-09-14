@@ -7,10 +7,10 @@ import Link from "next/link";
 import { ACCOUNT_STRINGS } from "@/lib/string-constants";
 
 const orders = [
-  { id: "ORD001", date: "2024-05-20", status: "결제완료", total: "₩25,000" },
-  { id: "ORD002", date: "2024-05-18", status: "결제완료", total: "₩35,000" },
-  { id: "ORD003", date: "2024-05-15", status: "결제완료", total: "₩18,000" },
-  { id: "ORD004", date: "2024-05-12", status: "환불됨", total: "₩12,000" },
+  { id: "ORD001", date: "2024-05-20", status: ACCOUNT_STRINGS.ORDER_STATUS_PAID, total: "₩25,000" },
+  { id: "ORD002", date: "2024-05-18", status: ACCOUNT_STRINGS.ORDER_STATUS_PAID, total: "₩35,000" },
+  { id: "ORD003", date: "2024-05-15", status: ACCOUNT_STRINGS.ORDER_STATUS_PAID, total: "₩18,000" },
+  { id: "ORD004", date: "2024-05-12", status: ACCOUNT_STRINGS.ORDER_STATUS_REFUNDED, total: "₩12,000" },
 ];
 
 export default function OrdersPage() {
@@ -37,7 +37,7 @@ export default function OrdersPage() {
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.date}</TableCell>
                 <TableCell>
-                  <Badge variant={order.status === '환불됨' ? 'destructive' : 'default'}>{order.status}</Badge>
+                  <Badge variant={order.status === ACCOUNT_STRINGS.ORDER_STATUS_REFUNDED ? 'destructive' : 'default'}>{order.status}</Badge>
                 </TableCell>
                 <TableCell>{order.total}</TableCell>
                 <TableCell className="text-right">

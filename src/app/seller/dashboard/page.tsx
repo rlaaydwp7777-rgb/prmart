@@ -1,6 +1,6 @@
 
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
-import { SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
+import { SELLER_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { DollarSign, Package, BarChart, Star, Trophy } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -16,34 +16,34 @@ export default function SellerDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight font-headline">당신의 아이디어가 세상과 연결됩니다 🚀</h1>
-        <p className="text-muted-foreground">지금 상품을 등록하고 prmart와 함께 성장을 시작해보세요.</p>
+        <h1 className="text-3xl font-bold tracking-tight font-headline">{SELLER_STRINGS.DASHBOARD_HEADLINE}</h1>
+        <p className="text-muted-foreground">{SELLER_STRINGS.DASHBOARD_SUBHEADLINE}</p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">총 매출</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_REVENUE}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩5,832,900</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +20.1%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +20.1%</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">총 판매량</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_SALES}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +180.1%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +180.1%</p>
           </CardContent>
         </Card>
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">총 상품 수</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_PRODUCTS}</CardTitle>
             <BarChart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -53,7 +53,7 @@ export default function SellerDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">리뷰 평점</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_REVIEW_RATING}</CardTitle>
             <Star className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -67,24 +67,24 @@ export default function SellerDashboardPage() {
         <div className="lg:col-span-2">
             <Card>
                 <CardHeader>
-                    <CardTitle className="font-headline text-2xl">{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_TITLE}</CardTitle>
-                    <CardDescription>{SELLER_DASHBOARD_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
+                    <CardTitle className="font-headline text-2xl">{SELLER_STRINGS.AI_ASSISTANT_TITLE}</CardTitle>
+                    <CardDescription>{SELLER_STRINGS.AI_ASSISTANT_DESCRIPTION}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2 text-primary">
                             <Badge className="h-6 w-6 shrink-0 p-0 items-center justify-center">1</Badge>
-                            <span className="font-semibold">상품 등록</span>
+                            <span className="font-semibold">{SELLER_STRINGS.STEP_1}</span>
                         </div>
                         <div className="h-px w-full bg-border"></div>
                         <div className="flex items-center gap-2">
                             <Badge variant="secondary" className="h-6 w-6 shrink-0 p-0 items-center justify-center">2</Badge>
-                            <span>검수</span>
+                            <span>{SELLER_STRINGS.STEP_2}</span>
                         </div>
                         <div className="h-px w-full bg-border"></div>
                         <div className="flex items-center gap-2">
                              <Badge variant="secondary" className="h-6 w-6 shrink-0 p-0 items-center justify-center">3</Badge>
-                            <span>판매 시작</span>
+                            <span>{SELLER_STRINGS.STEP_3}</span>
                         </div>
                     </div>
                     <ProductRegistrationForm />
@@ -94,8 +94,8 @@ export default function SellerDashboardPage() {
         <div className="lg:col-span-1 space-y-4">
            <Card>
                 <CardHeader>
-                    <CardTitle>최근 주문</CardTitle>
-                    <CardDescription>최근 5건의 주문 내역입니다.</CardDescription>
+                    <CardTitle>{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
+                    <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="flex items-center">
@@ -132,8 +132,8 @@ export default function SellerDashboardPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle>베스트셀러</CardTitle>
-                <CardDescription>가장 많이 팔린 상품 TOP 3입니다.</CardDescription>
+                <CardTitle>{SELLER_STRINGS.BEST_SELLERS_TITLE}</CardTitle>
+                <CardDescription>{SELLER_STRINGS.BEST_SELLERS_DESC}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {bestSellers.map((item, index) => (

@@ -17,87 +17,88 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import { Textarea } from "@/components/ui/textarea"
+import { SELLER_STRINGS } from "@/lib/string-constants"
 
 export default function SellerSettingsPage() {
   return (
     <div className="space-y-6">
         <div>
-            <h1 className="text-2xl font-bold tracking-tight font-headline">판매자 설정</h1>
-            <p className="text-muted-foreground">판매자 프로필과 정산 정보를 관리하세요.</p>
+            <h1 className="text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
+            <p className="text-muted-foreground">{SELLER_STRINGS.SETTINGS_DESC}</p>
         </div>
     <Tabs defaultValue="profile" className="w-full">
       <TabsList>
-        <TabsTrigger value="profile">프로필</TabsTrigger>
-        <TabsTrigger value="payouts">정산 계좌</TabsTrigger>
-        <TabsTrigger value="notifications">알림</TabsTrigger>
+        <TabsTrigger value="profile">{SELLER_STRINGS.SETTINGS_TAB_PROFILE}</TabsTrigger>
+        <TabsTrigger value="payouts">{SELLER_STRINGS.SETTINGS_TAB_PAYOUTS}</TabsTrigger>
+        <TabsTrigger value="notifications">{SELLER_STRINGS.SETTINGS_TAB_NOTIFICATIONS}</TabsTrigger>
       </TabsList>
       <TabsContent value="profile">
         <Card>
           <CardHeader>
-            <CardTitle>판매자 프로필</CardTitle>
+            <CardTitle>{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
             <CardDescription>
-              이 정보는 상품 상세 페이지에 표시됩니다.
+              {SELLER_STRINGS.PROFILE_DESC}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="seller-name">판매자명</Label>
+              <Label htmlFor="seller-name">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
               <Input id="seller-name" defaultValue="prmart 판매자" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="seller-bio">한 줄 소개</Label>
+              <Label htmlFor="seller-bio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
               <Textarea
                 id="seller-bio"
-                placeholder="당신을 잘 나타내는 한 줄 소개를 작성해주세요."
+                placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER}
                 defaultValue="AI와 자동화로 여러분의 작업을 돕습니다."
               />
             </div>
           </CardContent>
           <CardFooter>
-            <Button>프로필 저장</Button>
+            <Button>{SELLER_STRINGS.SAVE_PROFILE}</Button>
           </CardFooter>
         </Card>
       </TabsContent>
       <TabsContent value="payouts">
         <Card>
           <CardHeader>
-            <CardTitle>정산 계좌</CardTitle>
+            <CardTitle>{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
             <CardDescription>
-              수익금을 정산받을 계좌 정보를 입력해주세요.
+              {SELLER_STRINGS.PAYOUTS_DESC}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="bank-name">은행</Label>
-              <Input id="bank-name" placeholder="예: 토스뱅크" />
+              <Label htmlFor="bank-name">{SELLER_STRINGS.BANK_NAME_LABEL}</Label>
+              <Input id="bank-name" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="account-number">계좌번호</Label>
-              <Input id="account-number" placeholder="'-' 없이 숫자만 입력" />
+              <Label htmlFor="account-number">{SELLER_STRINGS.ACCOUNT_NUMBER_LABEL}</Label>
+              <Input id="account-number" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} />
             </div>
              <div className="space-y-2">
-              <Label htmlFor="account-holder">예금주명</Label>
-              <Input id="account-holder" placeholder="본인 명의의 계좌만 가능합니다." />
+              <Label htmlFor="account-holder">{SELLER_STRINGS.ACCOUNT_HOLDER_LABEL}</Label>
+              <Input id="account-holder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} />
             </div>
           </CardContent>
           <CardFooter>
-            <Button>계좌 정보 저장</Button>
+            <Button>{SELLER_STRINGS.SAVE_ACCOUNT_INFO}</Button>
           </CardFooter>
         </Card>
       </TabsContent>
        <TabsContent value="notifications">
         <Card>
           <CardHeader>
-            <CardTitle>알림 설정</CardTitle>
+            <CardTitle>{SELLER_STRINGS.NOTIFICATIONS_TITLE}</CardTitle>
             <CardDescription>
-              어떤 알림을 받을지 선택하세요.
+              {SELLER_STRINGS.NOTIFICATIONS_DESC}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p>이 기능은 현재 개발 중입니다.</p>
+            <p>{SELLER_STRINGS.NOTIFICATIONS_WIP}</p>
           </CardContent>
           <CardFooter>
-            <Button disabled>설정 저장</Button>
+            <Button disabled>{SELLER_STRINGS.SAVE_SETTINGS}</Button>
           </CardFooter>
         </Card>
       </TabsContent>

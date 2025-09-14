@@ -9,7 +9,7 @@ import { z } from "zod";
 import { generateDescriptionAction, registerProductAction } from "@/app/actions";
 import type { FormState } from "@/app/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,8 +18,7 @@ import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText } from "lucide-react";
-import { BUTTONS, SELLER_DASHBOARD_STRINGS } from "@/lib/string-constants";
-import { cn } from "@/lib/utils";
+import { BUTTONS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
 import type { Category } from "@/lib/types";
@@ -120,8 +119,8 @@ export function ProductRegistrationForm() {
   const handleGenerateDescription = async () => {
     if (!titleValue || titleValue.trim().length < 5) {
       toast({
-        title: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR,
-        description: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR_DESC_NO_TITLE,
+        title: SELLER_STRINGS.GENERATION_ERROR,
+        description: SELLER_STRINGS.GENERATION_ERROR_DESC_NO_TITLE,
         variant: "destructive",
       });
       return;
@@ -137,12 +136,12 @@ export function ProductRegistrationForm() {
       setValue("tags", tags.join(', '), { shouldValidate: true });
       setValue("price", price, { shouldValidate: true });
       toast({
-        title: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE,
-        description: SELLER_DASHBOARD_STRINGS.GENERATION_COMPLETE_DESC,
+        title: SELLER_STRINGS.GENERATION_COMPLETE,
+        description: SELLER_STRINGS.GENERATION_COMPLETE_DESC,
       });
     } else {
       toast({
-        title: SELLER_DASHBOARD_STRINGS.GENERATION_ERROR,
+        title: SELLER_STRINGS.GENERATION_ERROR,
         description: result.error,
         variant: "destructive",
       });
@@ -162,17 +161,17 @@ export function ProductRegistrationForm() {
     <>
       <form ref={formRef} action={formAction} className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="title">{SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_LABEL}</Label>
-          <Input id="title" placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
+          <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
+          <Input id="title" placeholder={SELLER_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
           {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
         </div>
 
         <div className="space-y-2">
-            <Label htmlFor="product-images">상품 이미지</Label>
+            <Label htmlFor="product-images">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
             <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
               <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
-                이미지를 여기로 드래그하거나 클릭하여 업로드하세요. (권장: 4:3 비율)
+                {SELLER_STRINGS.PRODUCT_IMAGES_HINT}
               </p>
               <Input id="product-images" type="file" className="sr-only" multiple />
             </div>
@@ -180,7 +179,7 @@ export function ProductRegistrationForm() {
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <Label htmlFor="description">{SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
+            <Label htmlFor="description">{SELLER_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
             <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
               {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
               {BUTTONS.GENERATE_WITH_AI}
@@ -189,12 +188,12 @@ export function ProductRegistrationForm() {
            <Card>
               <CardContent className="p-2 space-y-2">
                 <div className="flex gap-1">
-                    <Button variant="ghost" size="sm"><ImageIcon className="mr-2 h-4 w-4" /> 이미지 추가</Button>
-                    <Button variant="ghost" size="sm"><FileText className="mr-2 h-4 w-4" /> 템플릿에서 가져오기</Button>
+                    <Button variant="ghost" size="sm"><ImageIcon className="mr-2 h-4 w-4" /> {SELLER_STRINGS.ADD_IMAGE}</Button>
+                    <Button variant="ghost" size="sm"><FileText className="mr-2 h-4 w-4" /> {SELLER_STRINGS.IMPORT_TEMPLATE}</Button>
                 </div>
                 <Textarea
                     id="description"
-                    placeholder={SELLER_DASHBOARD_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
+                    placeholder={SELLER_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
                     className="min-h-[200px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                     {...register("description")}
                 />
@@ -205,10 +204,10 @@ export function ProductRegistrationForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="category">{SELLER_DASHBOARD_STRINGS.CATEGORY_LABEL}</Label>
+            <Label htmlFor="category">{SELLER_STRINGS.CATEGORY_LABEL}</Label>
             <Select name="category" value={categoryValue} onValueChange={handleCategoryChange}>
               <SelectTrigger id="category">
-                <SelectValue placeholder={SELLER_DASHBOARD_STRINGS.CATEGORY_PLACEHOLDER} />
+                <SelectValue placeholder={SELLER_STRINGS.CATEGORY_PLACEHOLDER} />
               </SelectTrigger>
               <SelectContent>
                 {categories.map(cat => (
@@ -219,22 +218,22 @@ export function ProductRegistrationForm() {
               {errors.category && <p className="text-destructive text-sm">{errors.category.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="price">{SELLER_DASHBOARD_STRINGS.PRICE_LABEL}</Label>
-            <Input id="price" type="number" placeholder={SELLER_DASHBOARD_STRINGS.PRICE_PLACEHOLDER} {...register("price")} />
+            <Label htmlFor="price">{SELLER_STRINGS.PRICE_LABEL}</Label>
+            <Input id="price" type="number" placeholder={SELLER_STRINGS.PRICE_PLACEHOLDER} {...register("price")} />
             {errors.price && <p className="text-destructive text-sm">{errors.price.message}</p>}
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="tags">{SELLER_DASHBOARD_STRINGS.TAGS_LABEL}</Label>
-          <Input id="tags" placeholder={SELLER_DASHBOARD_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
-          <p className="text-sm text-muted-foreground">{SELLER_DASHBOARD_STRINGS.TAGS_HINT}</p>
+          <Label htmlFor="tags">{SELLER_STRINGS.TAGS_LABEL}</Label>
+          <Input id="tags" placeholder={SELLER_STRINGS.TAGS_PLACEHOLDER} {...register("tags")} />
+          <p className="text-sm text-muted-foreground">{SELLER_STRINGS.TAGS_HINT}</p>
           {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
         </div>
 
         <div className="flex items-center space-x-2">
           <Switch id="sell-once" name="sellOnce" checked={sellOnceValue} onCheckedChange={handleSellOnceChange} />
-          <Label htmlFor="sell-once">1회만 판매 (판매 후 자동 품절 처리)</Label>
+          <Label htmlFor="sell-once">{SELLER_STRINGS.SELL_ONCE_LABEL}</Label>
         </div>
 
         <SubmitButton />
@@ -243,7 +242,7 @@ export function ProductRegistrationForm() {
       {formState?.issues && formState.issues.length > 0 && (
         <Alert variant="destructive" className="mt-4">
           <Terminal className="h-4 w-4" />
-          <AlertTitle>{SELLER_DASHBOARD_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
+          <AlertTitle>{SELLER_STRINGS.FORM_ERROR_TITLE}</AlertTitle>
           <AlertDescription>
             <ul className="list-disc pl-5">
               {formState.issues.map((issue, index) => (
@@ -257,11 +256,11 @@ export function ProductRegistrationForm() {
       {formState?.qualityResult && (
         <Alert className="mt-4" variant={formState.qualityResult.isApproved ? "default" : "destructive"}>
             {formState.qualityResult.isApproved ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
-          <AlertTitle>{SELLER_DASHBOARD_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
+          <AlertTitle>{SELLER_STRINGS.QUALITY_REVIEW_RESULT}</AlertTitle>
           <AlertDescription>
-            <p><strong>{SELLER_DASHBOARD_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
-            <p><strong>{SELLER_DASHBOARD_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_DASHBOARD_STRINGS.APPROVED : SELLER_DASHBOARD_STRINGS.PENDING_REVIEW}</p>
-            <p className="mt-2"><strong>{SELLER_DASHBOARD_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
+            <p><strong>{SELLER_STRINGS.SCORE}:</strong> {(formState.qualityResult.qualityScore * 100).toFixed(0)}/100</p>
+            <p><strong>{SELLER_STRINGS.STATUS}:</strong> {formState.qualityResult.isApproved ? SELLER_STRINGS.APPROVED : SELLER_STRINGS.PENDING_REVIEW}</p>
+            <p className="mt-2"><strong>{SELLER_STRINGS.REASON}:</strong> {formState.qualityResult.reason}</p>
           </AlertDescription>
         </Alert>
       )}

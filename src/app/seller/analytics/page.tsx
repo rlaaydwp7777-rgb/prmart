@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DollarSign, Package, CreditCard, Users } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Image from "next/image"
+import { SELLER_STRINGS } from "@/lib/string-constants"
 
 const data = [
   { name: "1월", total: Math.floor(Math.random() * 5000) + 1000 },
@@ -38,49 +39,49 @@ export default function SellerAnalyticsPage() {
   return (
     <div className="space-y-6">
       <CardHeader className="p-0">
-        <CardTitle>판매 분석</CardTitle>
-        <CardDescription>매출, 판매량, 방문자 수 등의 데이터를 분석합니다.</CardDescription>
+        <CardTitle>{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
+        <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
       </CardHeader>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">총 매출</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_REVENUE}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩5,832,900</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +20.1%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +20.1%</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">총 주문 수</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_ORDERS}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +180.1%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +180.1%</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">평균 주문 가치</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.AVG_ORDER_VALUE}</CardTitle>
             <CreditCard className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩24,821</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +12.4%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +12.4%</p>
           </CardContent>
         </Card>
          <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">순 방문자</CardTitle>
+            <CardTitle className="text-sm font-medium">{SELLER_STRINGS.UNIQUE_VISITORS}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">1,234명</div>
-            <p className="text-xs text-muted-foreground">지난 달 대비 +5.2%</p>
+            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.STATS_MONTHLY_GROWTH} +5.2%</p>
           </CardContent>
         </Card>
       </div>
@@ -88,7 +89,7 @@ export default function SellerAnalyticsPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="lg:col-span-4">
           <CardHeader>
-            <CardTitle>월별 개요</CardTitle>
+            <CardTitle>{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
              <ResponsiveContainer width="100%" height={350}>
@@ -115,8 +116,8 @@ export default function SellerAnalyticsPage() {
 
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle>최근 주문</CardTitle>
-            <CardDescription>최근 3건의 주문 내역입니다.</CardDescription>
+            <CardTitle>{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
+            <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -135,15 +136,15 @@ export default function SellerAnalyticsPage() {
       </div>
        <Card>
         <CardHeader>
-            <CardTitle>인기 상품</CardTitle>
-            <CardDescription>가장 많이 판매된 상품 순위입니다.</CardDescription>
+            <CardTitle>{SELLER_STRINGS.TOP_PRODUCTS}</CardTitle>
+            <CardDescription>{SELLER_STRINGS.TOP_PRODUCTS_DESC}</CardDescription>
         </CardHeader>
         <CardContent>
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>상품</TableHead>
-                        <TableHead className="text-right">판매량</TableHead>
+                        <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_PRODUCT}</TableHead>
+                        <TableHead className="text-right">{SELLER_STRINGS.PRODUCT_TABLE_SALES}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

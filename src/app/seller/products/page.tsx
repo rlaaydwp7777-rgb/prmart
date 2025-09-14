@@ -27,12 +27,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { SELLER_STRINGS } from "@/lib/string-constants"
 
 const mockProducts = [
   { 
     id: "prod_1", 
     name: "Next.js 14 Boilerplate", 
-    status: "판매중", 
+    status: SELLER_STRINGS.PRODUCT_STATUS_ACTIVE, 
     price: 25000, 
     sales: 1234, 
     createdAt: "2023-07-12",
@@ -41,7 +42,7 @@ const mockProducts = [
   { 
     id: "prod_2", 
     name: "Minimalist UI Kit", 
-    status: "판매중", 
+    status: SELLER_STRINGS.PRODUCT_STATUS_ACTIVE, 
     price: 35000, 
     sales: 982, 
     createdAt: "2023-10-21",
@@ -50,7 +51,7 @@ const mockProducts = [
   { 
     id: "prod_3", 
     name: "AI Stock Analyzer", 
-    status: "검수중", 
+    status: SELLER_STRINGS.PRODUCT_STATUS_PENDING, 
     price: 50000, 
     sales: 0, 
     createdAt: "2024-05-28",
@@ -59,7 +60,7 @@ const mockProducts = [
    { 
     id: "prod_4", 
     name: "Email Marketing Sequences", 
-    status: "판매중", 
+    status: SELLER_STRINGS.PRODUCT_STATUS_ACTIVE, 
     price: 18000, 
     sales: 721, 
     createdAt: "2023-04-01",
@@ -68,7 +69,7 @@ const mockProducts = [
    { 
     id: "prod_5", 
     name: "Travel Itinerary Template", 
-    status: "보류", 
+    status: SELLER_STRINGS.PRODUCT_STATUS_ARCHIVED, 
     price: 10000, 
     sales: 50, 
     createdAt: "2024-02-15",
@@ -83,12 +84,12 @@ export default function SellerProductsPage() {
       <CardHeader>
         <div className="flex items-center justify-between">
             <div>
-                <CardTitle>상품 관리</CardTitle>
-                <CardDescription>등록된 상품 목록을 확인하고 관리합니다.</CardDescription>
+                <CardTitle>{SELLER_STRINGS.PRODUCTS_TITLE}</CardTitle>
+                <CardDescription>{SELLER_STRINGS.PRODUCTS_DESC}</CardDescription>
             </div>
             <Button>
                 <PlusCircle className="h-4 w-4 mr-2" />
-                새 상품 추가
+                {SELLER_STRINGS.ADD_NEW_PRODUCT}
             </Button>
         </div>
       </CardHeader>
@@ -97,15 +98,15 @@ export default function SellerProductsPage() {
           <TableHeader>
             <TableRow>
               <TableHead className="hidden w-[100px] sm:table-cell">
-                <span className="sr-only">Image</span>
+                <span className="sr-only">{SELLER_STRINGS.PRODUCT_TABLE_HEADER_IMAGE}</span>
               </TableHead>
-              <TableHead>상품명</TableHead>
-              <TableHead>상태</TableHead>
-              <TableHead className="hidden md:table-cell">가격</TableHead>
-              <TableHead className="hidden md:table-cell">총 판매량</TableHead>
-              <TableHead className="hidden md:table-cell">등록일</TableHead>
+              <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_HEADER_NAME}</TableHead>
+              <TableHead>{SELLER_STRINGS.PRODUCT_TABLE_HEADER_STATUS}</TableHead>
+              <TableHead className="hidden md:table-cell">{SELLER_STRINGS.PRODUCT_TABLE_HEADER_PRICE}</TableHead>
+              <TableHead className="hidden md:table-cell">{SELLER_STRINGS.PRODUCT_TABLE_HEADER_TOTAL_SALES}</TableHead>
+              <TableHead className="hidden md:table-cell">{SELLER_STRINGS.PRODUCT_TABLE_HEADER_CREATED_AT}</TableHead>
               <TableHead>
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{SELLER_STRINGS.PRODUCT_TABLE_HEADER_ACTIONS}</span>
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -125,8 +126,8 @@ export default function SellerProductsPage() {
                 <TableCell className="font-medium">{product.name}</TableCell>
                 <TableCell>
                    <Badge variant={
-                    product.status === "판매중" ? "default" :
-                    product.status === "검수중" ? "secondary" : "destructive"
+                    product.status === SELLER_STRINGS.PRODUCT_STATUS_ACTIVE ? "default" :
+                    product.status === SELLER_STRINGS.PRODUCT_STATUS_PENDING ? "secondary" : "destructive"
                   }>
                     {product.status}
                   </Badge>
@@ -143,11 +144,11 @@ export default function SellerProductsPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>수정</DropdownMenuItem>
-                      <DropdownMenuItem>복제</DropdownMenuItem>
+                      <DropdownMenuLabel>{SELLER_STRINGS.PRODUCT_TABLE_HEADER_ACTIONS}</DropdownMenuLabel>
+                      <DropdownMenuItem>{SELLER_STRINGS.EDIT}</DropdownMenuItem>
+                      <DropdownMenuItem>{SELLER_STRINGS.DUPLICATE}</DropdownMenuItem>
                       <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-                        삭제
+                        {SELLER_STRINGS.DELETE}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -159,7 +160,7 @@ export default function SellerProductsPage() {
       </CardContent>
       <CardFooter>
         <div className="text-xs text-muted-foreground">
-          총 <strong>{mockProducts.length}개</strong>의 상품이 있습니다.
+          {SELLER_STRINGS.PRODUCT_COUNT_FOOTER.replace("{count}", mockProducts.length.toString())}
         </div>
       </CardFooter>
     </Card>
