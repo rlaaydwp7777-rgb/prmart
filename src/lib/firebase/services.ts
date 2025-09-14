@@ -22,7 +22,7 @@ const generateSubCategories = (parentSlug: string, names: string[]): SubCategory
     return names.map(name => ({ name, slug: slugify(name) }));
 };
 
-const EXAMPLE_CATEGORIES: Category[] = [
+export const EXAMPLE_CATEGORIES: Category[] = [
     { 
         id: "cat-1", name: "AI & 프로덕션", slug: "ai-and-production", icon: "Rocket", 
         subCategories: generateSubCategories("ai-and-production", ["이미지 프롬프트", "영상 프롬프트", "텍스트·문서 작성", "AI 업무 자동화", "AI 툴 리뷰 & 비교"])
@@ -269,5 +269,3 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
         return exampleRequest || null;
     });
 }
-
-    
