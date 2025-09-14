@@ -28,8 +28,8 @@ export function FeaturedCarousel({ featuredSlides }: { featuredSlides: { title: 
                         <div className="space-y-4">
                             <h3 className="text-2xl font-bold text-center">{slide.title}</h3>
                             <div className="grid grid-cols-1 gap-8 pt-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                                {slide.prompts.slice(0, 4).map((prompt) => (
-                                    <PromptCard key={prompt.id} prompt={prompt} />
+                                {slide.prompts.slice(0, 4).map((prompt, promptIndex) => (
+                                    <PromptCard key={`${prompt.id}-${promptIndex}`} prompt={prompt} />
                                 ))}
                             </div>
                         </div>

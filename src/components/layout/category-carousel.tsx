@@ -31,9 +31,9 @@ export function CategoryCarousel({ category, prompts }: { category: Category, pr
     >
       <CarouselContent>
         {items.map((prompt, index) => (
-          <CarouselItem key={`${category.slug}-${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
+          <CarouselItem key={`${prompt.id}-${index}`} className="basis-3/4 sm:basis-1/2 md:basis-1/4">
             <div className="p-1">
-              <PromptCard prompt={{...prompt, id: `${prompt.id}-${index}`}} />
+              <PromptCard prompt={prompt} />
             </div>
           </CarouselItem>
         ))}
