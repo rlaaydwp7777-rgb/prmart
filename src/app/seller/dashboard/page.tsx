@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { SELLER_STRINGS } from "@/lib/string-constants"
+import { SELLER_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants"
 import { BarChart, BadgeDollarSign, Package, Star, Loader2 } from "lucide-react";
 import { getSellerDashboardData } from "@/lib/firebase/services";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -96,7 +96,7 @@ export default function SellerDashboardPage() {
                 <CardContent>
                     <div className="text-2xl font-bold">{stats.averageRating.toFixed(1)}</div>
                     <p className="text-xs text-muted-foreground">
-                        ({stats.reviewCount} {SELLER_STRINGS.REVIEWS.toLowerCase()})
+                        ({stats.reviewCount} {SIDEBAR_STRINGS.REVIEWS.toLowerCase()})
                     </p>
                 </CardContent>
                 </Card>
