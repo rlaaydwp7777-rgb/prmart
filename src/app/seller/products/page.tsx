@@ -73,11 +73,11 @@ export default function SellerProductsPage() {
     }
   
   return (
-    <div className="grid md:grid-cols-3 gap-8 mt-4">
-        <div className="md:col-span-2">
+    <div className="grid md:grid-cols-5 gap-8 mt-4">
+        <div className="md:col-span-3">
             <h2 className="text-2xl font-bold tracking-tight mb-4">{SELLER_STRINGS.PRODUCTS_TITLE}</h2>
              {products.length === 0 ? (
-                <div className="text-center py-10 border rounded-lg bg-card">
+                <div className="text-center py-10 border rounded-lg bg-card flex items-center justify-center h-48">
                     <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_PRODUCTS_DATA}</p>
                 </div>
             ) : (
@@ -153,7 +153,7 @@ export default function SellerProductsPage() {
             </Card>
             )}
         </div>
-        <div className="md:col-span-1">
+        <div className="md:col-span-2">
             <h2 className="text-2xl font-bold tracking-tight mb-4">{SELLER_STRINGS.ADD_NEW_PRODUCT}</h2>
             <ProductRegistrationForm onProductRegistered={handleProductRegistered} />
         </div>
