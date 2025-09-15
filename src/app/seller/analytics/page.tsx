@@ -3,7 +3,7 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { DollarSign, Package, CreditCard, Users, ShoppingBag, PlusCircle } from "lucide-react"
+import { DollarSign, Package, CreditCard, ShoppingBag, PlusCircle } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import Image from "next/image"
 import { SELLER_STRINGS } from "@/lib/string-constants"
@@ -27,16 +27,16 @@ function AnalyticsSkeleton() {
     return (
          <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
+                <Skeleton className="h-28 rounded-xl" />
+                <Skeleton className="h-28 rounded-xl" />
+                <Skeleton className="h-28 rounded-xl" />
+                <Skeleton className="h-28 rounded-xl" />
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Skeleton className="lg:col-span-4 h-96" />
-                <Skeleton className="lg:col-span-3 h-96" />
+                <Skeleton className="lg:col-span-4 h-96 rounded-xl" />
+                <Skeleton className="lg:col-span-3 h-96 rounded-xl" />
             </div>
-             <Skeleton className="h-96" />
+             <Skeleton className="h-96 rounded-xl" />
         </div>
     )
 }
@@ -66,9 +66,9 @@ export default function SellerAnalyticsPage() {
 
   if(loading || authLoading) {
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             <CardHeader className="p-0">
-                <CardTitle>{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
                 <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
             </CardHeader>
             <AnalyticsSkeleton />
@@ -82,60 +82,62 @@ export default function SellerAnalyticsPage() {
 
   const { stats, recentSales, bestSellers, salesByMonth } = data;
   const hasSales = stats.totalSales > 0;
+  const hasMonthlySales = salesByMonth.some(month => month.total > 0);
+
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <CardHeader className="p-0">
-        <CardTitle>{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
+        <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
         <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
       </CardHeader>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_REVENUE}</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <DollarSign className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_ORDERS}</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+            <ShoppingBag className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">+{stats.totalSales.toLocaleString()}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.AVG_ORDER_VALUE}</CardTitle>
-            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            <CreditCard className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">₩{stats.totalSales > 0 ? Math.round(stats.totalRevenue / stats.totalSales).toLocaleString() : 0}</div>
           </CardContent>
         </Card>
-         <Card>
+         <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.TOTAL_PRODUCTS}</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+            <Package className="h-5 w-5 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.productCount}개</div>
+             <Link href="/seller/products" className="text-2xl font-bold hover:underline">{stats.productCount}개</Link>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="lg:col-span-4">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
+        <Card className="lg:col-span-4 shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader>
-            <CardTitle>{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
+            <CardTitle className="text-xl">{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            {hasSales ? (
+            {hasMonthlySales ? (
                  <ResponsiveContainer width="100%" height={350}>
                   <BarChart data={salesByMonth}>
                     <XAxis
@@ -163,9 +165,9 @@ export default function SellerAnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 shadow-sm rounded-xl hover:bg-muted/5 transition">
           <CardHeader>
-            <CardTitle>{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
+            <CardTitle className="text-xl">{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
             <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -177,7 +179,7 @@ export default function SellerAnalyticsPage() {
                      <Button asChild className="mt-4">
                         <Link href="/seller/dashboard">
                             <PlusCircle className="mr-2 h-4 w-4" />
-                            첫 상품 등록하기
+                            {SELLER_STRINGS.ADD_FIRST_PRODUCT}
                         </Link>
                     </Button>
                 </div>
@@ -185,9 +187,9 @@ export default function SellerAnalyticsPage() {
           </CardContent>
         </Card>
       </div>
-       <Card>
+       <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
         <CardHeader>
-            <CardTitle>{SELLER_STRINGS.TOP_PRODUCTS}</CardTitle>
+            <CardTitle className="text-xl">{SELLER_STRINGS.TOP_PRODUCTS}</CardTitle>
             <CardDescription>{SELLER_STRINGS.TOP_PRODUCTS_DESC}</CardDescription>
         </CardHeader>
         <CardContent>
@@ -217,7 +219,7 @@ export default function SellerAnalyticsPage() {
                 </Table>
             ) : (
                  <div className="text-center py-10">
-                    <p className="text-muted-foreground">아직 판매된 상품이 없습니다.</p>
+                    <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_TOP_PRODUCTS_DATA}</p>
                 </div>
             )}
         </CardContent>

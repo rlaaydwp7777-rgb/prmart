@@ -57,13 +57,13 @@ function ProductsSkeleton() {
           <TableBody>
             {Array.from({ length: 5 }).map((_, i) => (
                 <TableRow key={i}>
-                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-16 w-16" /></TableCell>
+                    <TableCell className="hidden sm:table-cell"><Skeleton className="h-16 w-16 rounded-md" /></TableCell>
                     <TableCell><Skeleton className="h-5 w-48" /></TableCell>
-                    <TableCell><Skeleton className="h-6 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-6 w-20 rounded-full" /></TableCell>
                     <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
                     <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-16" /></TableCell>
                     <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-24" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-8" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-8 rounded-full" /></TableCell>
                 </TableRow>
             ))}
           </TableBody>
@@ -95,11 +95,11 @@ export default function SellerProductsPage() {
     }, [user, authLoading, fetchProducts]);
 
   return (
-    <Card>
+    <Card className="shadow-sm rounded-xl">
       <CardHeader>
         <div className="flex items-center justify-between">
             <div>
-                <CardTitle>{SELLER_STRINGS.PRODUCTS_TITLE}</CardTitle>
+                <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.PRODUCTS_TITLE}</CardTitle>
                 <CardDescription>{SELLER_STRINGS.PRODUCTS_DESC}</CardDescription>
             </div>
             <Button asChild>
@@ -163,7 +163,7 @@ export default function SellerProductsPage() {
                         <DropdownMenuContent align="end">
                         <DropdownMenuLabel>{SELLER_STRINGS.PRODUCT_TABLE_HEADER_ACTIONS}</DropdownMenuLabel>
                         <DropdownMenuItem asChild>
-                           <Link href={`/seller/products/${product.id}/edit`}>{SELLER_STRINGS.EDIT}</Link>
+                           <Link href={`/seller/products`}>{SELLER_STRINGS.EDIT}</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem>{SELLER_STRINGS.DUPLICATE}</DropdownMenuItem>
                         <DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
@@ -178,11 +178,11 @@ export default function SellerProductsPage() {
             </Table>
         ) : (
             <div className="text-center py-16">
-                <p className="text-muted-foreground mb-4">아직 등록된 상품이 없습니다.</p>
+                <p className="text-muted-foreground mb-4">{SELLER_STRINGS.EMPTY_PRODUCTS_DATA}</p>
                 <Button asChild>
                     <Link href="/seller/dashboard">
                         <PlusCircle className="h-4 w-4 mr-2" />
-                        첫 상품 등록하기
+                        {SELLER_STRINGS.ADD_FIRST_PRODUCT}
                     </Link>
                 </Button>
             </div>

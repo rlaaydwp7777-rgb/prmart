@@ -58,8 +58,10 @@ export default function SellerSettingsPage() {
     useEffect(() => {
         if(user) {
             fetchProfile();
+        } else if(!authLoading) {
+            setLoading(false);
         }
-    }, [user, fetchProfile]);
+    }, [user, authLoading, fetchProfile]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -77,6 +79,8 @@ export default function SellerSettingsPage() {
                 title: "성공",
                 description: "프로필 정보가 성공적으로 저장되었습니다.",
             });
+            // Re-fetch after saving to confirm
+            await fetchProfile();
         } catch (error) {
             toast({
                 title: "오류",
@@ -90,23 +94,23 @@ export default function SellerSettingsPage() {
     
     if(authLoading || loading) {
         return (
-             <div className="space-y-6">
+             <div className="space-y-8">
                 <div>
-                    <h1 className="text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
+                    <h1 className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
                     <p className="text-muted-foreground">{SELLER_STRINGS.SETTINGS_DESC}</p>
                 </div>
                 <div className="space-y-4">
                     <Skeleton className="h-10 w-48" />
-                    <Skeleton className="h-96 w-full" />
+                    <Skeleton className="h-96 w-full rounded-xl" />
                 </div>
             </div>
         )
     }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
         <div>
-            <h1 className="text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
             <p className="text-muted-foreground">{SELLER_STRINGS.SETTINGS_DESC}</p>
         </div>
         <form onSubmit={handleSave}>
@@ -114,10 +118,9 @@ export default function SellerSettingsPage() {
             <TabsList>
                 <TabsTrigger value="profile">{SELLER_STRINGS.SETTINGS_TAB_PROFILE}</TabsTrigger>
                 <TabsTrigger value="payouts">{SELLER_STRINGS.SETTINGS_TAB_PAYOUTS}</TabsTrigger>
-                {/* <TabsTrigger value="notifications">{SELLER_STRINGS.SETTINGS_TAB_NOTIFICATIONS}</TabsTrigger> */}
             </TabsList>
             <TabsContent value="profile">
-                <Card>
+                <Card className="shadow-sm rounded-xl">
                 <CardHeader>
                     <CardTitle>{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
                     <CardDescription>
@@ -127,14 +130,14 @@ export default function SellerSettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                     <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
-                    <Input id="sellerName" value={profile.sellerName} onChange={handleInputChange} />
+                    <Input id="sellerName" value={profile.sellerName || ''} onChange={handleInputChange} />
                     </div>
                     <div className="space-y-2">
                     <Label htmlFor="sellerBio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
                     <Textarea
                         id="sellerBio"
                         placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER}
-                        value={profile.sellerBio}
+                        value={profile.sellerBio || ''}
                         onChange={handleInputChange}
                     />
                     </div>
@@ -142,7 +145,7 @@ export default function SellerSettingsPage() {
                 </Card>
             </TabsContent>
             <TabsContent value="payouts">
-                <Card>
+                <Card className="shadow-sm rounded-xl">
                 <CardHeader>
                     <CardTitle>{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
                     <CardDescription>
@@ -152,15 +155,15 @@ export default function SellerSettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                     <Label htmlFor="bankName">{SELLER_STRINGS.BANK_NAME_LABEL}</Label>
-                    <Input id="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} value={profile.bankName} onChange={handleInputChange}/>
+                    <Input id="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} value={profile.bankName || ''} onChange={handleInputChange}/>
                     </div>
                     <div className="space-y-2">
                     <Label htmlFor="accountNumber">{SELLER_STRINGS.ACCOUNT_NUMBER_LABEL}</Label>
-                    <Input id="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} value={profile.accountNumber} onChange={handleInputChange}/>
+                    <Input id="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} value={profile.accountNumber || ''} onChange={handleInputChange}/>
                     </div>
                     <div className="space-y-2">
                     <Label htmlFor="accountHolder">{SELLER_STRINGS.ACCOUNT_HOLDER_LABEL}</Label>
-                    <Input id="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder} onChange={handleInputChange}/>
+                    <Input id="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder || ''} onChange={handleInputChange}/>
                     </div>
                 </CardContent>
                 </Card>
