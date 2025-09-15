@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
@@ -108,74 +107,74 @@ export default function SellerSettingsPage() {
     }
 
   return (
-    <div className="space-y-8">
+    <form onSubmit={handleSave} className="space-y-8">
         <div>
             <h1 className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.SETTINGS_TITLE}</h1>
             <p className="text-muted-foreground">{SELLER_STRINGS.SETTINGS_DESC}</p>
         </div>
-        <form onSubmit={handleSave}>
-            <Tabs defaultValue="profile" className="w-full">
-            <TabsList>
-                <TabsTrigger value="profile">{SELLER_STRINGS.SETTINGS_TAB_PROFILE}</TabsTrigger>
-                <TabsTrigger value="payouts">{SELLER_STRINGS.SETTINGS_TAB_PAYOUTS}</TabsTrigger>
-            </TabsList>
-            <TabsContent value="profile">
-                <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
-                <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
-                    <CardDescription>
-                    {SELLER_STRINGS.PROFILE_DESC}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                    <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
-                    <Input id="sellerName" value={profile.sellerName || ''} onChange={handleInputChange} />
-                    </div>
-                    <div className="space-y-2">
-                    <Label htmlFor="sellerBio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
-                    <Textarea
-                        id="sellerBio"
-                        placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER}
-                        value={profile.sellerBio || ''}
-                        onChange={handleInputChange}
-                    />
-                    </div>
-                </CardContent>
-                </Card>
-            </TabsContent>
-            <TabsContent value="payouts">
-                <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
-                <CardHeader>
-                    <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
-                    <CardDescription>
-                    {SELLER_STRINGS.PAYOUTS_DESC}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="space-y-2">
-                    <Label htmlFor="bankName">{SELLER_STRINGS.BANK_NAME_LABEL}</Label>
-                    <Input id="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} value={profile.bankName || ''} onChange={handleInputChange}/>
-                    </div>
-                    <div className="space-y-2">
-                    <Label htmlFor="accountNumber">{SELLER_STRINGS.ACCOUNT_NUMBER_LABEL}</Label>
-                    <Input id="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} value={profile.accountNumber || ''} onChange={handleInputChange}/>
-                    </div>
-                    <div className="space-y-2">
-                    <Label htmlFor="accountHolder">{SELLER_STRINGS.ACCOUNT_HOLDER_LABEL}</Label>
-                    <Input id="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder || ''} onChange={handleInputChange}/>
-                    </div>
-                </CardContent>
-                </Card>
-            </TabsContent>
-            </Tabs>
-             <div className="mt-6">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {SELLER_STRINGS.SAVE_SETTINGS}
-                </Button>
-            </div>
-        </form>
-    </div>
+        
+        <Tabs defaultValue="profile" className="w-full">
+        <TabsList>
+            <TabsTrigger value="profile">{SELLER_STRINGS.SETTINGS_TAB_PROFILE}</TabsTrigger>
+            <TabsTrigger value="payouts">{SELLER_STRINGS.SETTINGS_TAB_PAYOUTS}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="profile">
+            <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
+            <CardHeader>
+                <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
+                <CardDescription>
+                {SELLER_STRINGS.PROFILE_DESC}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
+                <Input id="sellerName" value={profile.sellerName || ''} onChange={handleInputChange} />
+                </div>
+                <div className="space-y-2">
+                <Label htmlFor="sellerBio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
+                <Textarea
+                    id="sellerBio"
+                    placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER}
+                    value={profile.sellerBio || ''}
+                    onChange={handleInputChange}
+                />
+                </div>
+            </CardContent>
+            </Card>
+        </TabsContent>
+        <TabsContent value="payouts">
+            <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
+            <CardHeader>
+                <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
+                <CardDescription>
+                {SELLER_STRINGS.PAYOUTS_DESC}
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                <Label htmlFor="bankName">{SELLER_STRINGS.BANK_NAME_LABEL}</Label>
+                <Input id="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} value={profile.bankName || ''} onChange={handleInputChange}/>
+                </div>
+                <div className="space-y-2">
+                <Label htmlFor="accountNumber">{SELLER_STRINGS.ACCOUNT_NUMBER_LABEL}</Label>
+                <Input id="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} value={profile.accountNumber || ''} onChange={handleInputChange}/>
+                </div>
+                <div className="space-y-2">
+                <Label htmlFor="accountHolder">{SELLER_STRINGS.ACCOUNT_HOLDER_LABEL}</Label>
+                <Input id="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder || ''} onChange={handleInputChange}/>
+                </div>
+            </CardContent>
+            </Card>
+        </TabsContent>
+        </Tabs>
+        
+        <div className="mt-6">
+            <Button type="submit" disabled={isSaving}>
+                {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {SELLER_STRINGS.SAVE_SETTINGS}
+            </Button>
+        </div>
+    </form>
   )
 }
