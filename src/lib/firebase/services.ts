@@ -4,18 +4,16 @@ import { db } from "@/lib/firebase";
 import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
-const requestCache = new Map<string, any>();
+const requestCache = new Map<string, { ts: number, data: any }>();
 
-async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
-  if (process.env.NODE_ENV !== 'development' || !requestCache.has(key)) {
-    const data = await fetcher();
-    if (process.env.NODE_ENV === 'development') {
-        requestCache.set(key, data);
-        setTimeout(() => requestCache.delete(key), 1000); // 1-second cache in dev
-    }
-    return data;
+async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>, ttl = 60000): Promise<T> {
+  const item = requestCache.get(key);
+  if (item && Date.now() - item.ts < ttl) {
+    return item.data;
   }
-  return requestCache.get(key);
+  const data = await fetcher();
+  requestCache.set(key, { ts: Date.now(), data });
+  return data;
 }
 
 export const EXAMPLE_CATEGORIES: Category[] = [
@@ -235,6 +233,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     tags: [category.name, subCategory.name, "예제"],
                     isExample: true,
                     visibility: 'public',
+                    sellOnce: false,
                     createdAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     updatedAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     stats: {
@@ -434,7 +433,7 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     });
 }
 
-export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
+export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'stats' | 'rating' | 'reviews'>) {
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "products"), {
@@ -452,6 +451,15 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
     }
 }
 
+// Helper to chunk arrays for Firestore 'in' queries
+function chunk<T>(arr: T[], size: number): T[][] {
+    const res: T[][] = [];
+    for (let i = 0; i < arr.length; i += size) {
+        res.push(arr.slice(i, i + size));
+    }
+    return res;
+}
+
 export async function getSellerDashboardData(sellerId: string) {
     const cacheKey = `seller_dashboard_${sellerId}`;
     return fetchFromCache(cacheKey, async () => {
@@ -459,23 +467,35 @@ export async function getSellerDashboardData(sellerId: string) {
             // 1. Fetch products by seller
             const sellerProducts = await getProductsBySeller(sellerId);
 
-            // 2. Fetch orders for those products
+            // 2. Fetch orders for those products, handling chunking for 'in' query
             const productIds = sellerProducts.map(p => p.id);
             const orders: Order[] = [];
             if (productIds.length > 0) {
-                 const ordersQuery = query(collection(db, "orders"), where("productId", "in", productIds), orderBy("orderDate", "desc"));
-                 const ordersSnapshot = await getDocs(ordersQuery);
-                 ordersSnapshot.forEach(doc => {
-                     orders.push(serializeDoc(doc) as Order);
-                 });
+                const idChunks = chunk(productIds, 10);
+                const orderPromises = idChunks.map(chunk => {
+                    const ordersQuery = query(collection(db, "orders"), where("productId", "in", chunk));
+                    return getDocs(ordersQuery);
+                });
+                const orderSnapshots = await Promise.all(orderPromises);
+                orderSnapshots.forEach(snapshot => {
+                    snapshot.forEach(doc => {
+                        orders.push(serializeDoc(doc) as Order);
+                    });
+                });
+                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
             }
 
-            // 3. Calculate stats
+            // 3. Calculate stats safely
+            const ratedProducts = sellerProducts.filter(p => p.rating && p.rating > 0);
+            const averageRating = ratedProducts.length > 0 
+                ? ratedProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / ratedProducts.length
+                : 0;
+
             const stats: SellerStats = {
                 totalRevenue: orders.reduce((sum, order) => sum + order.amount, 0),
                 totalSales: orders.length,
                 productCount: sellerProducts.length,
-                averageRating: sellerProducts.length > 0 ? sellerProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / sellerProducts.filter(p => p.rating && p.rating > 0).length || 0 : 0,
+                averageRating: averageRating,
                 reviewCount: sellerProducts.reduce((sum, p) => sum + (p.reviews || 0), 0),
             };
 
@@ -497,7 +517,7 @@ export async function getSellerDashboardData(sellerId: string) {
                     return { ...product, ...salesByProduct[productId] };
                 })
                 .sort((a, b) => b.sales - a.sales)
-                .slice(0, 3) as (Prompt & { sales: number, revenue: number })[];
+                .slice(0, 3) as (Prompt & { sales: number; revenue: number; })[];
             
             // 6. Aggregate sales by month for the graph
             const salesByMonth: { name: string, total: number }[] = Array.from({ length: 12 }, (_, i) => {

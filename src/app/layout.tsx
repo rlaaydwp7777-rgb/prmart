@@ -43,7 +43,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const [categories, setCategories] = useState<Category[]>([]);
-
+  
   useEffect(() => {
     setMetadata();
     async function fetchCategories() {
@@ -61,13 +61,13 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <AuthProvider>
-          <div className="flex flex-col min-h-screen">
-            {showHeaderAndFooter && <Header categories={categories} />}
-            <main className={showHeaderAndFooter ? "flex-1 pt-16" : "flex-1"}>
-              {children}
-            </main>
-            {showHeaderAndFooter && <Footer />}
-          </div>
+            <div className="flex flex-col min-h-screen">
+                {showHeaderAndFooter && <Header categories={categories} />}
+                <main className={showHeaderAndFooter ? "flex-1 pt-16" : "flex-1"}>
+                  {children}
+                </main>
+                {showHeaderAndFooter && <Footer />}
+            </div>
           <Toaster />
         </AuthProvider>
       </body>
