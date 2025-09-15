@@ -4,17 +4,26 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, BarChart2, LogOut } from "lucide-react";
-import { SIDEBAR_STRINGS, AUTH_STRINGS } from "@/lib/string-constants";
+import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, BarChart2, LogOut, ChevronDown, PlusCircle } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { Loader2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
+import { SIDEBAR_STRINGS, AUTH_STRINGS } from "@/lib/string-constants";
 
 const sidebarNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
-  { href: "/seller/products", icon: Package, title: SIDEBAR_STRINGS.PRODUCTS },
+  { 
+    title: SIDEBAR_STRINGS.PRODUCTS,
+    icon: Package,
+    subItems: [
+        { href: "/seller/products", title: "상품 목록" },
+        { href: "/seller/products/add", title: "상품 등록", icon: PlusCircle },
+    ]
+  },
   { href: "/seller/analytics", icon: BarChart2, title: SIDEBAR_STRINGS.ANALYTICS },
   { href: "/seller/reviews", icon: Star, title: SIDEBAR_STRINGS.REVIEWS },
   { href: "/seller/customers", icon: Users, title: SIDEBAR_STRINGS.CUSTOMERS },
@@ -42,6 +51,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
   }
 
   const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
+  
+  const isProductRoute = pathname.startsWith('/seller/products');
 
   return (
     <SidebarProvider>
@@ -55,15 +66,41 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
               </Link>
             </SidebarHeader>
             <SidebarMenu>
-              {sidebarNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton asChild isActive={pathname === item.href}>
-                    <Link href={item.href}>
-                      <item.icon />
-                      {item.title}
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+              {sidebarNavItems.map((item, index) => (
+                 item.subItems ? (
+                    <Collapsible key={index} defaultOpen={isProductRoute}>
+                         <CollapsibleTrigger className="w-full">
+                            <SidebarMenuButton asChild={false} isActive={isProductRoute} className="w-full">
+                                <item.icon />
+                                {item.title}
+                                <ChevronDown className="ml-auto h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                            </SidebarMenuButton>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="pl-6">
+                             <SidebarMenu className="py-2">
+                                {item.subItems.map((subItem, subIndex) => (
+                                    <SidebarMenuItem key={subIndex}>
+                                        <SidebarMenuButton asChild isActive={pathname === subItem.href} variant="ghost" className="h-9 w-full justify-start">
+                                            <Link href={subItem.href}>
+                                                {subItem.icon && <subItem.icon />}
+                                                {subItem.title}
+                                            </Link>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                ))}
+                            </SidebarMenu>
+                        </CollapsibleContent>
+                    </Collapsible>
+                 ) : (
+                    <SidebarMenuItem key={index}>
+                        <SidebarMenuButton asChild isActive={pathname === item.href}>
+                            <Link href={item.href}>
+                            <item.icon />
+                            {item.title}
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                 )
               ))}
             </SidebarMenu>
           </SidebarContent>
