@@ -83,7 +83,7 @@ export function ProductFilters({ initialPrompts, category, allCategories, active
 
     const filterItems = isBrowseAllPage 
         ? allCategories?.map(c => ({ slug: c.slug, name: c.name })) || []
-        : category?.subCategories.map(sc => ({ slug: sc.slug, name: sc.name })) || [];
+        : category?.subCategories?.map(sc => ({ slug: sc.slug, name: sc.name })) || [];
 
 
     return (
