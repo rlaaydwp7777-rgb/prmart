@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useActionState } from "react";
@@ -17,7 +18,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText, Globe, Lock, Eye } from "lucide-react";
+import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText, Globe, Lock, Eye, Link as LinkIcon } from "lucide-react";
 import { BUTTONS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
@@ -31,10 +32,12 @@ const productSchema = z.object({
   category: z.string().min(1, "카테고리를 선택해주세요."),
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
+  contentUrl: z.string().url("유효한 URL을 입력해주세요.").optional().or(z.literal('')),
   sellOnce: z.boolean().optional(),
   visibility: z.enum(['public', 'private', 'partial']),
   sellerId: z.string().optional(),
   author: z.string().optional(),
+  sellerPhotoUrl: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -82,6 +85,7 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
       category: "",
       tags: "",
       price: 0,
+      contentUrl: "",
       sellOnce: false,
       visibility: "public",
     }
@@ -106,25 +110,17 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
 
     if (formState.success) {
       if(formRef.current) formRef.current.reset();
-      reset({
-        title: "",
-        description: "",
-        category: "",
-        tags: "",
-        price: 0,
-        sellOnce: false,
-        visibility: 'public',
-      });
+      reset();
       onProductRegistered?.();
     } else if (formState.fields) {
-      // Re-populate form with previous data on server-side validation failure
-      const { title, description, category, tags, price, sellOnce, visibility } = formState.fields;
+      const { title, description, category, tags, price, sellOnce, visibility, contentUrl } = formState.fields;
       reset({ 
         title, 
         description, 
         category, 
         tags, 
         price: Number(price) || 0,
+        contentUrl: contentUrl || "",
         sellOnce: !!sellOnce,
         visibility: visibility || 'public'
       });
@@ -182,6 +178,7 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
       <form ref={formRef} action={formAction} className="space-y-6">
         <input type="hidden" {...register("sellerId")} value={user?.uid || ''} />
         <input type="hidden" {...register("author")} value={user?.displayName || user?.email || 'prmart seller'} />
+        <input type="hidden" {...register("sellerPhotoUrl")} value={user?.photoURL || ''} />
         
         <div className="space-y-2">
           <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
@@ -258,14 +255,24 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
             </div>
         </div>
 
+         <div className="space-y-2">
+            <Label htmlFor="contentUrl">{SELLER_STRINGS.PRODUCT_CONTENT_URL}</Label>
+             <div className="flex items-center gap-2">
+                <LinkIcon className="h-5 w-5 text-muted-foreground" />
+                <Input id="contentUrl" placeholder={SELLER_STRINGS.PRODUCT_CONTENT_URL_PLACEHOLDER} {...register("contentUrl")} />
+            </div>
+             <p className="text-sm text-muted-foreground">{SELLER_STRINGS.PRODUCT_CONTENT_URL_HINT}</p>
+             {errors.contentUrl && <p className="text-destructive text-sm">{errors.contentUrl.message}</p>}
+        </div>
+
         <div className="space-y-2">
             <Label htmlFor="product-images">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
             <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
-              <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
+              <ImageIcon className="mx-auto h-12 w-12 text-muted-foreground" />
               <p className="mt-4 text-muted-foreground">
                 {SELLER_STRINGS.PRODUCT_IMAGES_HINT}
               </p>
-              <Input id="product-images" type="file" className="sr-only" multiple />
+              <Input id="product-images" type="file" className="sr-only" multiple accept="image/*" />
             </div>
         </div>
 

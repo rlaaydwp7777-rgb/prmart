@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
@@ -6,7 +7,7 @@ import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-
 import { z } from "zod";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { saveProduct, getCategories } from "@/lib/firebase/services";
+import { saveProduct, getCategories, saveIdeaRequest } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
 
 
@@ -89,7 +90,6 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
         };
     }
     
-    // This server action now only validates the form. The actual sign-in is done on the client.
     return { success: true, message: "유효성 검사 성공." };
 }
 
@@ -107,19 +107,7 @@ export async function signInWithGoogleAction(): Promise<AuthState> {
 }
 
 
-// --- Product Actions ---
-
-const productSchema = z.object({
-  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
-  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
-  category: z.string().min(1, "카테고리를 선택해주세요."),
-  tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
-  price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
-  sellOnce: z.boolean().optional(),
-  visibility: z.enum(['public', 'private', 'partial']),
-  sellerId: z.string().min(1, "판매자 정보가 필요합니다."),
-  author: z.string().min(1, "판매자 이름이 필요합니다."),
-});
+// --- Product & Request Actions ---
 
 export type FormState = {
   message: string;
@@ -128,6 +116,20 @@ export type FormState = {
   issues?: string[];
   qualityResult?: AssessContentQualityOutput;
 };
+
+const productSchema = z.object({
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
+  price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
+  contentUrl: z.string().url("유효한 URL을 입력해주세요.").optional().or(z.literal('')),
+  sellOnce: z.boolean().optional(),
+  visibility: z.enum(['public', 'private', 'partial']),
+  sellerId: z.string().min(1, "판매자 정보가 필요합니다."),
+  author: z.string().min(1, "판매자 이름이 필요합니다."),
+  sellerPhotoUrl: z.string().optional(),
+});
 
 export async function generateDescriptionAction(title: string): Promise<{data: GenerateProductDescriptionOutput | null; error: string | null}> {
   if (!title || title.trim().length < 5) {
@@ -146,15 +148,9 @@ export async function registerProductAction(prevState: FormState, formData: Form
   const rawData = Object.fromEntries(formData.entries());
   
   const validatedFields = productSchema.safeParse({
-    title: rawData.title,
-    description: rawData.description,
-    category: rawData.category,
-    tags: rawData.tags,
+    ...rawData,
     price: rawData.price,
     sellOnce: rawData.sellOnce === 'on',
-    visibility: rawData.visibility,
-    sellerId: rawData.sellerId,
-    author: rawData.author
   });
 
   if (!validatedFields.success) {
@@ -175,7 +171,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
     });
 
     if (qualityResult.isApproved) {
-        const { title, description, category, tags, price, sellOnce, sellerId, author, visibility } = validatedFields.data;
+        const { title, description, category, tags, price, sellOnce, sellerId, author, visibility, contentUrl, sellerPhotoUrl } = validatedFields.data;
         
         const categories = await getCategories();
         const categorySlug = categories.find(c => c.name === category)?.slug || "";
@@ -193,8 +189,10 @@ export async function registerProductAction(prevState: FormState, formData: Form
           aiHint: tags.split(',').map(tag => tag.trim()).slice(0,2).join(' '),
           author,
           sellerId,
+          sellerPhotoUrl: sellerPhotoUrl || "",
           visibility,
           sellOnce,
+          contentUrl: contentUrl || "",
         });
 
         revalidatePath('/seller/dashboard');
@@ -219,6 +217,59 @@ export async function registerProductAction(prevState: FormState, formData: Form
     return {
       success: false,
       message: "상품 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+      fields: validatedFields.data
+    };
+  }
+}
+
+const ideaRequestSchema = z.object({
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  budget: z.coerce.number().min(0, "예산은 0 이상의 숫자여야 합니다.").optional(),
+  author: z.string().min(1, "작성자 정보가 필요합니다."),
+});
+
+export async function createIdeaRequestAction(prevState: FormState, formData: FormData): Promise<FormState> {
+  const rawData = Object.fromEntries(formData.entries());
+  
+  const validatedFields = ideaRequestSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "입력 값을 다시 확인해주세요.",
+      fields: rawData,
+      issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : ["유효성 검사에 실패했습니다."],
+    };
+  }
+  
+  try {
+    const { title, description, category, budget, author } = validatedFields.data;
+    const categories = await getCategories();
+    const categorySlug = categories.find(c => c.name === category)?.slug || "";
+    
+    await saveIdeaRequest({
+        title,
+        description,
+        category,
+        categorySlug,
+        budget: budget || 0,
+        author,
+        proposals: 0,
+    });
+    
+    revalidatePath('/requests');
+
+    return {
+        success: true,
+        message: "아이디어 요청이 성공적으로 등록되었습니다!",
+    };
+  } catch (error) {
+    console.error("Error in createIdeaRequestAction:", error);
+    return {
+      success: false,
+      message: "요청 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
       fields: validatedFields.data
     };
   }

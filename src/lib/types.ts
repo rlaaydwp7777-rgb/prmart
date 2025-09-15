@@ -9,20 +9,22 @@ export interface Prompt {
   title: string;
   description?: string;
   author: string; 
-  sellerId: string; // sellerId is now mandatory
-  category: string; // 카테고리 이름
-  categorySlug: string; // 카테고리 슬러그
-  subCategorySlug?: string; // 하위 카테고리 슬러그
+  sellerId: string;
+  sellerPhotoUrl?: string;
+  category: string;
+  categorySlug: string;
+  subCategorySlug?: string;
   price: number;
   image: string;
+  contentUrl?: string; // To store external link for product content
   aiHint: string;
   tags?: string[];
   rank?: number;
   isExample?: boolean;
   visibility: PromptVisibility;
   sellOnce?: boolean;
-  createdAt: string; // Changed from Timestamp to string
-  updatedAt?: string; // Changed from Timestamp to string
+  createdAt: string; 
+  updatedAt?: string;
   stats: {
     views: number;
     likes: number;
@@ -42,6 +44,7 @@ export interface IdeaRequest {
     budget: number;
     proposals: number;
     isExample?: boolean;
+    createdAt: string;
 }
 
 export interface SubCategory {
@@ -54,7 +57,7 @@ export interface Category {
   id: string;
   name:string;
   slug: string;
-  icon: string; // LucideIcon name as string
+  icon: string;
   subCategories: SubCategory[];
 }
 
@@ -71,7 +74,7 @@ export interface HomePageContent {
 
 export interface Order {
     id: string;
-    orderDate: string; // ISO string
+    orderDate: string;
     productId: string;
     productTitle: string;
     sellerId: string;
@@ -93,6 +96,7 @@ export interface SellerStats {
 export interface SellerProfile {
     sellerName: string;
     sellerBio: string;
+    photoUrl?: string;
     bankName: string;
     accountNumber: string;
     accountHolder: string;
@@ -106,7 +110,7 @@ export interface Review {
     productTitle: string;
     rating: number;
     content: string;
-    createdAt: string; // ISO string
+    createdAt: string;
 }
 
 export interface Wishlist {

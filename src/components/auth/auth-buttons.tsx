@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useAuth } from "./auth-provider";
@@ -13,12 +14,21 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { signOut } from "@/lib/firebase/auth";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase/auth";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
 import { LayoutDashboard, Cog, LogOut, ChevronDown } from "lucide-react";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+        await signOut(auth);
+    } catch(e) {
+        console.error("Sign out error", e);
+    }
+  }
 
   if (loading) {
     return <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />;
@@ -31,7 +41,7 @@ export function AuthButtons() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-3 h-12 px-3">
              <Avatar className="h-9 w-9">
-              <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
+              <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} />
               <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="text-left hidden md:block">
@@ -62,7 +72,7 @@ export function AuthButtons() {
                 </Link>
             </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
+          <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
              <LogOut className="mr-2 h-4 w-4" />
             <span>{AUTH_STRINGS.LOGOUT_LINK}</span>
           </DropdownMenuItem>

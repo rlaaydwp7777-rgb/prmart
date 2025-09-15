@@ -105,7 +105,7 @@ export const EXAMPLE_CATEGORIES: Category[] = [
           { id: "sub-7-1", name: "효율적인 여행 계획", slug: "travel-planning" },
           { id: "sub-7-2", name: "알뜰 여행 꿀팁", slug: "budget-travel-tip" },
           { id: "sub-7-3", name: "테마별 여행 코스", slug: "themed-travel-course" },
-          { id: "sub-7-4", name: "여행 사진/영상 보정", slug: "travel-photo-editing" },
+          { id: "sub-7-4", name: "드론 및 VR 영상", slug: "drone-vr-video" },
           { id: "sub-7-5", name: "기타 여행 및 라이프", slug: "travel" },
         ]
       },
@@ -276,6 +276,7 @@ const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, i
         proposals: Math.floor(Math.random() * 15),
         description: example.description,
         isExample: true,
+        createdAt: new Date(Date.now() - (index * 1000 * 3600 * 24)).toISOString(),
     }
 });
 
@@ -403,7 +404,7 @@ export async function getCategories(): Promise<Category[]> {
 export async function getIdeaRequests(): Promise<IdeaRequest[]> {
     return fetchFromCache('ideaRequests', async () => {
         try {
-            const snapshot = await getDocs(collection(db, "ideaRequests"));
+            const snapshot = await getDocs(query(collection(db, "ideaRequests"), orderBy("createdAt", "desc")));
             if (snapshot.empty) {
                 console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
                 return EXAMPLE_IDEA_REQUESTS;
@@ -444,7 +445,7 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
             stats: { views: 0, likes: 0, sales: 0 },
             rating: 0,
             reviews: 0,
-            sellOnce: productData.sellOnce || false
+            sellOnce: productData.sellOnce || false,
         });
         return docRef.id;
     } catch (error) {
@@ -452,6 +453,21 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
         throw new Error("상품을 데이터베이스에 저장하는 데 실패했습니다.");
     }
 }
+
+export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt'>) {
+    try {
+        const now = Timestamp.now();
+        const docRef = await addDoc(collection(db, "ideaRequests"), {
+            ...requestData,
+            createdAt: now,
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error("Error saving idea request: ", error);
+        throw new Error("아이디어 요청을 데이터베이스에 저장하는 데 실패했습니다.");
+    }
+}
+
 
 // Helper to chunk arrays for Firestore 'in' queries
 function chunk<T>(arr: T[], size: number): T[][] {
@@ -466,26 +482,14 @@ export async function getSellerDashboardData(sellerId: string) {
     const cacheKey = `seller_dashboard_${sellerId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
-            // 1. Fetch products by seller
-            const sellerProducts = await getProductsBySeller(sellerId);
+            // 1. Fetch orders by sellerId directly for better performance
+            const ordersQuery = query(collection(db, "orders"), where("sellerId", "==", sellerId));
+            const ordersSnapshot = await getDocs(ordersQuery);
+            const orders: Order[] = ordersSnapshot.docs.map(doc => serializeDoc(doc) as Order);
+            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
 
-            // 2. Fetch orders for those products, handling chunking for 'in' query
-            const productIds = sellerProducts.map(p => p.id);
-            const orders: Order[] = [];
-            if (productIds.length > 0) {
-                const idChunks = chunk(productIds, 30);
-                const orderPromises = idChunks.map(chunk => {
-                    const ordersQuery = query(collection(db, "orders"), where("productId", "in", chunk));
-                    return getDocs(ordersQuery);
-                });
-                const orderSnapshots = await Promise.all(orderPromises);
-                orderSnapshots.forEach(snapshot => {
-                    snapshot.forEach(doc => {
-                        orders.push(serializeDoc(doc) as Order);
-                    });
-                });
-                orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-            }
+            // 2. Fetch products by seller
+            const sellerProducts = await getProductsBySeller(sellerId);
 
             // 3. Calculate stats safely
             const ratedProducts = sellerProducts.filter(p => p.rating && p.rating > 0);
@@ -574,7 +578,7 @@ export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
             console.error(`Error fetching orders for buyer ${buyerId}:`, error);
             return [];
         }
-    }, 10000); // 10-second cache
+    }, 10000);
 }
 
 export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
@@ -589,7 +593,7 @@ export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
             console.error(`Error fetching reviews for author ${authorId}:`, error);
             return [];
         }
-    }, 10000); // 10-second cache
+    }, 10000);
 }
 
 
@@ -602,10 +606,10 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
             if (docSnap.exists()) {
                 return serializeDoc(docSnap) as Wishlist;
             }
-            return { userId, productIds: [] }; // Return empty wishlist if not found
+            return { userId, productIds: [] };
         } catch (error) {
             console.error(`Error fetching wishlist for user ${userId}:`, error);
             return null;
         }
-    }, 10000); // 10-second cache
+    }, 10000);
 }

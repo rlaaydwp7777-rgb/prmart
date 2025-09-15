@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,8 @@ import type { SellerProfile } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { updateProfile } from "firebase/auth";
+import { auth } from "@/lib/firebase/auth";
 
 export default function SettingsPage() {
     const { user } = useAuth();
@@ -22,18 +25,28 @@ export default function SettingsPage() {
     const [profile, setProfile] = useState<Partial<SellerProfile>>({
         sellerName: '',
         sellerBio: '',
+        photoUrl: '',
         bankName: '',
         accountNumber: '',
         accountHolder: '',
     });
+    const [displayName, setDisplayName] = useState(user?.displayName || "prmart user");
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         if (user) {
+            setDisplayName(user.displayName || "prmart user");
             getSellerProfile(user.uid).then(data => {
                 if (data) {
                     setProfile(data);
+                } else {
+                    // Pre-fill with auth data if no seller profile exists
+                    setProfile(prev => ({
+                        ...prev,
+                        sellerName: user.displayName || '',
+                        photoUrl: user.photoURL || '',
+                    }))
                 }
             }).finally(() => setIsLoading(false));
         }
@@ -49,9 +62,21 @@ export default function SettingsPage() {
         if (!user) return;
         setIsSaving(true);
         try {
-            await saveSellerProfile(user.uid, profile);
+            // Update Firebase Auth profile
+            await updateProfile(auth.currentUser!, {
+                displayName: displayName,
+                photoURL: profile.photoUrl,
+            });
+
+            // Update Seller Profile in Firestore
+            await saveSellerProfile(user.uid, {
+                ...profile,
+                sellerName: displayName, // Ensure sellerName is synced with displayName
+            });
+
             toast({ title: "성공", description: "프로필 정보가 저장되었습니다." });
         } catch (error) {
+            console.error("Error saving profile:", error);
             toast({ title: "오류", description: "저장에 실패했습니다.", variant: "destructive" });
         } finally {
             setIsSaving(false);
@@ -72,7 +97,7 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="name">{ACCOUNT_STRINGS.SETTINGS_NAME_LABEL}</Label>
-                        <Input id="name" defaultValue={user?.displayName || "prmart user"} />
+                        <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="email">{ACCOUNT_STRINGS.SETTINGS_EMAIL_LABEL}</Label>
@@ -89,7 +114,11 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
-                        <Input id="sellerName" name="sellerName" value={profile.sellerName || user?.displayName || ''} onChange={handleInputChange} />
+                        <Input id="sellerName" name="sellerName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="photoUrl">{SELLER_STRINGS.SELLER_PHOTO_URL_LABEL}</Label>
+                        <Input id="photoUrl" name="photoUrl" placeholder={SELLER_STRINGS.SELLER_PHOTO_URL_PLACEHOLDER} value={profile.photoUrl || ''} onChange={handleInputChange} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="sellerBio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
