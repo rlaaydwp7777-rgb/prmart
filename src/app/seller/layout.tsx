@@ -4,13 +4,13 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Sparkles, LayoutDashboard, Package, Settings, LifeBuoy, Landmark, Star, Users, BarChart2 } from "lucide-react";
+import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, BarChart2, LogOut } from "lucide-react";
 import { SIDEBAR_STRINGS, AUTH_STRINGS } from "@/lib/string-constants";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarProvider, Sidebar } from "@/components/ui/sidebar";
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { SellerHeader } from "@/components/layout/seller-header";
 
 const sidebarNavItems = [
@@ -36,12 +36,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <Skeleton className="h-full w-64" />
-        <div className="flex-1 p-8">
-            <Skeleton className="h-14 w-full mb-8" />
-            <Skeleton className="h-96 w-full" />
-        </div>
+      <div className="flex h-screen w-full items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -50,59 +46,70 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen">
-        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar text-sidebar-foreground fixed inset-y-0 left-0">
-            <div className="flex h-16 items-center border-b px-6 border-sidebar-border">
+      <div className="flex min-h-screen">
+        <Sidebar>
+          <SidebarContent>
+            <SidebarHeader>
               <Link href="/" className="flex items-center gap-2 font-semibold">
-                  <Sparkles className="h-6 w-6 text-sidebar-primary" />
-                  <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
+                <Sparkles className="h-6 w-6 text-sidebar-primary" />
+                <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
               </Link>
-            </div>
-            <nav className="flex-1 space-y-2 p-4">
+            </SidebarHeader>
+            <SidebarMenu>
               {sidebarNavItems.map((item) => (
-                  <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
-                      pathname === item.href ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" : "text-muted-foreground"
-                  }`}
-                  >
-                  <item.icon className="h-5 w-5" />
-                  <span className="text-base font-medium">{item.title}</span>
-                  </Link>
-              ))}
-            </nav>
-            <div className="mt-auto border-t p-4 border-sidebar-border">
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
-                        <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
-                        <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 truncate">
-                        <p className="text-sm font-medium">{user.displayName || 'prmart user'}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                    </div>
-                </div>
-                <Button variant="ghost" className="mt-2 w-full justify-start hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" asChild>
-                    <Link href="/account/settings">
-                        <LifeBuoy className="mr-2 h-4 w-4" />
-                        {SIDEBAR_STRINGS.ACCOUNT}
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton asChild isActive={pathname === item.href}>
+                    <Link href={item.href}>
+                      <item.icon />
+                      {item.title}
                     </Link>
-                </Button>
-                <Button variant="ghost" className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={signOut}>
-                    {AUTH_STRINGS.LOGOUT_LINK}
-                </Button>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter>
+            <div className="flex items-center gap-3">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
+                <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1 truncate">
+                <p className="text-sm font-medium">{user.displayName || 'prmart user'}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+              </div>
             </div>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={signOut}>
+                  <LogOut />
+                  {AUTH_STRINGS.LOGOUT_LINK}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarFooter>
         </Sidebar>
 
-        <div className="md:pl-64 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col">
+          <header className="sticky top-0 z-10 flex h-14 items-center justify-between border-b bg-background px-4 md:hidden">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+              <Sparkles className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg font-headline tracking-tight">prmart</span>
+            </Link>
+            <SidebarTrigger />
+          </header>
           <main className="flex-1 bg-muted/30">
-              <div className="p-4 sm:p-6 lg:p-8">
-                  {children}
-              </div>
+            <div className="p-4 sm:p-6 lg:p-8">
+              {children}
+            </div>
           </main>
         </div>
       </div>
     </SidebarProvider>
   );
 }
+
+// Custom Loader while auth is loading
+const Loader2 = ({ className, ...props }: React.SVGProps<SVGSVGElement>) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} {...props}><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+);
