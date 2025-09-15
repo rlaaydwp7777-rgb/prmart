@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -9,8 +10,8 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SellerHeader } from "@/components/layout/seller-header";
 import { SidebarProvider, Sidebar } from "@/components/ui/sidebar";
+import { SellerHeader } from "@/components/layout/seller-header";
 
 const sidebarNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
@@ -49,8 +50,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
 
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen bg-background text-foreground">
-        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar text-sidebar-foreground">
+      <div className="min-h-screen">
+        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar text-sidebar-foreground fixed inset-y-0 left-0">
             <div className="flex h-16 items-center border-b px-6 border-sidebar-border">
               <Link href="/" className="flex items-center gap-2 font-semibold">
                   <Sparkles className="h-6 w-6 text-sidebar-primary" />
@@ -94,10 +95,9 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
             </div>
         </Sidebar>
 
-        <div className="flex flex-1 flex-col">
-          <SellerHeader />
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-              <div className="mx-auto w-full max-w-7xl">
+        <div className="md:pl-64 flex flex-col min-h-screen">
+          <main className="flex-1 bg-muted/30">
+              <div className="p-4 sm:p-6 lg:p-8">
                   {children}
               </div>
           </main>
