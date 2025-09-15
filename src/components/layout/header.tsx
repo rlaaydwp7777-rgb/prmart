@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -65,7 +66,7 @@ export function Header({ categories }: HeaderProps) {
       <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
         {HEADER_LINKS.REQUEST_IDEA}
       </Link>
-      <Link href="/seller" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+      <Link href="/seller/products/add" className="font-medium text-muted-foreground transition-colors hover:text-primary">
         {HEADER_LINKS.START_SELLING}
       </Link>
     </>

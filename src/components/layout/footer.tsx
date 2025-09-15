@@ -1,3 +1,4 @@
+
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
 import { FOOTER_STRINGS } from "@/lib/string-constants";
@@ -23,7 +24,7 @@ export function Footer() {
               <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</Link></li>
               <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</Link></li>
               <li><Link href="/requests" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</Link></li>
-              <li><Link href="/seller/dashboard" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</Link></li>
+              <li><Link href="/seller/products/add" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</Link></li>
             </ul>
           </div>
 

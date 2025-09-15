@@ -149,7 +149,7 @@ export default async function Home() {
 
             <div className="flex justify-center flex-col gap-2 mt-6 min-[400px]:flex-row">
               <Button asChild size="lg">
-                <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                <Link href="/seller/products/add">{BUTTONS.START_SELLING}</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link href="/requests">
@@ -312,7 +312,7 @@ export default async function Home() {
             </div>
             <div className="mx-auto w-full flex justify-center">
               <Button asChild size="lg" variant="secondary" className="text-lg">
-                <Link href="/seller/dashboard">{BUTTONS.START_SELLING}</Link>
+                <Link href="/seller/products/add">{BUTTONS.START_SELLING}</Link>
               </Button>
             </div>
           </div>
