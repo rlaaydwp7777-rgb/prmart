@@ -15,7 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { signOut } from "@/lib/firebase/auth";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
-import { LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { LayoutDashboard, Cog, LogOut } from "lucide-react";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
@@ -52,7 +52,7 @@ export function AuthButtons() {
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
                 <Link href="/seller/settings">
-                    <Settings className="mr-2 h-4 w-4" />
+                    <Cog className="mr-2 h-4 w-4" />
                     <span>{SIDEBAR_STRINGS.SETTINGS}</span>
                 </Link>
             </DropdownMenuItem>
