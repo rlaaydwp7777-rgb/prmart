@@ -225,16 +225,18 @@ const generateExamplePrompts = (): Prompt[] => {
                     description: idea.desc,
                     author: authors[promptIdCounter % authors.length],
                     sellerId: `seller-${promptIdCounter % authors.length}`,
+                    sellerPhotoUrl: `https://picsum.photos/seed/${promptIdCounter}/100/100`,
                     category: category.name,
                     categorySlug: category.slug,
                     subCategorySlug: subCategory.slug,
-                    price: 0,
+                    price: 0, // 모든 예제 상품은 무료
                     image: `https://picsum.photos/seed/${promptId}/400/300`,
                     aiHint: `${subCategory.name.split(' ')[0]}`,
                     tags: [category.name, subCategory.name, "예제"],
-                    isExample: true,
+                    isExample: true, // 모든 예제 상품에 플래그 설정
                     visibility: 'public',
                     sellOnce: false,
+                    contentUrl: "https://prmart.ai/example-content",
                     createdAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     updatedAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     stats: {
@@ -262,8 +264,8 @@ const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
 const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, index) => {
     const examples = [
-        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", budget: 50000, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
-        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", budget: 20000, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
+        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", budget: 0, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
+        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", budget: 0, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
     ];
     const example = examples[index % examples.length];
     return {
@@ -275,7 +277,7 @@ const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, i
         budget: example.budget,
         proposals: Math.floor(Math.random() * 15),
         description: example.description,
-        isExample: true,
+        isExample: true, // 모든 예제 요청에 플래그 설정
         createdAt: new Date(Date.now() - (index * 1000 * 3600 * 24)).toISOString(),
     }
 });
@@ -306,11 +308,12 @@ export async function getProducts(): Promise<Prompt[]> {
     return fetchFromCache('products', async () => {
         try {
             const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
-            if (snapshot.empty) {
-                console.warn("Firestore 'products' collection is empty, returning example data.");
-                return EXAMPLE_PROMPTS;
+            const dbProducts = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
+            if (dbProducts.length === 0) {
+                 console.warn("Firestore 'products' collection is empty, returning example data.");
+                 return EXAMPLE_PROMPTS;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
+            return [...dbProducts, ...EXAMPLE_PROMPTS];
         } catch (error) {
             console.error("Error fetching products, returning example data:", error);
             return EXAMPLE_PROMPTS;
@@ -337,6 +340,10 @@ export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
 export async function getProduct(id: string): Promise<Prompt | null> {
     const cacheKey = `product_${id}`;
     return fetchFromCache(cacheKey, async () => {
+        if (id.startsWith('ex-')) {
+            const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
+            return exampleProduct || null;
+        }
         try {
             const docRef = doc(db, "products", id);
             const docSnap = await getDoc(docRef);
@@ -347,35 +354,17 @@ export async function getProduct(id: string): Promise<Prompt | null> {
              console.error(`Error fetching product ${id}, falling back to example data:`, error);
         }
         
-        const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
-        return exampleProduct || null;
+        return null;
     });
 }
 
 export async function getProductsByCategorySlug(slug: string, count?: number, excludeId?: string): Promise<Prompt[]> {
     const cacheKey = `products_by_category_${slug}_${count}_${excludeId}`;
     return fetchFromCache(cacheKey, async () => {
-        try {
-            const q = query(collection(db, "products"), where("categorySlug", "==", slug));
-            const snapshot = await getDocs(q);
-
-            if (snapshot.empty) {
-                console.warn(`Firestore 'products' collection has no items for slug '${slug}', returning example data.`);
-                const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
-                 let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : exampleProducts;
-                 return count ? filteredExamples.slice(0, count) : filteredExamples;
-            } 
-            
-            const products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            let filteredProducts = excludeId ? products.filter(p => p.id !== excludeId) : products;
-            return count ? filteredProducts.slice(0, count) : filteredProducts;
-
-        } catch (error) {
-            console.error(`Error fetching products for category ${slug}, returning example data:`, error);
-            const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.categorySlug === slug);
-            let filteredExamples = excludeId ? exampleProducts.filter(p => p.id !== excludeId) : [];
-            return count ? filteredExamples.slice(0, count) : [];
-        }
+        const allProducts = await getProducts();
+        const productsInCategory = allProducts.filter(p => p.categorySlug === slug);
+        let filteredProducts = excludeId ? productsInCategory.filter(p => p.id !== excludeId) : productsInCategory;
+        return count ? filteredProducts.slice(0, count) : filteredProducts;
     });
 }
 
@@ -405,11 +394,12 @@ export async function getIdeaRequests(): Promise<IdeaRequest[]> {
     return fetchFromCache('ideaRequests', async () => {
         try {
             const snapshot = await getDocs(query(collection(db, "ideaRequests"), orderBy("createdAt", "desc")));
-            if (snapshot.empty) {
+            const dbRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
+             if (dbRequests.length === 0) {
                 console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
                 return EXAMPLE_IDEA_REQUESTS;
             }
-            return snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
+            return [...dbRequests, ...EXAMPLE_IDEA_REQUESTS];
         } catch (error) {
             console.error("Error fetching idea requests, returning example data:", error);
             return EXAMPLE_IDEA_REQUESTS;
@@ -420,6 +410,10 @@ export async function getIdeaRequests(): Promise<IdeaRequest[]> {
 export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     const cacheKey = `ideaRequest_${id}`;
     return fetchFromCache(cacheKey, async () => {
+        if (id.startsWith('req-')) {
+            const exampleRequest = EXAMPLE_IDEA_REQUESTS.find(r => r.id === id);
+            return exampleRequest || null;
+        }
         try {
             const docRef = doc(db, "ideaRequests", id);
             const docSnap = await getDoc(docRef);
@@ -427,11 +421,10 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
                 return serializeDoc(docSnap) as IdeaRequest;
             }
         } catch (error) {
-            console.error(`Error fetching idea request ${id}, falling back to example data:`, error);
+            console.error(`Error fetching idea request ${id}:`, error);
         }
 
-        const exampleRequest = EXAMPLE_IDEA_REQUESTS.find(r => r.id === id);
-        return exampleRequest || null;
+        return null;
     });
 }
 
@@ -454,11 +447,12 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
     }
 }
 
-export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt'>) {
+export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "ideaRequests"), {
             ...requestData,
+            isExample: false,
             createdAt: now,
         });
         return docRef.id;
@@ -485,7 +479,7 @@ export async function getSellerDashboardData(sellerId: string) {
             // 1. Fetch orders by sellerId directly for better performance
             const ordersQuery = query(collection(db, "orders"), where("sellerId", "==", sellerId));
             const ordersSnapshot = await getDocs(ordersQuery);
-            const orders: Order[] = ordersSnapshot.docs.map(doc => serializeDoc(doc) as Order);
+            const orders: Order[] = ordersSnapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
             orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
 
             // 2. Fetch products by seller

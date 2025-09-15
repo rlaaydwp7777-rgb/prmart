@@ -10,17 +10,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { SELLER_STRINGS, ACCOUNT_STRINGS } from "@/lib/string-constants";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useToast } from "@/hooks/use-toast";
-import { getSellerProfile, saveSellerProfile } from "@/lib/firebase/services";
-import { useEffect, useState } from "react";
+import { getSellerProfile } from "@/lib/firebase/services";
+import { useEffect, useState, useRef } from "react";
 import type { SellerProfile } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
-import { updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase/auth";
+import { useActionState } from "react";
+import { updateSellerProfileAction } from "@/app/actions";
+
+
+const initialState = {
+  message: "",
+  success: false,
+};
 
 export default function SettingsPage() {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const [profile, setProfile] = useState<Partial<SellerProfile>>({
         sellerName: '',
@@ -30,17 +36,17 @@ export default function SettingsPage() {
         accountNumber: '',
         accountHolder: '',
     });
-    const [displayName, setDisplayName] = useState(user?.displayName || "prmart user");
+    
     const [isLoading, setIsLoading] = useState(true);
-    const [isSaving, setIsSaving] = useState(false);
+    const [state, formAction] = useActionState(updateSellerProfileAction, initialState);
+    const formRef = useRef<HTMLFormElement>(null);
+    
 
     useEffect(() => {
         if (user) {
-            setDisplayName(user.displayName || "prmart user");
             getSellerProfile(user.uid).then(data => {
                 if (data) {
                     setProfile(data);
-                    setDisplayName(data.sellerName || user.displayName || "");
                 } else {
                     // Pre-fill with auth data if no seller profile exists
                     setProfile(prev => ({
@@ -50,48 +56,34 @@ export default function SettingsPage() {
                     }))
                 }
             }).finally(() => setIsLoading(false));
+        } else if (!authLoading) {
+            setIsLoading(false);
         }
-    }, [user]);
+    }, [user, authLoading]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setProfile(prev => ({ ...prev, [name]: value }));
-    }
-
-    const handleFormSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!user || !auth.currentUser) return;
-        setIsSaving(true);
-        try {
-             const sellerProfileToSave: Partial<SellerProfile> = {
-                ...profile,
-                sellerName: displayName,
-            };
-
-            // Update Firebase Auth profile
-            await updateProfile(auth.currentUser, {
-                displayName: displayName,
-                photoURL: profile.photoUrl,
+    useEffect(() => {
+        if (state.message) {
+            toast({
+                title: state.success ? "성공" : "오류",
+                description: state.message,
+                variant: state.success ? "default" : "destructive",
             });
-
-            // Update Seller Profile in Firestore
-            await saveSellerProfile(user.uid, sellerProfileToSave);
-
-            toast({ title: "성공", description: "프로필 정보가 저장되었습니다." });
-        } catch (error) {
-            console.error("Error saving profile:", error);
-            toast({ title: "오류", description: "저장에 실패했습니다.", variant: "destructive" });
-        } finally {
-            setIsSaving(false);
         }
-    }
+    }, [state, toast]);
+    
 
-    if (isLoading) {
+    if (isLoading || authLoading) {
         return <div className="flex justify-center items-center h-full"><Loader2 className="h-8 w-8 animate-spin" /></div>;
+    }
+    
+    if (!user) {
+        return <div>로그인이 필요합니다.</div>
     }
 
     return (
-        <form onSubmit={handleFormSubmit} className="space-y-6">
+        <form ref={formRef} action={formAction} className="space-y-6">
+            <input type="hidden" name="userId" value={user.uid} />
+
             <Card>
                 <CardHeader>
                     <CardTitle>{ACCOUNT_STRINGS.SETTINGS_PROFILE_TITLE}</CardTitle>
@@ -99,12 +91,16 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="name">{ACCOUNT_STRINGS.SETTINGS_NAME_LABEL}</Label>
-                        <Input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                        <Label htmlFor="sellerName">{ACCOUNT_STRINGS.SETTINGS_NAME_LABEL}</Label>
+                        <Input id="sellerName" name="sellerName" defaultValue={profile.sellerName || user.displayName || ""} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="email">{ACCOUNT_STRINGS.SETTINGS_EMAIL_LABEL}</Label>
-                        <Input id="email" type="email" defaultValue={user?.email || "prmart@example.com"} disabled />
+                        <Input id="email" type="email" defaultValue={user.email || ""} disabled />
+                    </div>
+                     <div className="space-y-2">
+                        <Label htmlFor="photoUrl">{SELLER_STRINGS.SELLER_PHOTO_URL_LABEL}</Label>
+                        <Input id="photoUrl" name="photoUrl" placeholder={SELLER_STRINGS.SELLER_PHOTO_URL_PLACEHOLDER} defaultValue={profile.photoUrl || ''} />
                     </div>
                 </CardContent>
             </Card>
@@ -116,16 +112,8 @@ export default function SettingsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
-                        <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
-                        <Input id="sellerName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                    </div>
-                     <div className="space-y-2">
-                        <Label htmlFor="photoUrl">{SELLER_STRINGS.SELLER_PHOTO_URL_LABEL}</Label>
-                        <Input id="photoUrl" name="photoUrl" placeholder={SELLER_STRINGS.SELLER_PHOTO_URL_PLACEHOLDER} value={profile.photoUrl || ''} onChange={handleInputChange} />
-                    </div>
-                    <div className="space-y-2">
                         <Label htmlFor="sellerBio">{SELLER_STRINGS.SELLER_BIO_LABEL}</Label>
-                        <Textarea id="sellerBio" name="sellerBio" placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER} value={profile.sellerBio || ''} onChange={handleInputChange} />
+                        <Textarea id="sellerBio" name="sellerBio" placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER} defaultValue={profile.sellerBio || ''} />
                     </div>
                 </CardContent>
             </Card>
@@ -138,15 +126,15 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="bankName">{SELLER_STRINGS.BANK_NAME_LABEL}</Label>
-                        <Input id="bankName" name="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} value={profile.bankName || ''} onChange={handleInputChange} />
+                        <Input id="bankName" name="bankName" placeholder={SELLER_STRINGS.BANK_NAME_PLACEHOLDER} defaultValue={profile.bankName || ''} />
                     </div>
                     <div className="space-y-2">
                         <Label htmlFor="accountNumber">{SELLER_STRINGS.ACCOUNT_NUMBER_LABEL}</Label>
-                        <Input id="accountNumber" name="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} value={profile.accountNumber || ''} onChange={handleInputChange} />
+                        <Input id="accountNumber" name="accountNumber" placeholder={SELLER_STRINGS.ACCOUNT_NUMBER_PLACEHOLDER} defaultValue={profile.accountNumber || ''} />
                     </div>
                         <div className="space-y-2">
                         <Label htmlFor="accountHolder">{SELLER_STRINGS.ACCOUNT_HOLDER_LABEL}</Label>
-                        <Input id="accountHolder" name="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder || ''} onChange={handleInputChange} />
+                        <Input id="accountHolder" name="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} defaultValue={profile.accountHolder || ''} />
                     </div>
                 </CardContent>
             </Card>
@@ -181,14 +169,12 @@ export default function SettingsPage() {
                         <Switch id="security" defaultChecked disabled />
                     </div>
                 </CardContent>
+                 <CardFooter>
+                    <Button type="submit">
+                        {ACCOUNT_STRINGS.SETTINGS_SAVE_BUTTON}
+                    </Button>
+                </CardFooter>
             </Card>
-            
-            <div className="flex justify-end">
-                <Button type="submit" disabled={isSaving}>
-                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {ACCOUNT_STRINGS.SETTINGS_SAVE_BUTTON}
-                </Button>
-            </div>
         </form>
     );
 }

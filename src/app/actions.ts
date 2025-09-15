@@ -7,8 +7,9 @@ import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-
 import { z } from "zod";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { saveProduct, getCategories, saveIdeaRequest, saveProposal } from "@/lib/firebase/services";
+import { saveProduct, getCategories, saveIdeaRequest, saveProposal, getSellerProfile, saveSellerProfile } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
+import { updateProfile } from "firebase/auth";
 
 
 // --- Auth Actions ---
@@ -192,6 +193,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
           sellerPhotoUrl: sellerPhotoUrl || "",
           visibility,
           sellOnce,
+          isExample: false,
           contentUrl: contentUrl || "",
         });
 
@@ -309,4 +311,56 @@ export async function createProposalAction(prevState: FormState, formData: FormD
             message: "제안 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
         };
     }
+}
+
+
+const sellerProfileSchema = z.object({
+  sellerName: z.string().min(2, "판매자 이름은 2자 이상이어야 합니다."),
+  sellerBio: z.string().max(100, "소개는 100자 이하여야 합니다.").optional(),
+  photoUrl: z.string().url("유효한 URL을 입력해주세요.").or(z.literal('')).optional(),
+  bankName: z.string().optional(),
+  accountNumber: z.string().optional(),
+  accountHolder: z.string().optional(),
+  userId: z.string(),
+});
+
+export async function updateSellerProfileAction(prevState: any, formData: FormData) {
+  const rawData = Object.fromEntries(formData.entries());
+  
+  const validatedFields = sellerProfileSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
+    };
+  }
+  
+  const { userId, sellerName, photoUrl, ...sellerProfileData } = validatedFields.data;
+
+  if (!auth.currentUser || auth.currentUser.uid !== userId) {
+    return { success: false, message: "인증 정보가 일치하지 않습니다." };
+  }
+
+  try {
+    // Update Firebase Auth profile
+    await updateProfile(auth.currentUser, {
+        displayName: sellerName,
+        photoURL: photoUrl,
+    });
+    
+    // Update Seller Profile in Firestore
+    await saveSellerProfile(userId, {
+        sellerName,
+        photoUrl,
+        ...sellerProfileData,
+    });
+    
+    revalidatePath('/seller/settings');
+    
+    return { success: true, message: "프로필 정보가 성공적으로 저장되었습니다." };
+  } catch (error) {
+    console.error("Error saving profile:", error);
+    return { success: false, message: "프로필 저장 중 오류가 발생했습니다." };
+  }
 }
