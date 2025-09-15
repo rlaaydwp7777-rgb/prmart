@@ -47,6 +47,9 @@ export default function OrdersPage() {
         {orders.length === 0 ? (
             <div className="text-center py-10">
                 <p className="text-muted-foreground">{ACCOUNT_STRINGS.ORDERS_EMPTY}</p>
+                <Button asChild variant="link" className="mt-2">
+                    <Link href="/browse">상품 둘러보기</Link>
+                </Button>
             </div>
         ) : (
             <Table>

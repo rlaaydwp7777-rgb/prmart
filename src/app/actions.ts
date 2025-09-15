@@ -7,7 +7,7 @@ import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-
 import { z } from "zod";
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { FirebaseError } from "firebase/app";
-import { saveProduct, getCategories, saveIdeaRequest } from "@/lib/firebase/services";
+import { saveProduct, getCategories, saveIdeaRequest, saveProposal } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
 
 
@@ -273,4 +273,40 @@ export async function createIdeaRequestAction(prevState: FormState, formData: Fo
       fields: validatedFields.data
     };
   }
+}
+
+const proposalSchema = z.object({
+  content: z.string().min(10, "제안 내용은 10자 이상이어야 합니다."),
+  requestId: z.string(),
+  authorId: z.string(),
+  authorName: z.string(),
+  authorAvatar: z.string().url().or(z.literal('')),
+});
+
+export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
+    const rawData = Object.fromEntries(formData.entries());
+    const validatedFields = proposalSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: "입력 값을 다시 확인해주세요.",
+            issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : ["유효성 검사에 실패했습니다."],
+        };
+    }
+
+    try {
+        await saveProposal(validatedFields.data);
+        revalidatePath(`/requests/${validatedFields.data.requestId}`);
+        return {
+            success: true,
+            message: "제안이 성공적으로 등록되었습니다!",
+        };
+    } catch (error) {
+        console.error("Error creating proposal:", error);
+        return {
+            success: false,
+            message: "제안 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
+        };
+    }
 }

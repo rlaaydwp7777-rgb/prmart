@@ -40,6 +40,7 @@ export default function SettingsPage() {
             getSellerProfile(user.uid).then(data => {
                 if (data) {
                     setProfile(data);
+                    setDisplayName(data.sellerName || user.displayName || "");
                 } else {
                     // Pre-fill with auth data if no seller profile exists
                     setProfile(prev => ({
@@ -59,20 +60,22 @@ export default function SettingsPage() {
 
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!user) return;
+        if (!user || !auth.currentUser) return;
         setIsSaving(true);
         try {
+             const sellerProfileToSave: Partial<SellerProfile> = {
+                ...profile,
+                sellerName: displayName,
+            };
+
             // Update Firebase Auth profile
-            await updateProfile(auth.currentUser!, {
+            await updateProfile(auth.currentUser, {
                 displayName: displayName,
                 photoURL: profile.photoUrl,
             });
 
             // Update Seller Profile in Firestore
-            await saveSellerProfile(user.uid, {
-                ...profile,
-                sellerName: displayName, // Ensure sellerName is synced with displayName
-            });
+            await saveSellerProfile(user.uid, sellerProfileToSave);
 
             toast({ title: "성공", description: "프로필 정보가 저장되었습니다." });
         } catch (error) {
@@ -114,7 +117,7 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
                         <Label htmlFor="sellerName">{SELLER_STRINGS.SELLER_NAME_LABEL}</Label>
-                        <Input id="sellerName" name="sellerName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+                        <Input id="sellerName" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
                     </div>
                      <div className="space-y-2">
                         <Label htmlFor="photoUrl">{SELLER_STRINGS.SELLER_PHOTO_URL_LABEL}</Label>

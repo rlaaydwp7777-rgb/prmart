@@ -10,6 +10,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { getOrdersByBuyer } from "@/lib/firebase/services";
 import { useEffect, useState } from "react";
 import type { Order } from "@/lib/types";
+import Link from "next/link";
 
 export default function DownloadsPage() {
     const { user, loading: authLoading } = useAuth();
@@ -47,6 +48,9 @@ export default function DownloadsPage() {
         {purchasedItems.length === 0 ? (
             <div className="text-center py-10">
                 <p className="text-muted-foreground">{ACCOUNT_STRINGS.DOWNLOADS_EMPTY}</p>
+                 <Button asChild variant="link" className="mt-2">
+                    <Link href="/browse">상품 둘러보기</Link>
+                </Button>
             </div>
         ) : (
             <Table>

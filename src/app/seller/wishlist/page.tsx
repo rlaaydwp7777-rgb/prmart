@@ -9,6 +9,8 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect, useState } from "react";
 import type { Prompt } from "@/lib/types";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function WishlistPage() {
     const { user, loading: authLoading } = useAuth();
@@ -52,6 +54,9 @@ export default function WishlistPage() {
                 ) : (
                      <div className="text-center py-10">
                         <p className="text-muted-foreground">{ACCOUNT_STRINGS.WISHLIST_EMPTY}</p>
+                         <Button asChild variant="link" className="mt-2">
+                            <Link href="/browse">상품 둘러보기</Link>
+                        </Button>
                     </div>
                 )}
             </CardContent>

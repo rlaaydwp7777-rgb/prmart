@@ -82,8 +82,14 @@ export default function SellerProductsPage() {
         </CardHeader>
         <CardContent>
         {products.length === 0 ? (
-            <div className="text-center py-10 border rounded-lg bg-card flex items-center justify-center h-48">
+            <div className="text-center py-10 border rounded-lg bg-card flex flex-col items-center justify-center h-48 gap-4">
                 <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_PRODUCTS_DATA}</p>
+                 <Button asChild>
+                    <Link href="/seller/products/add">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        {SELLER_STRINGS.ADD_FIRST_PRODUCT}
+                    </Link>
+                </Button>
             </div>
         ) : (
             <Table>

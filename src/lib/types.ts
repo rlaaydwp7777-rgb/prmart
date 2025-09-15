@@ -117,3 +117,14 @@ export interface Wishlist {
     userId: string;
     productIds: string[];
 }
+
+export interface Proposal {
+    id?: string;
+    requestId: string;
+    authorId: string;
+    authorName: string;
+    authorAvatar: string;
+    content: string;
+    productId?: string;
+    createdAt: string;
+}

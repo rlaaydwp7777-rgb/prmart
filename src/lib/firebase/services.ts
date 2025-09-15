@@ -2,7 +2,7 @@
 
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist } from "@/lib/types";
+import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist, Proposal } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, { ts: number, data: any }>();
@@ -522,6 +522,7 @@ export async function getSellerDashboardData(sellerId: string) {
                     const product = sellerProducts.find(p => p.id === productId);
                     return { ...product, ...salesByProduct[productId] };
                 })
+                .filter(p => p.id) // Filter out cases where product was not found
                 .sort((a, b) => b.sales - a.sales)
                 .slice(0, 3) as (Prompt & { sales: number; revenue: number; })[];
             
@@ -612,4 +613,19 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
             return null;
         }
     }, 10000);
+}
+
+
+export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt'>): Promise<string> {
+    try {
+        const now = Timestamp.now();
+        const docRef = await addDoc(collection(db, "proposals"), {
+            ...proposalData,
+            createdAt: now,
+        });
+        return docRef.id;
+    } catch (error) {
+        console.error("Error saving proposal: ", error);
+        throw new Error("제안을 데이터베이스에 저장하는 데 실패했습니다.");
+    }
 }
