@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -10,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { SellerHeader } from "@/components/layout/seller-header";
+import { SidebarProvider, Sidebar } from "@/components/ui/sidebar";
 
 const sidebarNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
@@ -20,7 +22,6 @@ const sidebarNavItems = [
   { href: "/seller/payouts", icon: Landmark, title: SIDEBAR_STRINGS.PAYOUTS },
   { href: "/seller/settings", icon: Settings, title: SIDEBAR_STRINGS.SETTINGS },
 ];
-
 
 function SellerLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
@@ -48,62 +49,64 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
   const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      {/* Sidebar */}
-      <aside className="hidden w-64 flex-col border-r bg-muted/20 md:flex">
-        <div className="flex h-16 items-center border-b px-6">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
-          </Link>
-        </div>
-        <nav className="flex-1 space-y-2 p-4">
-          {sidebarNavItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-primary/10 hover:text-primary ${
-                pathname === item.href ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground"
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-base font-medium">{item.title}</span>
+    <SidebarProvider>
+        <div className="flex min-h-screen bg-background text-foreground">
+        {/* Sidebar */}
+        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-muted/40">
+            <div className="flex h-16 items-center border-b px-6">
+            <Link href="/" className="flex items-center gap-2 font-semibold">
+                <Sparkles className="h-6 w-6 text-primary" />
+                <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
             </Link>
-          ))}
-        </nav>
-        <div className="mt-auto border-t p-4">
-            <div className="flex items-center gap-3">
-                 <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
-                    <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1 truncate">
-                    <p className="text-sm font-medium">{user.displayName || 'prmart user'}</p>
-                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
-                </div>
             </div>
-             <Button variant="ghost" className="mt-2 w-full justify-start" asChild>
-                <Link href="/account/settings">
-                    <LifeBuoy className="mr-2 h-4 w-4" />
-                    {SIDEBAR_STRINGS.ACCOUNT}
+            <nav className="flex-1 space-y-2 p-4">
+            {sidebarNavItems.map((item) => (
+                <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-primary/10 hover:text-primary ${
+                    pathname === item.href ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground"
+                }`}
+                >
+                <item.icon className="h-5 w-5" />
+                <span className="text-base font-medium">{item.title}</span>
                 </Link>
-            </Button>
-            <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
-                {SIDEBAR_STRINGS.LOGOUT_LINK}
-            </Button>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex flex-1 flex-col">
-        <SellerHeader />
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="mx-auto w-full max-w-7xl">
-                {children}
+            ))}
+            </nav>
+            <div className="mt-auto border-t p-4">
+                <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                        <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
+                        <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 truncate">
+                        <p className="text-sm font-medium">{user.displayName || 'prmart user'}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                </div>
+                <Button variant="ghost" className="mt-2 w-full justify-start" asChild>
+                    <Link href="/account/settings">
+                        <LifeBuoy className="mr-2 h-4 w-4" />
+                        {SIDEBAR_STRINGS.ACCOUNT}
+                    </Link>
+                </Button>
+                <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
+                    {SIDEBAR_STRINGS.LOGOUT_LINK}
+                </Button>
             </div>
-        </main>
-      </div>
-    </div>
+        </Sidebar>
+
+        {/* Main Content */}
+        <div className="flex flex-1 flex-col">
+            <SellerHeader />
+            <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                <div className="mx-auto w-full max-w-7xl">
+                    {children}
+                </div>
+            </main>
+        </div>
+        </div>
+    </SidebarProvider>
   );
 }
 
