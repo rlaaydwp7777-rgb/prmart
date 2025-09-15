@@ -23,6 +23,7 @@ const buyerNavItems = [
 
 const sellerNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
+  { href: "/seller/products/add", icon: PlusCircle, title: SELLER_STRINGS.ADD_NEW_PRODUCT },
   { href: "/seller/products", icon: Package, title: SIDEBAR_STRINGS.PRODUCTS },
   { href: "/seller/analytics", icon: BarChart2, title: SIDEBAR_STRINGS.ANALYTICS },
   { href: "/seller/reviews", icon: Star, title: SIDEBAR_STRINGS.REVIEWS },
@@ -146,8 +147,8 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
                 </div>
                 <div className="w-8"></div>
             </header>
-            <main className="flex flex-col flex-1 gap-4 p-4 sm:p-6 lg:p-8 bg-background overflow-y-auto">
-                <div className="mx-auto w-full max-w-7xl">
+            <main className="flex-1 overflow-y-auto bg-background">
+                <div className="p-4 sm:p-6 lg:p-8">
                     <div className="space-y-0.5 mb-4">
                         <h1 className="text-2xl font-bold tracking-tight font-headline">{ACCOUNT_STRINGS.HEADLINE}</h1>
                         <p className="text-muted-foreground">{ACCOUNT_STRINGS.SUBHEADLINE}</p>

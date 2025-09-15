@@ -44,7 +44,7 @@ export default function SettingsPage() {
         setProfile(prev => ({ ...prev, [name]: value }));
     }
 
-    const handleProfileSave = async (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!user) return;
         setIsSaving(true);
@@ -63,8 +63,8 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="space-y-6">
-            <Card as="form" onSubmit={handleProfileSave}>
+        <form onSubmit={handleFormSubmit} className="space-y-6">
+            <Card>
                 <CardHeader>
                     <CardTitle>{ACCOUNT_STRINGS.SETTINGS_PROFILE_TITLE}</CardTitle>
                     <CardDescription>{ACCOUNT_STRINGS.SETTINGS_PROFILE_DESC}</CardDescription>
@@ -79,15 +79,9 @@ export default function SettingsPage() {
                         <Input id="email" type="email" defaultValue={user?.email || "prmart@example.com"} disabled />
                     </div>
                 </CardContent>
-                 <CardFooter>
-                    <Button type="submit" disabled={isSaving}>
-                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {ACCOUNT_STRINGS.SETTINGS_SAVE_BUTTON}
-                    </Button>
-                </CardFooter>
             </Card>
 
-            <Card as="form" onSubmit={handleProfileSave}>
+            <Card>
                 <CardHeader>
                     <CardTitle>{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
                     <CardDescription>{SELLER_STRINGS.PROFILE_DESC}</CardDescription>
@@ -102,15 +96,9 @@ export default function SettingsPage() {
                         <Textarea id="sellerBio" name="sellerBio" placeholder={SELLER_STRINGS.SELLER_BIO_PLACEHOLDER} value={profile.sellerBio || ''} onChange={handleInputChange} />
                     </div>
                 </CardContent>
-                <CardFooter>
-                    <Button type="submit" disabled={isSaving}>
-                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {SELLER_STRINGS.SAVE_PROFILE}
-                    </Button>
-                </CardFooter>
             </Card>
             
-            <Card as="form" onSubmit={handleProfileSave}>
+            <Card>
                 <CardHeader>
                     <CardTitle>{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
                     <CardDescription>{SELLER_STRINGS.PAYOUTS_DESC}</CardDescription>
@@ -129,12 +117,6 @@ export default function SettingsPage() {
                         <Input id="accountHolder" name="accountHolder" placeholder={SELLER_STRINGS.ACCOUNT_HOLDER_PLACEHOLDER} value={profile.accountHolder || ''} onChange={handleInputChange} />
                     </div>
                 </CardContent>
-                <CardFooter>
-                    <Button type="submit" disabled={isSaving}>
-                        {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {SELLER_STRINGS.SAVE_ACCOUNT_INFO}
-                    </Button>
-                </CardFooter>
             </Card>
 
             <Card>
@@ -168,6 +150,13 @@ export default function SettingsPage() {
                     </div>
                 </CardContent>
             </Card>
-        </div>
+            
+            <div className="flex justify-end">
+                <Button type="submit" disabled={isSaving}>
+                    {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {ACCOUNT_STRINGS.SETTINGS_SAVE_BUTTON}
+                </Button>
+            </div>
+        </form>
     );
 }
