@@ -13,7 +13,7 @@ import { Loader2, Menu } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_STRINGS, AUTH_STRINGS, SELLER_STRINGS } from "@/lib/string-constants";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const sidebarNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
