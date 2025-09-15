@@ -80,20 +80,20 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
         </div>
         <div className="flex-1 overflow-y-auto">
             <nav className="p-2 space-y-2">
-                <div>
-                  <h3 className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">구매 활동</h3>
-                  <div className="space-y-1 mt-1">
-                    {buyerNavItems.map((item) => <NavLink key={item.href} item={item} />)}
-                  </div>
-                </div>
-                
-                <Separator className="bg-sidebar-border/50" />
-                
-                <div>
+                 <div>
                    <h3 className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">판매 활동</h3>
                    <div className="space-y-1 mt-1">
                      <NavLink item={{ href: "/seller/products/add", icon: PlusCircle, title: SELLER_STRINGS.ADD_NEW_PRODUCT }} />
                     {sellerNavItems.map((item) => <NavLink key={item.href} item={item} />)}
+                  </div>
+                </div>
+
+                <Separator className="bg-sidebar-border/50" />
+
+                <div>
+                  <h3 className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">구매 활동</h3>
+                  <div className="space-y-1 mt-1">
+                    {buyerNavItems.map((item) => <NavLink key={item.href} item={item} />)}
                   </div>
                 </div>
             </nav>
