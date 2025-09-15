@@ -1,4 +1,7 @@
 
+"use client";
+
+import * as React from "react";
 import {
   Card,
   CardContent,
@@ -6,30 +9,54 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
 import { SELLER_STRINGS } from "@/lib/string-constants"
-import { BarChart, BadgeDollarSign, Package, Star } from "lucide-react";
+import { BarChart, BadgeDollarSign, Package, Star, Loader2 } from "lucide-react";
 import { getSellerDashboardData } from "@/lib/firebase/services";
-import { auth } from "@/lib/firebase/auth";
-import { redirect } from "next/navigation";
+import { useAuth } from "@/components/auth/auth-provider";
 import { Overview } from "@/components/seller/overview";
 import { RecentSales } from "@/components/seller/recent-sales";
 import { PromptCard } from "@/components/prompts/prompt-card";
+import { useRouter } from "next/navigation";
+import type { SellerStats, Order, Prompt } from "@/lib/types";
 
-export default async function SellerDashboardPage() {
-    const user = auth.currentUser;
-    if(!user) {
-        redirect('/login');
+type DashboardData = {
+    stats: SellerStats;
+    recentSales: Order[];
+    bestSellers: (Prompt & { sales: number; revenue: number; })[];
+    salesByMonth: { name: string; total: number; }[];
+}
+
+export default function SellerDashboardPage() {
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
+    const [data, setData] = React.useState<DashboardData | null>(null);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        if (!authLoading) {
+            if (!user) {
+                router.push('/login');
+            } else {
+                getSellerDashboardData(user.uid)
+                    .then(setData)
+                    .finally(() => setLoading(false));
+            }
+        }
+    }, [user, authLoading, router]);
+    
+    if (authLoading || loading) {
+        return (
+            <div className="flex h-[80vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
     }
     
-    const { stats, recentSales, bestSellers, salesByMonth } = await getSellerDashboardData(user.uid);
+    if (!data) {
+        return <p>데이터를 불러오는데 실패했습니다.</p>;
+    }
+    
+    const { stats, recentSales, bestSellers, salesByMonth } = data;
     
     return (
         <div className="grid gap-4 md:gap-8">
@@ -41,9 +68,6 @@ export default async function SellerDashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</div>
-                    <p className="text-xs text-muted-foreground">
-                        {/* Based on last month, etc. - can be added later */}
-                    </p>
                 </CardContent>
                 </Card>
                 <Card>
@@ -53,9 +77,6 @@ export default async function SellerDashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">+{stats.totalSales}</div>
-                    <p className="text-xs text-muted-foreground">
-                        {/* Based on last month, etc. - can be added later */}
-                    </p>
                 </CardContent>
                 </Card>
                 <Card>
@@ -65,9 +86,6 @@ export default async function SellerDashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="text-2xl font-bold">{stats.productCount}</div>
-                     <p className="text-xs text-muted-foreground">
-                        {/* Based on last month, etc. - can be added later */}
-                    </p>
                 </CardContent>
                 </Card>
                 <Card>

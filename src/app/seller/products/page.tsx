@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Table,
   TableBody,
@@ -8,7 +10,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Loader2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,18 +23,54 @@ import Image from "next/image";
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_STRINGS } from "@/lib/string-constants";
 import { getProductsBySeller } from "@/lib/firebase/services";
-import { auth } from "@/lib/firebase/auth";
-import { redirect } from "next/navigation";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useAuth } from "@/components/auth/auth-provider";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { format } from 'date-fns';
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import type { Prompt } from "@/lib/types";
 
-export default async function SellerProductsPage() {
-    const user = auth.currentUser;
-    if (!user) {
-        redirect('/login');
+export default function SellerProductsPage() {
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
+    const [products, setProducts] = React.useState<Prompt[]>([]);
+    const [loading, setLoading] = React.useState(true);
+
+    const fetchProducts = React.useCallback(async (userId: string) => {
+        setLoading(true);
+        try {
+            const fetchedProducts = await getProductsBySeller(userId);
+            setProducts(fetchedProducts);
+        } catch (error) {
+            console.error("Failed to fetch products:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    React.useEffect(() => {
+        if (!authLoading) {
+            if (user) {
+                fetchProducts(user.uid);
+            } else {
+                router.push('/login');
+            }
+        }
+    }, [user, authLoading, router, fetchProducts]);
+
+    const handleProductRegistered = () => {
+        if (user) {
+            fetchProducts(user.uid);
+        }
     }
 
-    const products = await getProductsBySeller(user.uid);
+    if (authLoading || loading) {
+        return (
+            <div className="flex h-[80vh] w-full items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+        );
+    }
   
   return (
     <div className="grid md:grid-cols-3 gap-8 mt-4">
@@ -71,11 +109,12 @@ export default async function SellerProductsPage() {
                                         height="64"
                                         src={product.image}
                                         width="64"
+                                        data-ai-hint={product.aiHint}
                                     />
                                 </TableCell>
                                 <TableCell className="font-medium">{product.title}</TableCell>
                                 <TableCell>
-                                    <Badge variant="outline">{/* Status Logic Here */ SELLER_STRINGS.PRODUCT_STATUS_ACTIVE}</Badge>
+                                    <Badge variant="outline">{ SELLER_STRINGS.PRODUCT_STATUS_ACTIVE}</Badge>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">₩{product.price.toLocaleString()}</TableCell>
                                 <TableCell className="hidden md:table-cell">{product.stats.sales}</TableCell>
@@ -116,7 +155,7 @@ export default async function SellerProductsPage() {
         </div>
         <div className="md:col-span-1">
             <h2 className="text-2xl font-bold tracking-tight mb-4">{SELLER_STRINGS.ADD_NEW_PRODUCT}</h2>
-            <ProductRegistrationForm />
+            <ProductRegistrationForm onProductRegistered={handleProductRegistered} />
         </div>
     </div>
   )
