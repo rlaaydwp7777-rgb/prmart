@@ -15,13 +15,13 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { signOut } from "@/lib/firebase/auth";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
-import { LayoutDashboard, Cog, LogOut } from "lucide-react";
+import { LayoutDashboard, Cog, LogOut, ChevronDown } from "lucide-react";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return <div className="h-10 w-24 animate-pulse rounded-md bg-muted" />;
+    return <div className="h-10 w-32 animate-pulse rounded-md bg-muted" />;
   }
 
   if (user) {
@@ -29,11 +29,16 @@ export function AuthButtons() {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-            <Avatar className="h-10 w-10">
+          <Button variant="ghost" className="flex items-center gap-3 h-12 px-3">
+             <Avatar className="h-9 w-9">
               <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
               <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
             </Avatar>
+            <div className="text-left hidden md:block">
+                <p className="text-sm font-medium leading-tight">{user.displayName || AUTH_STRINGS.USER_MENU_GREETING}</p>
+                <p className="text-xs text-muted-foreground">prmart 사용자</p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-56">
