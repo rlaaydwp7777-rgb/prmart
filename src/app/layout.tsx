@@ -1,4 +1,6 @@
 
+"use client";
+
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
@@ -8,31 +10,61 @@ import { AuthProvider } from '@/components/auth/auth-provider';
 import { getCategories } from '@/lib/firebase/services';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import type { Category } from '@/lib/types';
+
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
 
-export const metadata: Metadata = {
-  title: META.TITLE,
-  description: META.DESCRIPTION,
-  icons: [{ rel: "icon", url: META.ICON_URL }]
+// We can't use metadata export in a client component, but we can set it manually.
+// This is a workaround for using usePathname in the root layout.
+const setMetadata = () => {
+  if (typeof window !== 'undefined') {
+    document.title = META.TITLE;
+    const descriptionMeta = document.querySelector('meta[name="description"]');
+    if (descriptionMeta) {
+      descriptionMeta.setAttribute('content', META.DESCRIPTION);
+    } else {
+      const meta = document.createElement('meta');
+      meta.name = 'description';
+      meta.content = META.DESCRIPTION;
+      document.head.appendChild(meta);
+    }
+  }
 };
 
-export default async function RootLayout({
+
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const categories = await getCategories();
+  const pathname = usePathname();
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    setMetadata();
+    async function fetchCategories() {
+      const fetchedCategories = await getCategories();
+      setCategories(fetchedCategories);
+    }
+    fetchCategories();
+  }, []);
+
+  const isSellerPage = pathname.startsWith('/seller');
+  const isAuthPage = pathname === '/login' || pathname === '/signup';
+
 
   return (
     <html lang="ko">
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
-            <Header categories={categories} />
-            <main className="flex-1 pt-16">{children}</main>
-            <Footer />
+            {!isSellerPage && !isAuthPage && <Header categories={categories} />}
+            <main className={!isSellerPage && !isAuthPage ? "flex-1 pt-16" : "flex-1"}>{children}</main>
+            {!isSellerPage && !isAuthPage && <Footer />}
           </div>
           <Toaster />
         </AuthProvider>
