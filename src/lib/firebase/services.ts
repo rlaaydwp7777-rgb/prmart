@@ -444,6 +444,7 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
             stats: { views: 0, likes: 0, sales: 0 },
             rating: 0,
             reviews: 0,
+            sellOnce: productData.sellOnce || false
         });
         return docRef.id;
     } catch (error) {
@@ -565,9 +566,10 @@ export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
     const cacheKey = `orders_by_buyer_${buyerId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
-            const q = query(collection(db, "orders"), where("buyerId", "==", buyerId), orderBy("orderDate", "desc"));
+            const q = query(collection(db, "orders"), where("buyerId", "==", buyerId));
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
+            const orders = snapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
+            return orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
         } catch (error) {
             console.error(`Error fetching orders for buyer ${buyerId}:`, error);
             return [];
@@ -579,9 +581,10 @@ export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
     const cacheKey = `reviews_by_author_${authorId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
-            const q = query(collection(db, "reviews"), where("authorId", "==", authorId), orderBy("createdAt", "desc"));
+            const q = query(collection(db, "reviews"), where("authorId", "==", authorId));
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => serializeDoc(doc) as Review).filter(Boolean);
+            const reviews = snapshot.docs.map(doc => serializeDoc(doc) as Review).filter(Boolean);
+            return reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error(`Error fetching reviews for author ${authorId}:`, error);
             return [];
