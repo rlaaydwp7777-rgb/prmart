@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 
 import * as React from "react";
 import Link from "next/link";
@@ -12,33 +11,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Sparkles, LayoutDashboard, Package, Settings, UserCircle, LifeBuoy, Landmark, Star, Users, ChevronDown, BarChart3 } from "lucide-react";
+import { Sparkles, LayoutDashboard, Package, Settings, UserCircle, LifeBuoy, Landmark, Star, Users, ChevronDown } from "lucide-react";
 import { SIDEBAR_STRINGS } from "@/lib/string-constants";
-import { AuthButtons } from "@/components/auth/auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
+import { SellerHeader } from "@/components/layout/seller-header";
 
-function SellerHeader() {
-  return (
-     <div className="flex items-center justify-between h-14 px-4 border-b bg-background">
-        <div className="flex items-center gap-2 md:hidden">
-          <SidebarTrigger/>
-           <Link href="/" className="flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </Link>
-        </div>
-        <div className="flex items-center gap-2 ml-auto">
-           <AuthButtons />
-        </div>
-    </div>
-  )
-}
 
 function CollapsibleSidebarMenu({
     title,
@@ -225,10 +208,10 @@ export default function SellerLayout({
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <div className="flex flex-col flex-1 w-full">
+        <div className="flex flex-1 flex-col">
           <SellerHeader />
           <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="w-full max-w-7xl mx-auto">
+            <div className="mx-auto w-full max-w-7xl">
               {children}
             </div>
           </main>
