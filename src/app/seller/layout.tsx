@@ -13,12 +13,12 @@ import {
   SidebarInset,
   SidebarTrigger
 } from "@/components/ui/sidebar";
-import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy } from "lucide-react";
+import { Sparkles, LayoutDashboard, Package, BarChart3, Settings, UserCircle, LifeBuoy, Landmark, Star, Users } from "lucide-react";
 import { SIDEBAR_STRINGS } from "@/lib/string-constants";
 import { AuthButtons } from "@/components/auth/auth-buttons";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function SellerHeader() {
@@ -86,6 +86,14 @@ export default function SellerLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
+                  <Link href="/seller/analytics">
+                    <BarChart3 />
+                    <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PRODUCTS}>
                   <Link href="/seller/products">
                     <Package />
@@ -93,11 +101,27 @@ export default function SellerLayout({
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-               <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
-                  <Link href="/seller/analytics">
-                    <BarChart3 />
-                    <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.REVIEWS}>
+                  <Link href="/seller/reviews">
+                    <Star />
+                    <span>{SIDEBAR_STRINGS.REVIEWS}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PAYOUTS}>
+                   <Link href="/seller/payouts">
+                    <Landmark />
+                    <span>{SIDEBAR_STRINGS.PAYOUTS}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.CUSTOMERS}>
+                  <Link href="/seller/customers">
+                    <Users />
+                    <span>{SIDEBAR_STRINGS.CUSTOMERS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -132,12 +156,12 @@ export default function SellerLayout({
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <div className="flex flex-col flex-1">
+        <SidebarInset>
             <SellerHeader />
             <main className="p-4 sm:p-6 lg:p-8 flex-1">
                 {children}
             </main>
-        </div>
+        </SidebarInset>
       </div>
     </SidebarProvider>
   );

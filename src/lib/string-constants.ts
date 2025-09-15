@@ -113,6 +113,7 @@ export const SELLER_STRINGS = {
     TOP_PRODUCTS_DESC: "가장 많이 판매된 상품 순위입니다.",
     PRODUCT_TABLE_PRODUCT: "상품",
     PRODUCT_TABLE_SALES: "판매량",
+    PRODUCT_TABLE_REVENUE: "매출액",
     PRODUCTS_TITLE: "상품 관리",
     PRODUCTS_DESC: "등록된 상품 목록을 확인하고 관리합니다.",
     ADD_NEW_PRODUCT: "새 상품 추가",
@@ -190,6 +191,9 @@ export const SIDEBAR_STRINGS = {
     SETTINGS: "설정",
     HELP: "도움말",
     ACCOUNT: "계정",
+    PAYOUTS: "정산",
+    REVIEWS: "리뷰",
+    CUSTOMERS: "고객 관리",
 }
 
 export const ACCOUNT_STRINGS = {
@@ -247,5 +251,3 @@ export const ACCOUNT_STRINGS = {
     SETTINGS_NOTI_SECURITY: "보안 알림",
     SETTINGS_NOTI_SECURITY_DESC: "계정 관련 중요 변경사항에 대한 알림입니다.",
 }
-
-    
