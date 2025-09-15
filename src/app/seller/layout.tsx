@@ -8,9 +8,7 @@ import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, Ba
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from "@/components/ui/sidebar";
 import { Loader2, Menu } from "lucide-react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { SIDEBAR_STRINGS, AUTH_STRINGS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -52,7 +50,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
   const sidebarContent = (
      <div className="flex flex-col h-full">
         <div className="p-4">
-              <Link href="/seller/dashboard" className="flex items-center gap-2 font-semibold">
+              <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Sparkles className="h-6 w-6 text-primary" />
                 <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
               </Link>
@@ -112,7 +110,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
                     </SheetContent>
                 </Sheet>
                  <div className="flex-1 text-center">
-                    <Link href="/seller/dashboard" className="flex items-center gap-2 font-semibold justify-center">
+                    <Link href="/" className="flex items-center gap-2 font-semibold justify-center">
                         <Sparkles className="h-6 w-6 text-primary" />
                         <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
                     </Link>
