@@ -3,10 +3,10 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { 
-  SidebarProvider, 
-  Sidebar, 
-  SidebarHeader, 
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -81,14 +81,13 @@ function CollapsibleSidebarMenu({
 function SellerLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
-
+  
   React.useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
   }, [user, loading, router]);
-
+  
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -127,7 +126,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
           <SidebarContent>
             <SidebarMenu>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={pathname === '/seller/dashboard'}>
+                 <SidebarMenuButton asChild data-active={usePathname() === '/seller/dashboard'}>
                     <Link href="/seller/dashboard">
                         <LayoutDashboard className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.DASHBOARD}</span>
@@ -161,7 +160,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
                 </CollapsibleSidebarMenu>
               
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={pathname.startsWith('/seller/payouts')}>
+                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/payouts')}>
                     <Link href="/seller/payouts">
                         <Landmark className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.PAYOUTS}</span>
@@ -169,7 +168,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
                  </SidebarMenuButton>
                </SidebarMenuItem>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={pathname.startsWith('/seller/settings')}>
+                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/settings')}>
                     <Link href="/seller/settings">
                         <Settings className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.SETTINGS}</span>
@@ -199,7 +198,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <div className="flex flex-1 flex-col">
+        <div className="flex-1 flex flex-col">
           <SellerHeader />
           <main className="flex-1 p-4 sm:p-6 lg:p-8">
             <div className="mx-auto w-full max-w-7xl">
