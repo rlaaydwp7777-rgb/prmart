@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -23,7 +22,8 @@ const sidebarNavItems = [
   { href: "/seller/settings", icon: Settings, title: SIDEBAR_STRINGS.SETTINGS },
 ];
 
-function SellerLayoutContent({ children }: { children: React.ReactNode }) {
+
+export default function SellerLayout({ children }: { children: React.ReactNode; }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -36,7 +36,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
 
   if (loading || !user) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-background">
         <Skeleton className="h-full w-64" />
         <div className="flex-1 p-8">
             <Skeleton className="h-14 w-full mb-8" />
@@ -50,30 +50,29 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-        <div className="flex min-h-screen bg-background text-foreground">
-        {/* Sidebar */}
-        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-muted/40">
+      <div className="flex min-h-screen bg-background text-foreground">
+        <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar text-sidebar-foreground">
             <div className="flex h-16 items-center border-b px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-                <Sparkles className="h-6 w-6 text-primary" />
-                <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
-            </Link>
+              <Link href="/" className="flex items-center gap-2 font-semibold">
+                  <Sparkles className="h-6 w-6 text-primary" />
+                  <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
+              </Link>
             </div>
             <nav className="flex-1 space-y-2 p-4">
-            {sidebarNavItems.map((item) => (
-                <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-primary/10 hover:text-primary ${
-                    pathname === item.href ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground"
-                }`}
-                >
-                <item.icon className="h-5 w-5" />
-                <span className="text-base font-medium">{item.title}</span>
-                </Link>
-            ))}
+              {sidebarNavItems.map((item) => (
+                  <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground ${
+                      pathname === item.href ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold" : "text-muted-foreground"
+                  }`}
+                  >
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-base font-medium">{item.title}</span>
+                  </Link>
+              ))}
             </nav>
-            <div className="mt-auto border-t p-4">
+            <div className="mt-auto border-t p-4 border-sidebar-border">
                 <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
                         <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
@@ -84,32 +83,27 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
                         <p className="text-xs text-muted-foreground truncate">{user.email}</p>
                     </div>
                 </div>
-                <Button variant="ghost" className="mt-2 w-full justify-start" asChild>
+                <Button variant="ghost" className="mt-2 w-full justify-start hover:bg-sidebar-accent hover:text-sidebar-accent-foreground" asChild>
                     <Link href="/account/settings">
                         <LifeBuoy className="mr-2 h-4 w-4" />
                         {SIDEBAR_STRINGS.ACCOUNT}
                     </Link>
                 </Button>
-                <Button variant="ghost" className="w-full justify-start" onClick={signOut}>
-                    {SIDEBAR_STRINGS.LOGOUT_LINK}
+                <Button variant="ghost" className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={signOut}>
+                    {AUTH_STRINGS.LOGOUT_LINK}
                 </Button>
             </div>
         </Sidebar>
 
-        {/* Main Content */}
         <div className="flex flex-1 flex-col">
-            <SellerHeader />
-            <main className="flex-1 p-4 sm:p-6 lg:p-8">
-                <div className="mx-auto w-full max-w-7xl">
-                    {children}
-                </div>
-            </main>
+          <SellerHeader />
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+              <div className="mx-auto w-full max-w-7xl">
+                  {children}
+              </div>
+          </main>
         </div>
-        </div>
+      </div>
     </SidebarProvider>
   );
-}
-
-export default function SellerLayout({ children }: { children: React.ReactNode; }) {
-  return <SellerLayoutContent>{children}</SellerLayoutContent>;
 }
