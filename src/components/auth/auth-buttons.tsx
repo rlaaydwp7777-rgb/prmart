@@ -14,7 +14,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { signOut } from "@/lib/firebase/auth";
-import { AUTH_STRINGS } from "@/lib/string-constants";
+import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
@@ -42,10 +42,10 @@ export function AuthButtons() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
-            <Link href="/seller/dashboard">{AUTH_STRINGS.DASHBOARD_LINK}</Link>
+            <Link href="/seller/dashboard">{SIDEBAR_STRINGS.DASHBOARD}</Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/account/settings">{AUTH_STRINGS.SETTINGS_LINK}</Link>
+            <Link href="/seller/settings">{SIDEBAR_STRINGS.SETTINGS}</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
