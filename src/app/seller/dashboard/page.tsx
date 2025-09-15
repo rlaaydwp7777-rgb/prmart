@@ -25,20 +25,20 @@ interface DashboardData {
 
 function DashboardSkeleton() {
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
              <div>
                 <Skeleton className="h-9 w-1/2" />
                 <Skeleton className="h-4 w-3/4 mt-2" />
             </div>
 
              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
-                <Skeleton className="h-28" />
+                <Skeleton className="h-32 rounded-xl" />
+                <Skeleton className="h-32 rounded-xl" />
+                <Skeleton className="h-32 rounded-xl" />
+                <Skeleton className="h-32 rounded-xl" />
             </div>
             <div className="grid gap-6 grid-cols-1">
-                 <Skeleton className="h-96" />
+                 <Skeleton className="h-96 rounded-xl" />
             </div>
         </div>
     )
@@ -53,9 +53,15 @@ export default function SellerDashboardPage() {
     const fetchDashboardData = useCallback(async () => {
         if (user) {
             setLoading(true);
-            const dashboardData = await getSellerDashboardData(user.uid);
-            setData(dashboardData);
-            setLoading(false);
+            try {
+                const dashboardData = await getSellerDashboardData(user.uid);
+                setData(dashboardData);
+            } catch (error) {
+                console.error("Failed to fetch dashboard data:", error);
+                setData(null);
+            } finally {
+                setLoading(false);
+            }
         }
     }, [user]);
 
@@ -84,7 +90,7 @@ export default function SellerDashboardPage() {
     }
     
     if (!data) {
-       return <p>데이터를 불러오는 중 오류가 발생했습니다.</p>;
+       return <p>데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>;
     }
 
     const { stats, recentSales, bestSellers, salesByMonth } = data;
@@ -94,14 +100,14 @@ export default function SellerDashboardPage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline">{SELLER_STRINGS.DASHBOARD_HEADLINE}</h1>
         <p className="text-muted-foreground">{SELLER_STRINGS.DASHBOARD_SUBHEADLINE}</p>
       </div>
 
         {!hasProducts ? (
-            <Card className="flex flex-col items-center justify-center p-8 text-center">
+            <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition flex flex-col items-center justify-center p-8 text-center">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">prmart 판매를 시작해보세요!</CardTitle>
                     <CardDescription>당신의 첫 상품을 등록하고 수익 창출의 기회를 만드세요.</CardDescription>
@@ -113,37 +119,37 @@ export default function SellerDashboardPage() {
         ) : (
             <>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    <Card>
+                    <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_REVENUE}</CardTitle>
-                            <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            <DollarSign className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</div>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_SALES}</CardTitle>
-                            <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+                            <ShoppingBag className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             <div className="text-2xl font-bold">+{stats.totalSales.toLocaleString()}</div>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_TOTAL_PRODUCTS}</CardTitle>
-                            <Package className="h-4 w-4 text-muted-foreground" />
+                            <Package className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                              <Link href="/seller/products" className="text-2xl font-bold hover:underline">{stats.productCount}개</Link>
                         </CardContent>
                     </Card>
-                    <Card>
+                    <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                             <CardTitle className="text-sm font-medium">{SELLER_STRINGS.STATS_REVIEW_RATING}</CardTitle>
-                            <Star className="h-4 w-4 text-muted-foreground" />
+                            <Star className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
                             {stats.reviewCount > 0 ? (
@@ -158,7 +164,7 @@ export default function SellerDashboardPage() {
                     </Card>
                 </div>
                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                    <Card className="lg:col-span-4">
+                    <Card className="lg:col-span-4 shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader>
                             <CardTitle className="text-xl">{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
                             <CardDescription>{SELLER_STRINGS.MONTHLY_OVERVIEW_DESC}</CardDescription>
@@ -174,7 +180,7 @@ export default function SellerDashboardPage() {
                             )}
                         </CardContent>
                     </Card>
-                    <Card className="lg:col-span-3">
+                    <Card className="lg:col-span-3 shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader>
                             <CardTitle className="text-xl">{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
                             <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
@@ -192,15 +198,15 @@ export default function SellerDashboardPage() {
                 </div>
                 
                  {bestSellers.length > 0 && (
-                    <Card>
+                    <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader>
                             <CardTitle className="text-xl">{SELLER_STRINGS.BEST_SELLERS_TITLE}</CardTitle>
                             <CardDescription>{SELLER_STRINGS.BEST_SELLERS_DESC}</CardDescription>
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {bestSellers.map(product => (
-                                <Card key={product.id} className="flex gap-4 p-4">
-                                    <Image src={product.image} alt={product.title} width={80} height={60} className="rounded-md object-cover aspect-video" />
+                                <Card key={product.id} className="flex gap-4 p-4 shadow-sm rounded-lg hover:bg-background transition">
+                                    <Image src={product.image} alt={product.title} width={80} height={60} className="rounded-md object-cover aspect-video" data-ai-hint="abstract design" />
                                     <div className="space-y-1 text-sm">
                                         <p className="font-semibold line-clamp-2">{product.title}</p>
                                         <p className="text-muted-foreground">{product.sales} 판매</p>

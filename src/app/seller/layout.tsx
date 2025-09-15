@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link";
@@ -20,6 +21,7 @@ import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 function SellerHeader() {
   return (
@@ -54,21 +56,35 @@ export default function SellerLayout({
     }
   }, [user, loading, router]);
 
-  if (loading || !user) {
+  if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-          <div className="space-y-4">
-              <p className="text-center text-muted-foreground">인증 정보를 확인하는 중입니다...</p>
-              <Skeleton className="h-10 w-64" />
+          <div className="space-y-4 text-center">
+              <p className="text-muted-foreground">인증 정보를 확인하는 중입니다...</p>
+              <Skeleton className="h-10 w-64 mx-auto" />
           </div>
       </div>
     );
   }
 
+  if (!user) {
+     return (
+        <div className="flex min-h-screen items-center justify-center">
+            <div className="space-y-4 text-center">
+                <h1 className="text-2xl font-bold">로그인 필요</h1>
+                <p className="text-muted-foreground">이 페이지에 접근하려면 로그인이 필요합니다.</p>
+                <Button asChild>
+                    <Link href="/login">로그인 페이지로 이동</Link>
+                </Button>
+            </div>
+        </div>
+     )
+  }
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen bg-background">
-        <Sidebar>
+        <Sidebar className="w-64">
           <SidebarHeader>
             <Link href="/" className="flex items-center gap-2">
               <Sparkles className="h-6 w-6 text-sidebar-primary" />
@@ -80,56 +96,56 @@ export default function SellerLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.DASHBOARD}>
                   <Link href="/seller/dashboard">
-                    <LayoutDashboard />
-                    <span>{SIDEBAR_STRINGS.DASHBOARD}</span>
+                    <LayoutDashboard className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.DASHBOARD}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ANALYTICS}>
                   <Link href="/seller/analytics">
-                    <BarChart3 />
-                    <span>{SIDEBAR_STRINGS.ANALYTICS}</span>
+                    <BarChart3 className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.ANALYTICS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PRODUCTS}>
                   <Link href="/seller/products">
-                    <Package />
-                    <span>{SIDEBAR_STRINGS.PRODUCTS}</span>
+                    <Package className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.PRODUCTS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.REVIEWS}>
                   <Link href="/seller/reviews">
-                    <Star />
-                    <span>{SIDEBAR_STRINGS.REVIEWS}</span>
+                    <Star className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.REVIEWS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.PAYOUTS}>
                    <Link href="/seller/payouts">
-                    <Landmark />
-                    <span>{SIDEBAR_STRINGS.PAYOUTS}</span>
+                    <Landmark className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.PAYOUTS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.CUSTOMERS}>
                   <Link href="/seller/customers">
-                    <Users />
-                    <span>{SIDEBAR_STRINGS.CUSTOMERS}</span>
+                    <Users className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.CUSTOMERS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.SETTINGS}>
                   <Link href="/seller/settings">
-                    <Settings />
-                    <span>{SIDEBAR_STRINGS.SETTINGS}</span>
+                    <Settings className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.SETTINGS}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -140,28 +156,30 @@ export default function SellerLayout({
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.HELP}>
                   <Link href="#">
-                    <LifeBuoy />
-                    <span>{SIDEBAR_STRINGS.HELP}</span>
+                    <LifeBuoy className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.HELP}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild tooltip={SIDEBAR_STRINGS.ACCOUNT}>
                   <Link href="/account/settings">
-                    <UserCircle />
-                    <span>{SIDEBAR_STRINGS.ACCOUNT}</span>
+                    <UserCircle className="h-5 w-5" />
+                    <span className="text-base font-medium">{SIDEBAR_STRINGS.ACCOUNT}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
-            <SellerHeader />
-            <main className="p-4 sm:p-6 lg:p-8 flex-1">
-                {children}
-            </main>
-        </SidebarInset>
+        <div className="flex-1 w-full">
+          <SellerHeader />
+          <main className="p-4 sm:p-6 lg:p-8">
+            <div className="w-full max-w-7xl mx-auto">
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
     </SidebarProvider>
   );
