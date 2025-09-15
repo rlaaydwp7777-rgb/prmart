@@ -54,19 +54,17 @@ export default function RootLayout({
   }, []);
 
   const isSellerPage = pathname.startsWith('/seller');
-  const isAuthPage = pathname === '/login' || pathname === '/signup';
-  const showHeaderAndFooter = !isSellerPage && !isAuthPage;
 
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <AuthProvider>
             <div className="flex flex-col min-h-screen">
-                {showHeaderAndFooter && <Header categories={categories} />}
-                <main className="flex-1">
+                {!isSellerPage && <Header categories={categories} />}
+                <main className={`flex-1 ${!isSellerPage ? 'pt-16' : ''}`}>
                   {children}
                 </main>
-                {showHeaderAndFooter && <Footer />}
+                {!isSellerPage && <Footer />}
             </div>
           <Toaster />
         </AuthProvider>

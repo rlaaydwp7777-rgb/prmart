@@ -34,6 +34,7 @@ export default async function CategoryCatchAll({ params }: Props) {
       }
   }
 
+  // Fetch all products for the main category, filtering will be done on the client
   const prompts = await getProductsByCategorySlug(categorySlug);
   
   const pageTitle = subCategory ? subCategory.name : category.name;
@@ -41,7 +42,7 @@ export default async function CategoryCatchAll({ params }: Props) {
 
 
   return (
-      <div className="container px-4 md:px-6 pt-8">
+      <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center mb-8 md:mb-12">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-headline tracking-tighter">
             {pageTitle}

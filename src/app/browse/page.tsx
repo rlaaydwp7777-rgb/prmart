@@ -1,9 +1,35 @@
-import { PromptCard } from "@/components/prompts/prompt-card";
-import { getProducts } from "@/lib/firebase/services";
 
-export default async function BrowsePage() {
-  const allPrompts = await getProducts();
+"use client";
 
+import * as React from "react";
+import { getCategories, getProducts } from "@/lib/firebase/services";
+import type { Prompt, Category } from "@/lib/types";
+import { Loader2 } from "lucide-react";
+import { ProductFilters } from "@/components/browse/product-filters";
+
+export default function BrowsePage() {
+  const [products, setProducts] = React.useState<Prompt[]>([]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    Promise.all([
+      getProducts(),
+      getCategories()
+    ]).then(([fetchedProducts, fetchedCategories]) => {
+      setProducts(fetchedProducts);
+      setCategories(fetchedCategories);
+    }).finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="container px-4 md:px-6 text-center py-20">
+        <Loader2 className="h-10 w-10 animate-spin mx-auto text-muted-foreground" />
+      </div>
+    )
+  }
+  
   return (
     <div className="container px-4 md:px-6">
       <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
@@ -15,13 +41,10 @@ export default async function BrowsePage() {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {allPrompts.map((prompt) => (
-          <PromptCard key={prompt.id} prompt={prompt} />
-        ))}
-      </div>
-
-      {/* TODO: Add pagination or infinite scroll */}
+      <ProductFilters 
+        initialPrompts={products}
+        allCategories={categories}
+      />
     </div>
   );
 }

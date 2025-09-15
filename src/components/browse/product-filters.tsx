@@ -13,8 +13,9 @@ import { cn } from "@/lib/utils";
 
 interface ProductFiltersProps {
   initialPrompts: Prompt[];
-  category: Category;
-  activeSubCategorySlug: string | null;
+  category?: Category; // Make category optional for "Browse All" page
+  allCategories?: Category[]; // Add this for "Browse All" page
+  activeSubCategorySlug?: string | null;
 }
 
 const sortOptions = [
@@ -24,24 +25,33 @@ const sortOptions = [
     { value: "price-asc", label: "가격 낮은순" },
 ];
 
-export function ProductFilters({ initialPrompts, category, activeSubCategorySlug }: ProductFiltersProps) {
+export function ProductFilters({ initialPrompts, category, allCategories, activeSubCategorySlug }: ProductFiltersProps) {
     const [searchQuery, setSearchQuery] = React.useState("");
-    const [selectedSubCategory, setSelectedSubCategory] = React.useState(activeSubCategorySlug || "all");
+    const [selectedFilter, setSelectedFilter] = React.useState(activeSubCategorySlug || "all");
     const [sortBy, setSortBy] = React.useState("popular");
     const [priceFilter, setPriceFilter] = React.useState("all");
+
+    const isBrowseAllPage = !category;
 
     const filteredAndSortedPrompts = React.useMemo(() => {
         let filtered = initialPrompts;
 
-        // Filter by sub-category
-        if (selectedSubCategory !== "all") {
-            filtered = filtered.filter(prompt => prompt.subCategorySlug === selectedSubCategory);
+        if (selectedFilter !== "all") {
+             if (isBrowseAllPage) {
+                // Filter by main category slug on browse all page
+                filtered = filtered.filter(prompt => prompt.categorySlug === selectedFilter);
+            } else {
+                // Filter by sub-category slug on category page
+                filtered = filtered.filter(prompt => prompt.subCategorySlug === selectedFilter);
+            }
         }
-
+        
         // Filter by search query
         if (searchQuery) {
             filtered = filtered.filter(prompt => 
-                prompt.title.toLowerCase().includes(searchQuery.toLowerCase())
+                prompt.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                prompt.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                prompt.tags?.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
             );
         }
         
@@ -51,7 +61,6 @@ export function ProductFilters({ initialPrompts, category, activeSubCategorySlug
         } else if (priceFilter === 'free') {
             filtered = filtered.filter(prompt => prompt.price === 0);
         }
-
 
         // Sort
         const sorted = [...filtered].sort((a, b) => {
@@ -70,51 +79,52 @@ export function ProductFilters({ initialPrompts, category, activeSubCategorySlug
 
         return sorted;
 
-    }, [initialPrompts, selectedSubCategory, searchQuery, sortBy, priceFilter]);
+    }, [initialPrompts, selectedFilter, searchQuery, sortBy, priceFilter, isBrowseAllPage]);
+
+    const filterItems = isBrowseAllPage 
+        ? allCategories?.map(c => ({ slug: c.slug, name: c.name })) || []
+        : category?.subCategories.map(sc => ({ slug: sc.slug, name: sc.name })) || [];
+
 
     return (
         <div className="space-y-8">
-            {/* Filters and Sorters */}
             <div className="space-y-6">
-                {/* Sub Categories */}
                 <div className="flex flex-wrap justify-start gap-2">
                      <Button 
-                        onClick={() => setSelectedSubCategory("all")}
-                        variant={selectedSubCategory === "all" ? "default" : "outline"}
+                        onClick={() => setSelectedFilter("all")}
+                        variant={selectedFilter === "all" ? "default" : "outline"}
                     >
                        전체
                     </Button>
-                    {category.subCategories.map((sub) => (
+                    {filterItems.map((item) => (
                         <Button 
-                            key={sub.slug} 
-                            variant={selectedSubCategory === sub.slug ? "default" : "outline"}
-                            onClick={() => setSelectedSubCategory(sub.slug)}
+                            key={item.slug} 
+                            variant={selectedFilter === item.slug ? "default" : "outline"}
+                            onClick={() => setSelectedFilter(item.slug)}
                         >
-                            {sub.name}
+                            {item.name}
                         </Button>
                     ))}
                 </div>
 
                 <div className="flex flex-col md:flex-row gap-4 items-center">
-                    {/* Search Input */}
                     <div className="relative w-full md:flex-1">
                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                         <Input 
-                            placeholder={`${category.name} 내에서 검색...`}
+                            placeholder={`${category?.name || '전체 상품'} 내에서 검색...`}
                             className="pl-10 h-11 text-base"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
 
-                    {/* Sorter and Price Filter */}
                     <div className="grid grid-cols-2 gap-2 w-full md:w-auto">
                          <Select value={priceFilter} onValueChange={setPriceFilter}>
                             <SelectTrigger className="h-11 text-base w-full md:w-[120px]">
                                 <SelectValue placeholder="가격" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">전체</SelectItem>
+                                <SelectItem value="all">전체 가격</SelectItem>
                                 <SelectItem value="paid">유료</SelectItem>
                                 <SelectItem value="free">무료</SelectItem>
                             </SelectContent>
@@ -136,7 +146,6 @@ export function ProductFilters({ initialPrompts, category, activeSubCategorySlug
                 </div>
             </div>
 
-            {/* Product Grid */}
             {filteredAndSortedPrompts.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {filteredAndSortedPrompts.map((prompt) => (
