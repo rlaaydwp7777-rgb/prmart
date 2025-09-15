@@ -65,7 +65,9 @@ export function PromptCard({ prompt }: PromptCardProps) {
           <Link href={`/p/${prompt.id}`} className="block">
             <h3 className="font-bold text-lg truncate font-headline hover:underline">{prompt.title}</h3>
           </Link>
-          <p className="text-muted-foreground text-sm">{PROMPT_CARD_STRINGS.BY} {prompt.author}</p>
+          <Link href={`/seller/${prompt.sellerId}`} className="text-muted-foreground text-sm hover:underline">
+            {PROMPT_CARD_STRINGS.BY} {prompt.author}
+          </Link>
           <div className="flex items-center justify-between pt-1 mt-auto">
             <div className="flex items-center gap-1">
               <Star className="w-5 h-5 text-amber-400 fill-amber-400" />

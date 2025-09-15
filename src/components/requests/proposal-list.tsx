@@ -4,6 +4,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PromptCard } from "@/components/prompts/prompt-card";
 import type { Proposal, Prompt } from "@/lib/types";
+import Link from "next/link";
 
 interface ProposalListProps {
     initialProposals: Proposal[];
@@ -24,14 +25,18 @@ export function ProposalList({ initialProposals, allProducts }: ProposalListProp
                     const product = proposal.productId ? allProducts.find(p => p.id === proposal.productId) : null;
                     return (
                         <div key={proposal.id} className="flex gap-4">
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src={proposal.authorAvatar} alt={proposal.authorName} data-ai-hint="person face" />
-                                <AvatarFallback>{proposal.authorName.charAt(0)}</AvatarFallback>
-                            </Avatar>
+                            <Link href={`/seller/${proposal.authorId}`}>
+                                <Avatar className="h-10 w-10">
+                                    <AvatarImage src={proposal.authorAvatar} alt={proposal.authorName} data-ai-hint="person face" />
+                                    <AvatarFallback>{proposal.authorName.charAt(0)}</AvatarFallback>
+                                </Avatar>
+                            </Link>
                             <div className="flex-1 space-y-3">
                                 <div className="p-4 rounded-lg bg-muted/50 border">
                                     <div className="flex justify-between items-center">
-                                        <p className="font-semibold">{proposal.authorName}</p>
+                                         <Link href={`/seller/${proposal.authorId}`} className="font-semibold hover:underline">
+                                            {proposal.authorName}
+                                        </Link>
                                         <p className="text-xs text-muted-foreground">{new Date(proposal.createdAt).toLocaleString()}</p>
                                     </div>
                                     <p className="text-sm text-foreground/90 mt-1">{proposal.content}</p>

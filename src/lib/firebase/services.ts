@@ -219,13 +219,14 @@ const generateExamplePrompts = (): Prompt[] => {
 
             ideas.forEach((idea, index) => {
                 const promptId = `ex-${category.slug}-${subCategory.slug}-${index + 1}`;
+                const sellerId = `seller-${promptIdCounter % authors.length}`;
                 prompts.push({
                     id: promptId,
                     title: idea.title,
                     description: idea.desc,
                     author: authors[promptIdCounter % authors.length],
-                    sellerId: `seller-${promptIdCounter % authors.length}`,
-                    sellerPhotoUrl: `https://picsum.photos/seed/${promptIdCounter}/100/100`,
+                    sellerId: sellerId,
+                    sellerPhotoUrl: `https://picsum.photos/seed/${sellerId}/100/100`,
                     category: category.name,
                     categorySlug: category.slug,
                     subCategorySlug: subCategory.slug,
@@ -331,7 +332,9 @@ export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
             return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error(`Error fetching products for seller ${sellerId}:`, error);
-            return [];
+            // Fallback to example data for example sellers
+            const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.sellerId === sellerId);
+            return exampleProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         }
     });
 }
@@ -548,12 +551,28 @@ export async function getSellerDashboardData(sellerId: string) {
 }
 
 export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
-    const docRef = doc(db, 'sellers', userId);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-        return serializeDoc(docSnap) as SellerProfile;
-    }
-    return null;
+    const cacheKey = `seller_profile_${userId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const docRef = doc(db, 'sellers', userId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return serializeDoc(docSnap) as SellerProfile;
+            }
+             // If no profile in DB, check auth user data
+            const exampleUser = EXAMPLE_PROMPTS.find(p => p.sellerId === userId);
+            if (exampleUser) {
+                return {
+                    sellerName: exampleUser.author,
+                    sellerBio: `${exampleUser.author}의 프로필입니다.`,
+                    photoUrl: exampleUser.sellerPhotoUrl
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching seller profile for ${userId}:`, error);
+        }
+        return null;
+    });
 }
 
 export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
@@ -617,6 +636,13 @@ export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdA
             ...proposalData,
             createdAt: now,
         });
+        // This is a simplified simulation. In a real app, you'd use a transaction or a cloud function.
+        const requestRef = doc(db, "ideaRequests", proposalData.requestId);
+        const requestSnap = await getDoc(requestRef);
+        if(requestSnap.exists()){
+            const currentProposals = requestSnap.data().proposals || 0;
+            await setDoc(requestRef, { proposals: currentProposals + 1}, { merge: true });
+        }
         return docRef.id;
     } catch (error) {
         console.error("Error saving proposal: ", error);

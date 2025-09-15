@@ -80,9 +80,9 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
             )}
             <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter mt-2">{prompt.title}</h1>
             <div className="flex items-center gap-4 mt-3 text-sm text-muted-foreground">
-               <Link href="#" className="flex items-center gap-2 hover:text-primary">
+               <Link href={`/seller/${prompt.sellerId}`} className="flex items-center gap-2 hover:text-primary">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={`https://avatar.vercel.sh/${prompt.author}.png`} alt={prompt.author} data-ai-hint="person face" />
+                        <AvatarImage src={prompt.sellerPhotoUrl || `https://avatar.vercel.sh/${prompt.author}.png`} alt={prompt.author} data-ai-hint="person face" />
                         <AvatarFallback>{prompt.author.substring(0, 2)}</AvatarFallback>
                     </Avatar>
                     <span className="font-medium">{prompt.author}</span>
@@ -237,11 +237,13 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                     <h3 className="font-bold text-lg font-headline">판매자 정보</h3>
                 </CardHeader>
                 <CardContent className="text-center">
-                     <Avatar className="h-20 w-20 mx-auto mb-4">
-                        <AvatarImage src={`https://avatar.vercel.sh/${prompt.author}.png`} alt={prompt.author} data-ai-hint="person face" />
-                        <AvatarFallback>{prompt.author.substring(0, 2)}</AvatarFallback>
-                    </Avatar>
-                    <h4 className="font-bold text-lg">{prompt.author}</h4>
+                    <Link href={`/seller/${prompt.sellerId}`}>
+                        <Avatar className="h-20 w-20 mx-auto mb-4">
+                            <AvatarImage src={prompt.sellerPhotoUrl || `https://avatar.vercel.sh/${prompt.author}.png`} alt={prompt.author} data-ai-hint="person face" />
+                            <AvatarFallback>{prompt.author.substring(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <h4 className="font-bold text-lg hover:underline">{prompt.author}</h4>
+                    </Link>
                     <p className="text-sm text-muted-foreground">AI와 자동화로 세상을 이롭게 합니다.</p>
                     <Button variant="outline" className="w-full mt-4">
                         <Send className="mr-2 h-4 w-4" />
