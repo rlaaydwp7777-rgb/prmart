@@ -1,5 +1,4 @@
 
-
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet } from "lucide-react";
 
 export const META = {
@@ -84,6 +83,13 @@ export const SELLER_STRINGS = {
     TAGS_PLACEHOLDER: "예: 생산성, 노션, 템플릿",
     TAGS_HINT: "태그는 쉼표로 구분해주세요.",
     SELL_ONCE_LABEL: "1회만 판매 (판매 후 자동 품절 처리)",
+    VISIBILITY_LABEL: "공개 범위",
+    VISIBILITY_PUBLIC: "전체 공개",
+    VISIBILITY_PUBLIC_DESC: "누구나 상품의 상세 정보를 볼 수 있습니다.",
+    VISIBILITY_PRIVATE: "구매자에게만 공개",
+    VISIBILITY_PRIVATE_DESC: "상품을 구매한 사용자만 상세 정보를 봅니다.",
+    VISIBILITY_PARTIAL: "미리보기 후 공개",
+    VISIBILITY_PARTIAL_DESC: "일부 정보만 노출하고 구매를 유도합니다.",
     FORM_ERROR_TITLE: "폼 오류",
     QUALITY_REVIEW_RESULT: "AI 품질 검수 결과",
     SCORE: "점수",

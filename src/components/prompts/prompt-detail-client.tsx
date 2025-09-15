@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -6,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Eye, Heart, Send, ShoppingCart, Star, Zap } from "lucide-react";
+import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Category, Prompt } from "@/lib/types";
 import { useAuth } from "@/components/auth/auth-provider";
 import { PromptCard } from "./prompt-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const mockReviews = [
     { id: 1, author: "김지훈", avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요." },
@@ -34,6 +36,10 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   const isFree = prompt.price === 0;
+  // This would be replaced with actual purchase status logic
+  const hasPurchased = false; 
+
+  const canViewContent = prompt.visibility === 'public' || (prompt.visibility === 'private' && hasPurchased);
 
   return (
     <div className="container px-4 md:px-6">
@@ -97,12 +103,8 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
           { isFree ? (
               <div className="flex flex-col gap-2 mt-auto">
                   <Button size="lg" className="w-full">
-                      <Eye className="mr-2"/>
-                      콘텐츠 보기
-                  </Button>
-                  <Button size="lg" variant="outline" className="w-full">
                       <Download className="mr-2"/>
-                      다운로드
+                      무료 다운로드
                   </Button>
               </div>
           ) : user ? (
@@ -140,37 +142,58 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
         <div className="md:col-span-2 space-y-8">
             <div>
                 <h2 className="text-2xl font-bold font-headline mb-4">상품 상세 정보</h2>
-                <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-                    <AccordionItem value="item-1">
-                        <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
-                        <AccordionContent>
-                            <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
-                                <p>{prompt.description}</p>
-                                <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
-                                <p>주요 기능:</p>
-                                <ul>
-                                    <li>Next.js 14 앱 라우터</li>
-                                    <li>ShadCN UI 및 Tailwind CSS</li>
-                                    <li>Firebase 인증 및 Firestore</li>
-                                    <li>Genkit AI 통합</li>
-                                </ul>
-                            </div>
-                        </AccordionContent>
-                    </AccordionItem>
-                    <AccordionItem value="item-2">
-                        <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
-                        <AccordionContent>
-                            ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)
-                        </AccordionContent>
-                    </AccordionItem>
-                     <AccordionItem value="item-3">
-                        <AccordionTrigger className="text-lg font-semibold">자주 묻는 질문</AccordionTrigger>
-                        <AccordionContent>
-                            <strong>Q: 상업적으로 이용할 수 있나요?</strong>
-                            <p>A: 네, 구매 후 상업적 프로젝트를 포함하여 자유롭게 사용하실 수 있습니다. 재판매는 금지됩니다.</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                </Accordion>
+                 {canViewContent ? (
+                    <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+                        <AccordionItem value="item-1">
+                            <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
+                            <AccordionContent>
+                                <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
+                                    <p>{prompt.description}</p>
+                                    {prompt.visibility === 'partial' && (
+                                        <Alert className="mt-4">
+                                            <Eye className="h-4 w-4" />
+                                            <AlertTitle>미리보기 정보</AlertTitle>
+                                            <AlertDescription>
+                                                이 상품은 미리보기 후 전체 콘텐츠를 확인할 수 있습니다.
+                                            </AlertDescription>
+                                        </Alert>
+                                    )}
+                                    <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
+                                    <p>주요 기능:</p>
+                                    <ul>
+                                        <li>Next.js 14 앱 라우터</li>
+                                        <li>ShadCN UI 및 Tailwind CSS</li>
+                                        <li>Firebase 인증 및 Firestore</li>
+                                        <li>Genkit AI 통합</li>
+                                    </ul>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-2">
+                            <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
+                            <AccordionContent>
+                                ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)
+                            </AccordionContent>
+                        </AccordionItem>
+                        <AccordionItem value="item-3">
+                            <AccordionTrigger className="text-lg font-semibold">자주 묻는 질문</AccordionTrigger>
+                            <AccordionContent>
+                                <strong>Q: 상업적으로 이용할 수 있나요?</strong>
+                                <p>A: 네, 구매 후 상업적 프로젝트를 포함하여 자유롭게 사용하실 수 있습니다. 재판매는 금지됩니다.</p>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
+                ) : (
+                    <Card className="flex flex-col items-center justify-center text-center p-8 border-dashed">
+                        <Lock className="h-12 w-12 text-muted-foreground mb-4" />
+                        <h3 className="text-xl font-bold font-headline">구매자 전용 콘텐츠입니다</h3>
+                        <p className="text-muted-foreground mt-2">이 상품의 상세 정보는 구매한 사용자에게만 공개됩니다.</p>
+                        <Button className="mt-6">
+                            <Zap className="mr-2 h-4 w-4"/>
+                            구매하고 콘텐츠 보기
+                        </Button>
+                    </Card>
+                )}
             </div>
 
             <Separator/>

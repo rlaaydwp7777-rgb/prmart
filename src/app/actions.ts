@@ -116,6 +116,7 @@ const productSchema = z.object({
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
   sellOnce: z.boolean().optional(),
+  visibility: z.enum(['public', 'private', 'partial']),
   sellerId: z.string().min(1, "판매자 정보가 필요합니다."),
   author: z.string().min(1, "판매자 이름이 필요합니다."),
 });
@@ -151,6 +152,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
     tags: rawData.tags,
     price: rawData.price,
     sellOnce: rawData.sellOnce === 'on',
+    visibility: rawData.visibility,
     sellerId: rawData.sellerId,
     author: rawData.author
   });
@@ -173,7 +175,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
     });
 
     if (qualityResult.isApproved) {
-        const { title, description, category, tags, price, sellOnce, sellerId, author } = validatedFields.data;
+        const { title, description, category, tags, price, sellOnce, sellerId, author, visibility } = validatedFields.data;
         
         const categories = await getCategories();
         const categorySlug = categories.find(c => c.name === category)?.slug || "";
@@ -191,6 +193,7 @@ export async function registerProductAction(prevState: FormState, formData: Form
           aiHint: tags.split(',').map(tag => tag.trim()).slice(0,2).join(' '),
           author,
           sellerId,
+          visibility,
         });
 
         revalidatePath('/seller/dashboard');
@@ -218,7 +221,3 @@ export async function registerProductAction(prevState: FormState, formData: Form
     };
   }
 }
-
-    
-
-    

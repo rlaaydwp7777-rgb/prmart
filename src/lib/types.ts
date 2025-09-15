@@ -1,6 +1,8 @@
 
 import type { LucideIcon } from "lucide-react";
 
+export type PromptVisibility = 'public' | 'private' | 'partial';
+
 export interface Prompt {
   id: string;
   title: string;
@@ -16,6 +18,7 @@ export interface Prompt {
   tags?: string[];
   rank?: number;
   isExample?: boolean;
+  visibility: PromptVisibility;
   createdAt: string; // Changed from Timestamp to string
   updatedAt?: string; // Changed from Timestamp to string
   stats: {

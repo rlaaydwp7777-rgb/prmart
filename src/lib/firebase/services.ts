@@ -234,6 +234,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     aiHint: `${subCategory.name.split(' ')[0]}`,
                     tags: [category.name, subCategory.name, "예제"],
                     isExample: true,
+                    visibility: 'public',
                     createdAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     stats: {
                         views: Math.floor(Math.random() * 2000) + 100,

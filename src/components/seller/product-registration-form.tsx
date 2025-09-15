@@ -17,12 +17,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useEffect, useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText } from "lucide-react";
+import { CheckCircle, Loader2, Sparkles, Terminal, XCircle, UploadCloud, Image as ImageIcon, FileText, Globe, Lock, Eye } from "lucide-react";
 import { BUTTONS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
-import type { Category } from "@/lib/types";
+import type { Category, PromptVisibility } from "@/lib/types";
 import { useAuth } from "../auth/auth-provider";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -31,6 +32,7 @@ const productSchema = z.object({
   tags: z.string().min(1, "태그를 하나 이상 입력해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상의 숫자여야 합니다."),
   sellOnce: z.boolean().optional(),
+  visibility: z.enum(['public', 'private', 'partial']),
   sellerId: z.string().optional(),
   author: z.string().optional(),
 });
@@ -81,12 +83,15 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
       tags: "",
       price: 0,
       sellOnce: false,
+      visibility: "public",
     }
   });
   
   const titleValue = watch("title");
   const categoryValue = watch("category");
   const sellOnceValue = watch("sellOnce");
+  const visibilityValue = watch("visibility");
+
 
   useEffect(() => {
     if (!formState) return;
@@ -108,18 +113,20 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
         tags: "",
         price: 0,
         sellOnce: false,
+        visibility: 'public',
       });
       onProductRegistered?.();
     } else if (formState.fields) {
       // Re-populate form with previous data on server-side validation failure
-      const { title, description, category, tags, price, sellOnce } = formState.fields;
+      const { title, description, category, tags, price, sellOnce, visibility } = formState.fields;
       reset({ 
         title, 
         description, 
         category, 
         tags, 
         price: Number(price) || 0,
-        sellOnce: !!sellOnce
+        sellOnce: !!sellOnce,
+        visibility: visibility || 'public'
       });
     }
   }, [formState, toast, reset, onProductRegistered]);
@@ -164,6 +171,10 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
   const handleSellOnceChange = (checked: boolean) => {
     setValue('sellOnce', checked, { shouldValidate: true });
   };
+  
+  const handleVisibilityChange = (value: PromptVisibility) => {
+    setValue('visibility', value, { shouldValidate: true });
+  };
 
 
   return (
@@ -176,42 +187,6 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
           <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
           <Input id="title" placeholder={SELLER_STRINGS.PRODUCT_TITLE_PLACEHOLDER} {...register("title")} />
           {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
-        </div>
-
-        <div className="space-y-2">
-            <Label htmlFor="product-images">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
-            <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
-              <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
-              <p className="mt-4 text-muted-foreground">
-                {SELLER_STRINGS.PRODUCT_IMAGES_HINT}
-              </p>
-              <Input id="product-images" type="file" className="sr-only" multiple />
-            </div>
-        </div>
-
-        <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <Label htmlFor="description">{SELLER_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
-            <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
-              {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-              {BUTTONS.GENERATE_WITH_AI}
-            </Button>
-          </div>
-           <Card>
-              <CardContent className="p-2 space-y-2">
-                <div className="flex gap-1">
-                    <Button variant="ghost" size="sm"><ImageIcon className="mr-2 h-4 w-4" /> {SELLER_STRINGS.ADD_IMAGE}</Button>
-                    <Button variant="ghost" size="sm"><FileText className="mr-2 h-4 w-4" /> {SELLER_STRINGS.IMPORT_TEMPLATE}</Button>
-                </div>
-                <Textarea
-                    id="description"
-                    placeholder={SELLER_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
-                    className="min-h-[200px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                    {...register("description")}
-                />
-              </CardContent>
-            </Card>
-          {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -242,10 +217,81 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
           <p className="text-sm text-muted-foreground">{SELLER_STRINGS.TAGS_HINT}</p>
           {errors.tags && <p className="text-destructive text-sm">{errors.tags.message}</p>}
         </div>
+        
+        <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+                <Switch id="sell-once" name="sellOnce" checked={sellOnceValue} onCheckedChange={handleSellOnceChange} />
+                <Label htmlFor="sell-once">{SELLER_STRINGS.SELL_ONCE_LABEL}</Label>
+            </div>
+            
+            <div className="space-y-2">
+                <Label>{SELLER_STRINGS.VISIBILITY_LABEL}</Label>
+                <RadioGroup
+                    defaultValue="public"
+                    name="visibility"
+                    value={visibilityValue}
+                    onValueChange={handleVisibilityChange}
+                    className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                >
+                    <Label className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-muted/50 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5">
+                       <RadioGroupItem value="public" id="public" />
+                       <div className="grid gap-1.5">
+                           <div className="font-semibold flex items-center"><Globe className="mr-2 h-4 w-4 text-muted-foreground" /> {SELLER_STRINGS.VISIBILITY_PUBLIC}</div>
+                           <p className="text-sm text-muted-foreground">{SELLER_STRINGS.VISIBILITY_PUBLIC_DESC}</p>
+                       </div>
+                    </Label>
+                    <Label className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-muted/50 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5">
+                        <RadioGroupItem value="private" id="private" />
+                         <div className="grid gap-1.5">
+                           <div className="font-semibold flex items-center"><Lock className="mr-2 h-4 w-4 text-muted-foreground" /> {SELLER_STRINGS.VISIBILITY_PRIVATE}</div>
+                           <p className="text-sm text-muted-foreground">{SELLER_STRINGS.VISIBILITY_PRIVATE_DESC}</p>
+                       </div>
+                    </Label>
+                    <Label className="flex items-center gap-3 p-4 border rounded-md cursor-pointer hover:bg-muted/50 has-[input:checked]:border-primary has-[input:checked]:bg-primary/5">
+                        <RadioGroupItem value="partial" id="partial" />
+                        <div className="grid gap-1.5">
+                           <div className="font-semibold flex items-center"><Eye className="mr-2 h-4 w-4 text-muted-foreground" /> {SELLER_STRINGS.VISIBILITY_PARTIAL}</div>
+                           <p className="text-sm text-muted-foreground">{SELLER_STRINGS.VISIBILITY_PARTIAL_DESC}</p>
+                       </div>
+                    </Label>
+                </RadioGroup>
+            </div>
+        </div>
 
-        <div className="flex items-center space-x-2">
-          <Switch id="sell-once" name="sellOnce" checked={sellOnceValue} onCheckedChange={handleSellOnceChange} />
-          <Label htmlFor="sell-once">{SELLER_STRINGS.SELL_ONCE_LABEL}</Label>
+        <div className="space-y-2">
+            <Label htmlFor="product-images">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
+            <div className="border-2 border-dashed border-muted-foreground/50 rounded-lg p-8 text-center cursor-pointer hover:bg-muted/50">
+              <UploadCloud className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-4 text-muted-foreground">
+                {SELLER_STRINGS.PRODUCT_IMAGES_HINT}
+              </p>
+              <Input id="product-images" type="file" className="sr-only" multiple />
+            </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <Label htmlFor="description">{SELLER_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
+            <Button type="button" variant="outline" size="sm" onClick={handleGenerateDescription} disabled={isGenerating}>
+              {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+              {BUTTONS.GENERATE_WITH_AI}
+            </Button>
+          </div>
+           <Card>
+              <CardContent className="p-2 space-y-2">
+                <div className="flex gap-1">
+                    <Button variant="ghost" size="sm"><ImageIcon className="mr-2 h-4 w-4" /> {SELLER_STRINGS.ADD_IMAGE}</Button>
+                    <Button variant="ghost" size="sm"><FileText className="mr-2 h-4 w-4" /> {SELLER_STRINGS.IMPORT_TEMPLATE}</Button>
+                </div>
+                <Textarea
+                    id="description"
+                    placeholder={SELLER_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
+                    className="min-h-[250px] border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+                    {...register("description")}
+                />
+              </CardContent>
+            </Card>
+          {errors.description && <p className="text-destructive text-sm">{errors.description.message}</p>}
         </div>
 
         <SubmitButton />
@@ -279,5 +325,3 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
     </>
   );
 }
-
-    
