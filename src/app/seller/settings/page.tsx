@@ -120,9 +120,9 @@ export default function SellerSettingsPage() {
                 <TabsTrigger value="payouts">{SELLER_STRINGS.SETTINGS_TAB_PAYOUTS}</TabsTrigger>
             </TabsList>
             <TabsContent value="profile">
-                <Card className="shadow-sm rounded-xl">
+                <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                 <CardHeader>
-                    <CardTitle>{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PROFILE_TITLE}</CardTitle>
                     <CardDescription>
                     {SELLER_STRINGS.PROFILE_DESC}
                     </CardDescription>
@@ -145,9 +145,9 @@ export default function SellerSettingsPage() {
                 </Card>
             </TabsContent>
             <TabsContent value="payouts">
-                <Card className="shadow-sm rounded-xl">
+                <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
                 <CardHeader>
-                    <CardTitle>{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
+                    <CardTitle className="text-xl md:text-2xl">{SELLER_STRINGS.PAYOUTS_TITLE}</CardTitle>
                     <CardDescription>
                     {SELLER_STRINGS.PAYOUTS_DESC}
                     </CardDescription>

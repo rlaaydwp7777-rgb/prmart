@@ -26,10 +26,10 @@ interface AnalyticsData {
 function AnalyticsSkeleton() {
     return (
          <div className="space-y-8">
-            <CardHeader className="p-0">
+            <div className="p-0">
                 <Skeleton className="h-8 w-48" />
                 <Skeleton className="h-4 w-80 mt-2" />
-            </CardHeader>
+            </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Skeleton className="h-28 rounded-xl" />
                 <Skeleton className="h-28 rounded-xl" />
@@ -86,10 +86,10 @@ export default function SellerAnalyticsPage() {
 
   return (
     <div className="space-y-8">
-        <CardHeader className="p-0">
-            <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
-            <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
-        </CardHeader>
+        <div className="p-0">
+            <h1 className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</h1>
+            <p className="text-muted-foreground">{SELLER_STRINGS.ANALYTICS_DESC}</p>
+        </div>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">

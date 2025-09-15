@@ -4,7 +4,7 @@
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { DollarSign, Package, Star, ShoppingBag, BarChart } from "lucide-react";
+import { DollarSign, Package, Star, ShoppingBag } from "lucide-react";
 import type { SellerStats, Order, Prompt } from "@/lib/types";
 import { getSellerDashboardData } from "@/lib/firebase/services";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 import { RecentSales } from "@/components/seller/recent-sales";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 
 interface DashboardData {
     stats: SellerStats;
@@ -188,7 +187,7 @@ export default function SellerDashboardPage() {
                     </Card>
                 )}
 
-                 <Card>
+                 <Card className="shadow-sm rounded-xl">
                     <CardHeader>
                         <CardTitle className="font-headline text-2xl">새 상품 등록</CardTitle>
                         <CardDescription>AI 어시스턴트를 사용해 빠르고 쉽게 상품을 등록해보세요.</CardDescription>
