@@ -1,4 +1,5 @@
 
+
 import { Rocket, Code, LineChart, Plane, Users, Briefcase, Brush, BookOpen, Car, Home, Wallet } from "lucide-react";
 
 export const META = {
@@ -210,7 +211,7 @@ export const ACCOUNT_STRINGS = {
     SUBHEADLINE: "구매내역, 다운로드, 프로필 설정을 관리하세요.",
     NAV_ORDERS: "구매 내역",
     NAV_DOWNLOADS: "다운로드",
-    NAV_REVIEWS: "리뷰 관리",
+    NAV_REVIEWS: "내가 작성한 리뷰",
     NAV_WISHLIST: "위시리스트",
     NAV_PROFILE: "프로필 설정",
     
@@ -227,11 +228,13 @@ export const ACCOUNT_STRINGS = {
     ORDER_VIEW_DETAILS: "상세보기",
     ORDERS_TITLE: "전체 구매 내역",
     ORDERS_DESC: "지금까지 구매한 모든 상품 내역입니다.",
+    ORDERS_EMPTY: "아직 구매한 상품이 없습니다.",
     ORDER_STATUS_PAID: "결제완료",
     ORDER_STATUS_REFUNDED: "환불됨",
     
     DOWNLOADS_TITLE: "다운로드 센터",
     DOWNLOADS_DESC: "구매한 상품을 여기서 다운로드할 수 있습니다.",
+    DOWNLOADS_EMPTY: "다운로드할 수 있는 상품이 없습니다.",
     DOWNLOADS_PRODUCT_NAME: "상품명",
     DOWNLOADS_PURCHASE_DATE: "구매일",
     DOWNLOADS_VERSION: "버전",

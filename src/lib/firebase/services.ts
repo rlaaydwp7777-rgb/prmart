@@ -1,7 +1,8 @@
 
+
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile } from "@/lib/types";
+import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, { ts: number, data: any }>();
@@ -433,7 +434,7 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     });
 }
 
-export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'stats' | 'rating' | 'reviews'>) {
+export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "products"), {
@@ -471,7 +472,7 @@ export async function getSellerDashboardData(sellerId: string) {
             const productIds = sellerProducts.map(p => p.id);
             const orders: Order[] = [];
             if (productIds.length > 0) {
-                const idChunks = chunk(productIds, 10);
+                const idChunks = chunk(productIds, 30);
                 const orderPromises = idChunks.map(chunk => {
                     const ordersQuery = query(collection(db, "orders"), where("productId", "in", chunk));
                     return getDocs(ordersQuery);
@@ -558,4 +559,50 @@ export async function getSellerProfile(userId: string): Promise<SellerProfile | 
 export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
     const docRef = doc(db, 'sellers', userId);
     await setDoc(docRef, profile, { merge: true });
+}
+
+export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
+    const cacheKey = `orders_by_buyer_${buyerId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const q = query(collection(db, "orders"), where("buyerId", "==", buyerId), orderBy("orderDate", "desc"));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
+        } catch (error) {
+            console.error(`Error fetching orders for buyer ${buyerId}:`, error);
+            return [];
+        }
+    }, 10000); // 10-second cache
+}
+
+export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
+    const cacheKey = `reviews_by_author_${authorId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const q = query(collection(db, "reviews"), where("authorId", "==", authorId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            return snapshot.docs.map(doc => serializeDoc(doc) as Review).filter(Boolean);
+        } catch (error) {
+            console.error(`Error fetching reviews for author ${authorId}:`, error);
+            return [];
+        }
+    }, 10000); // 10-second cache
+}
+
+
+export async function getWishlistByUserId(userId: string): Promise<Wishlist | null> {
+    const cacheKey = `wishlist_by_user_${userId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const docRef = doc(db, "wishlists", userId);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+                return serializeDoc(docSnap) as Wishlist;
+            }
+            return { userId, productIds: [] }; // Return empty wishlist if not found
+        } catch (error) {
+            console.error(`Error fetching wishlist for user ${userId}:`, error);
+            return null;
+        }
+    }, 10000); // 10-second cache
 }
