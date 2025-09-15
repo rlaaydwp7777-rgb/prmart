@@ -1,4 +1,3 @@
-
 "use client";
 
 import * as React from "react";
@@ -52,9 +51,9 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
     <SidebarProvider>
       <div className="flex min-h-screen bg-background text-foreground">
         <Sidebar className="hidden md:flex md:flex-col md:w-64 border-r bg-sidebar text-sidebar-foreground">
-            <div className="flex h-16 items-center border-b px-6">
+            <div className="flex h-16 items-center border-b px-6 border-sidebar-border">
               <Link href="/" className="flex items-center gap-2 font-semibold">
-                  <Sparkles className="h-6 w-6 text-primary" />
+                  <Sparkles className="h-6 w-6 text-sidebar-primary" />
                   <span className="font-bold text-xl font-headline tracking-tight">prmart</span>
               </Link>
             </div>

@@ -6,13 +6,11 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 export function SellerHeader() {
   return (
      <div className="flex h-14 items-center justify-between border-b bg-background px-4">
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="md:hidden">
           <SidebarTrigger/>
-           <Link href="/" className="flex items-center gap-2">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </Link>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="hidden md:block"></div> {/* This empty div pushes AuthButtons to the right on desktop */}
+        <div className="flex items-center gap-2">
            <AuthButtons />
         </div>
     </div>
