@@ -50,35 +50,23 @@ export default function RootLayout({
       const fetchedCategories = await getCategories();
       setCategories(fetchedCategories);
     }
-    if (!pathname.startsWith('/seller')) {
-        fetchCategories();
-    }
-  }, [pathname]);
+    fetchCategories();
+  }, []);
 
   const isSellerPage = pathname.startsWith('/seller');
   const isAuthPage = pathname === '/login' || pathname === '/signup';
-
-  if (isSellerPage) {
-    return (
-        <html lang="ko" suppressHydrationWarning>
-            <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
-                <AuthProvider>
-                    {children}
-                    <Toaster />
-                </AuthProvider>
-            </body>
-        </html>
-    );
-  }
+  const showHeaderAndFooter = !isSellerPage && !isAuthPage;
 
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
         <AuthProvider>
           <div className="flex flex-col min-h-screen">
-            {!isAuthPage && <Header categories={categories} />}
-            <main className={!isAuthPage ? "flex-1 pt-16" : "flex-1"}>{children}</main>
-            {!isAuthPage && <Footer />}
+            {showHeaderAndFooter && <Header categories={categories} />}
+            <main className={showHeaderAndFooter ? "flex-1 pt-16" : "flex-1"}>
+              {children}
+            </main>
+            {showHeaderAndFooter && <Footer />}
           </div>
           <Toaster />
         </AuthProvider>
@@ -86,3 +74,4 @@ export default function RootLayout({
     </html>
   );
 }
+
