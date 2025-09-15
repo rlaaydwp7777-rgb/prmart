@@ -22,7 +22,13 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 import { SellerHeader } from "@/components/layout/seller-header";
+import '../globals.css';
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/components/auth/auth-provider";
+import { Inter, Space_Grotesk } from 'next/font/google';
 
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-space-grotesk' });
 
 function CollapsibleSidebarMenu({
     title,
@@ -80,15 +86,9 @@ function CollapsibleSidebarMenu({
     );
 }
 
-
-export default function SellerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function SellerLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
 
   React.useEffect(() => {
     if (!loading && !user) {
@@ -120,9 +120,6 @@ export default function SellerLayout({
         </div>
      )
   }
-  
-  const isActive = (path: string) => pathname.startsWith(path);
-
 
   return (
     <SidebarProvider>
@@ -137,7 +134,7 @@ export default function SellerLayout({
           <SidebarContent>
             <SidebarMenu>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={pathname === '/seller/dashboard'}>
+                 <SidebarMenuButton asChild data-active={usePathname() === '/seller/dashboard'}>
                     <Link href="/seller/dashboard">
                         <LayoutDashboard className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.DASHBOARD}</span>
@@ -171,7 +168,7 @@ export default function SellerLayout({
                 </CollapsibleSidebarMenu>
               
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={isActive('/seller/payouts')}>
+                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/payouts')}>
                     <Link href="/seller/payouts">
                         <Landmark className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.PAYOUTS}</span>
@@ -179,7 +176,7 @@ export default function SellerLayout({
                  </SidebarMenuButton>
                </SidebarMenuItem>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={isActive('/seller/settings')}>
+                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/settings')}>
                     <Link href="/seller/settings">
                         <Settings className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.SETTINGS}</span>
@@ -219,5 +216,19 @@ export default function SellerLayout({
         </div>
       </div>
     </SidebarProvider>
+  );
+}
+
+
+export default function SellerLayout({ children }: { children: React.ReactNode; }) {
+  return (
+    <html lang="ko" suppressHydrationWarning>
+      <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
+        <AuthProvider>
+            <SellerLayoutContent>{children}</SellerLayoutContent>
+            <Toaster />
+        </AuthProvider>
+      </body>
+    </html>
   );
 }
