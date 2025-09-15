@@ -203,7 +203,7 @@ export const SIDEBAR_STRINGS = {
     DASHBOARD: "대시보드",
     PRODUCTS: "상품 관리",
     ANALYTICS: "판매 분석",
-    SETTINGS: "판매자 설정",
+    SETTINGS: "설정",
     HELP: "도움말",
     ACCOUNT: "계정 정보",
     PAYOUTS: "정산 관리",
@@ -268,3 +268,5 @@ export const ACCOUNT_STRINGS = {
     SETTINGS_NOTI_SECURITY: "보안 알림",
     SETTINGS_NOTI_SECURITY_DESC: "계정 관련 중요 변경사항에 대한 알림입니다.",
 }
+
+    

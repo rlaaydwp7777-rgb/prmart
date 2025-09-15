@@ -1,0 +1,62 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default: Deny all reads and writes
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Products can be read by anyone, but only created/updated/deleted by their seller
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
+      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+    }
+
+    // Categories can be read by anyone, but only written by admins (future implementation)
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if false; // To be replaced with admin check
+    }
+
+    // Idea Requests can be read by anyone, created by any logged-in user
+    match /ideaRequests/{requestId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      // Only the author can update/delete their request
+      allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
+    }
+
+    // Proposals can be created by any logged-in user
+    match /proposals/{proposalId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
+    }
+
+    // Seller profiles can be read by anyone, but only written by the user themselves
+    match /sellers/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Orders can only be read/written by the buyer or seller involved
+    match /orders/{orderId} {
+      allow read: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
+    }
+
+    // Reviews can be created by a logged-in user, but only modified by the author
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
+    }
+
+    // Wishlists can only be read/written by the owner
+    match /wishlists/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
