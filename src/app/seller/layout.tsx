@@ -23,7 +23,6 @@ const buyerNavItems = [
 
 const sellerNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
-  { href: "/seller/products/add", icon: PlusCircle, title: SELLER_STRINGS.ADD_NEW_PRODUCT },
   { href: "/seller/products", icon: Package, title: SIDEBAR_STRINGS.PRODUCTS },
   { href: "/seller/analytics", icon: BarChart2, title: SIDEBAR_STRINGS.ANALYTICS },
   { href: "/seller/reviews", icon: Star, title: SIDEBAR_STRINGS.REVIEWS },
@@ -72,7 +71,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
   );
 
   const sidebarContent = (
-     <div className="flex flex-col h-full bg-sidebar text-sidebar-foreground">
+     <div className="flex flex-col h-full bg-sidebar-background text-sidebar-foreground">
         <div className="p-4 border-b border-sidebar-border">
             <Link href="/" className="flex items-center gap-2 font-semibold">
                 <Sparkles className="h-6 w-6 text-primary" />
@@ -80,19 +79,20 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
             </Link>
         </div>
         <div className="flex-1 overflow-y-auto">
-            <nav className="p-4 space-y-4">
+            <nav className="p-2 space-y-2">
                 <div>
-                  <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">구매 활동</h3>
-                  <div className="space-y-1 mt-2">
+                  <h3 className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">구매 활동</h3>
+                  <div className="space-y-1 mt-1">
                     {buyerNavItems.map((item) => <NavLink key={item.href} item={item} />)}
                   </div>
                 </div>
                 
-                <Separator className="bg-sidebar-border" />
+                <Separator className="bg-sidebar-border/50" />
                 
                 <div>
-                   <h3 className="px-3 py-2 text-xs font-semibold text-muted-foreground/80 uppercase tracking-wider">판매 활동</h3>
-                   <div className="space-y-1 mt-2">
+                   <h3 className="px-3 py-2 text-xs font-semibold text-sidebar-foreground/60 uppercase tracking-wider">판매 활동</h3>
+                   <div className="space-y-1 mt-1">
+                     <NavLink item={{ href: "/seller/products/add", icon: PlusCircle, title: SELLER_STRINGS.ADD_NEW_PRODUCT }} />
                     {sellerNavItems.map((item) => <NavLink key={item.href} item={item} />)}
                   </div>
                 </div>
@@ -111,7 +111,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
                 <p className="text-sm font-medium">{user.displayName || 'prmart user'}</p>
                 <p className="text-xs text-sidebar-foreground/70 truncate">{user.email}</p>
               </div>
-               <Button variant="ghost" size="icon" className="text-sidebar-foreground/70" onClick={signOut}>
+               <Button variant="ghost" size="icon" className="text-sidebar-foreground/70 hover:text-sidebar-foreground" onClick={signOut}>
                   <LogOut className="h-5 w-5" />
                   <span className="sr-only">로그아웃</span>
               </Button>
@@ -123,14 +123,14 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[280px_1fr]">
-        <aside className="hidden border-r bg-muted/40 md:block">
+        <aside className="hidden border-r bg-sidebar md:block">
             {sidebarContent}
         </aside>
         <div className="flex flex-col">
-            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6 md:hidden">
+            <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 md:hidden">
                 <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
                     <SheetTrigger asChild>
-                        <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+                        <Button variant="outline" size="icon" className="shrink-0">
                             <Menu className="h-5 w-5" />
                             <span className="sr-only">Toggle navigation menu</span>
                         </Button>
@@ -147,7 +147,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
                 </div>
                 <div className="w-8"></div>
             </header>
-            <main className="flex-1 bg-background">
+            <main className="flex-1 bg-muted/30">
                 <div className="mx-auto w-full max-w-7xl p-6">
                     {children}
                 </div>

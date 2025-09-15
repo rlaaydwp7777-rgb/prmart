@@ -284,7 +284,7 @@ function serializeDoc(doc: any): any {
         return null;
     }
     const data = doc.data();
-    if (!data) return { id: doc.id };
+    if (!data) return null;
 
     const serializedData: { [key: string]: any } = { id: doc.id };
 
