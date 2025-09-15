@@ -15,6 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { signOut } from "@/lib/firebase/auth";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
+import { LayoutDashboard, Settings, LogOut } from "lucide-react";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
@@ -24,32 +25,41 @@ export function AuthButtons() {
   }
 
   if (user) {
-    const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : '');
+    const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-            <Avatar className="h-9 w-9">
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+            <Avatar className="h-10 w-10">
               <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? "user"} data-ai-hint="person face" />
               <AvatarFallback>{userInitial.toUpperCase()}</AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel>
-            <p>{user.displayName ?? AUTH_STRINGS.USER_MENU_GREETING}</p>
-            <p className="text-xs font-normal text-muted-foreground">{user.email}</p>
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.displayName || AUTH_STRINGS.USER_MENU_GREETING}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <Link href="/seller/dashboard">{SIDEBAR_STRINGS.DASHBOARD}</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/seller/settings">{SIDEBAR_STRINGS.SETTINGS}</Link>
-          </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/seller/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    <span>{SIDEBAR_STRINGS.DASHBOARD}</span>
+                </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+                <Link href="/seller/settings">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>{SIDEBAR_STRINGS.SETTINGS}</span>
+                </Link>
+            </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive">
-            {AUTH_STRINGS.LOGOUT_LINK}
+             <LogOut className="mr-2 h-4 w-4" />
+            <span>{AUTH_STRINGS.LOGOUT_LINK}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
