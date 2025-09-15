@@ -1,3 +1,4 @@
+
 "use client";
 
 import * as React from "react";
@@ -81,6 +82,7 @@ function CollapsibleSidebarMenu({
 function SellerLayoutContent({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
   
   React.useEffect(() => {
     if (!loading && !user) {
@@ -126,7 +128,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
           <SidebarContent>
             <SidebarMenu>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={usePathname() === '/seller/dashboard'}>
+                 <SidebarMenuButton asChild data-active={pathname === '/seller/dashboard'}>
                     <Link href="/seller/dashboard">
                         <LayoutDashboard className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.DASHBOARD}</span>
@@ -160,7 +162,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
                 </CollapsibleSidebarMenu>
               
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/payouts')}>
+                 <SidebarMenuButton asChild data-active={pathname.startsWith('/seller/payouts')}>
                     <Link href="/seller/payouts">
                         <Landmark className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.PAYOUTS}</span>
@@ -168,7 +170,7 @@ function SellerLayoutContent({ children }: { children: React.ReactNode }) {
                  </SidebarMenuButton>
                </SidebarMenuItem>
                <SidebarMenuItem>
-                 <SidebarMenuButton asChild data-active={usePathname().startsWith('/seller/settings')}>
+                 <SidebarMenuButton asChild data-active={pathname.startsWith('/seller/settings')}>
                     <Link href="/seller/settings">
                         <Settings className="h-5 w-5" />
                         <span className="text-base font-medium">{SIDEBAR_STRINGS.SETTINGS}</span>
