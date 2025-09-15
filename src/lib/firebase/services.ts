@@ -318,9 +318,11 @@ export async function getProducts(): Promise<Prompt[]> {
 export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
     return fetchFromCache(`products_by_seller_${sellerId}`, async () => {
          try {
-            const q = query(collection(db, "products"), where("sellerId", "==", sellerId), orderBy("createdAt", "desc"));
+            const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
             const snapshot = await getDocs(q);
-            return snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
+            const products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
+            // Sort by createdAt client-side to avoid composite index
+            return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error(`Error fetching products for seller ${sellerId}:`, error);
             return [];
