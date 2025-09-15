@@ -62,7 +62,7 @@ export default function SellerLayout({ children }: { children: React.ReactNode; 
         href={item.href}
         className={cn(
             "flex items-center gap-3 rounded-lg px-3 py-2 text-base font-medium transition-all hover:bg-accent hover:text-accent-foreground",
-            pathname.startsWith(item.href) ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+            pathname === item.href ? "bg-accent text-accent-foreground" : "text-muted-foreground"
         )}
         onClick={() => isMobileSheetOpen && setIsMobileSheetOpen(false)}
     >
