@@ -4,23 +4,21 @@
 import { ProductRegistrationForm } from "@/components/seller/product-registration-form";
 import { SELLER_STRINGS } from "@/lib/string-constants";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
-import { DollarSign, Package, Star, ShoppingBag, PlusCircle, BarChart } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { RecentSales } from "@/components/seller/recent-sales";
-import { Overview } from "@/components/seller/overview";
+import { DollarSign, Package, Star, ShoppingBag, BarChart } from "lucide-react";
 import type { SellerStats, Order, Prompt } from "@/lib/types";
 import { getSellerDashboardData } from "@/lib/firebase/services";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useEffect, useState, useCallback } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import { RecentSales } from "@/components/seller/recent-sales";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
 
 interface DashboardData {
     stats: SellerStats;
     recentSales: Order[];
     bestSellers: (Prompt & { sales: number; revenue: number })[];
-    salesByMonth: { name: string; total: number }[];
 }
 
 function DashboardSkeleton() {
@@ -78,28 +76,17 @@ export default function SellerDashboardPage() {
     }
 
     if (!user) {
-        return (
-            <div className="flex flex-col items-center justify-center h-full text-center">
-                <h1 className="text-2xl font-bold font-headline">인증 오류</h1>
-                <p className="text-muted-foreground">판매자 정보를 불러올 수 없습니다. 다시 로그인해주세요.</p>
-                <Button asChild className="mt-4">
-                    <Link href="/login">로그인</Link>
-                </Button>
-            </div>
-        );
+        return null; // The layout will handle the redirect.
     }
     
     if (!data) {
        return <p>데이터를 불러오는 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.</p>;
     }
 
-    const { stats, recentSales, bestSellers, salesByMonth } = data;
+    const { stats, recentSales, bestSellers } = data;
     const hasProducts = stats.productCount > 0;
-    const hasSales = stats.totalSales > 0;
-    const hasMonthlySales = salesByMonth.some(month => month.total > 0);
 
-
-  return (
+    return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight font-headline">{SELLER_STRINGS.DASHBOARD_HEADLINE}</h1>
@@ -125,7 +112,7 @@ export default function SellerDashboardPage() {
                             <DollarSign className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">₩{stats.totalRevenue.toLocaleString()}</div>
+                            <Link href="/seller/analytics" className="text-2xl font-bold hover:underline">₩{stats.totalRevenue.toLocaleString()}</Link>
                         </CardContent>
                     </Card>
                     <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
@@ -134,7 +121,7 @@ export default function SellerDashboardPage() {
                             <ShoppingBag className="h-5 w-5 text-muted-foreground" />
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold">+{stats.totalSales.toLocaleString()}</div>
+                            <Link href="/seller/analytics" className="text-2xl font-bold hover:underline">+{stats.totalSales.toLocaleString()}</Link>
                         </CardContent>
                     </Card>
                     <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
@@ -164,23 +151,7 @@ export default function SellerDashboardPage() {
                     </Card>
                 </div>
                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-                    <Card className="lg:col-span-4 shadow-sm rounded-xl hover:bg-muted/5 transition">
-                        <CardHeader>
-                            <CardTitle className="text-xl">{SELLER_STRINGS.MONTHLY_OVERVIEW}</CardTitle>
-                            <CardDescription>{SELLER_STRINGS.MONTHLY_OVERVIEW_DESC}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="pl-2">
-                            {hasMonthlySales ? (
-                                <Overview data={salesByMonth} />
-                            ) : (
-                                <div className="h-[350px] flex flex-col items-center justify-center text-center">
-                                    <BarChart className="h-12 w-12 text-muted-foreground mb-4" />
-                                    <p className="text-muted-foreground">{SELLER_STRINGS.EMPTY_SALES_DATA}</p>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
-                    <Card className="lg:col-span-3 shadow-sm rounded-xl hover:bg-muted/5 transition">
+                    <Card className="lg:col-span-7 shadow-sm rounded-xl hover:bg-muted/5 transition">
                         <CardHeader>
                             <CardTitle className="text-xl">{SELLER_STRINGS.RECENT_ORDERS_TITLE}</CardTitle>
                             <CardDescription>{SELLER_STRINGS.RECENT_ORDERS_DESC}</CardDescription>
@@ -206,7 +177,7 @@ export default function SellerDashboardPage() {
                         <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {bestSellers.map(product => (
                                 <Card key={product.id} className="flex gap-4 p-4 shadow-sm rounded-lg hover:bg-background transition">
-                                    <Image src={product.image} alt={product.title} width={80} height={60} className="rounded-md object-cover aspect-video" data-ai-hint="abstract design" />
+                                    <Image src={product.image} alt={product.title} width={80} height={60} className="rounded-md object-cover aspect-video" data-ai-hint={product.aiHint ?? 'abstract design'} />
                                     <div className="space-y-1 text-sm">
                                         <p className="font-semibold line-clamp-2">{product.title}</p>
                                         <p className="text-muted-foreground">{product.sales} 판매</p>
@@ -216,6 +187,16 @@ export default function SellerDashboardPage() {
                         </CardContent>
                     </Card>
                 )}
+
+                 <Card>
+                    <CardHeader>
+                        <CardTitle className="font-headline text-2xl">새 상품 등록</CardTitle>
+                        <CardDescription>AI 어시스턴트를 사용해 빠르고 쉽게 상품을 등록해보세요.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <ProductRegistrationForm onProductRegistered={fetchDashboardData} />
+                    </CardContent>
+                 </Card>
             </>
         )}
       

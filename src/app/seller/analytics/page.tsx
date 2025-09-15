@@ -10,7 +10,7 @@ import { SELLER_STRINGS } from "@/lib/string-constants"
 import { useAuth } from "@/components/auth/auth-provider"
 import { useState, useEffect, useCallback } from "react"
 import { getSellerDashboardData } from "@/lib/firebase/services"
-import type { SellerStats, Prompt } from "@/lib/types"
+import type { SellerStats, Prompt, Order } from "@/lib/types"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RecentSales } from "@/components/seller/recent-sales"
 import { Button } from "@/components/ui/button"
@@ -18,21 +18,25 @@ import Link from "next/link"
 
 interface AnalyticsData {
     stats: SellerStats;
-    recentSales: any[];
+    recentSales: Order[];
     bestSellers: (Prompt & { sales: number; revenue: number })[];
     salesByMonth: { name: string; total: number }[];
 }
 
 function AnalyticsSkeleton() {
     return (
-         <div className="space-y-6">
+         <div className="space-y-8">
+            <CardHeader className="p-0">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-80 mt-2" />
+            </CardHeader>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <Skeleton className="h-28 rounded-xl" />
                 <Skeleton className="h-28 rounded-xl" />
                 <Skeleton className="h-28 rounded-xl" />
                 <Skeleton className="h-28 rounded-xl" />
             </div>
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
                 <Skeleton className="lg:col-span-4 h-96 rounded-xl" />
                 <Skeleton className="lg:col-span-3 h-96 rounded-xl" />
             </div>
@@ -65,32 +69,27 @@ export default function SellerAnalyticsPage() {
 
 
   if(loading || authLoading) {
-    return (
-        <div className="space-y-8">
-            <CardHeader className="p-0">
-                <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
-                <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
-            </CardHeader>
-            <AnalyticsSkeleton />
-        </div>
-    )
+    return <AnalyticsSkeleton />
   }
 
+  if(!user) {
+    return null; // The layout will handle the redirect
+  }
+  
   if(!data) {
     return <p>데이터를 불러오는 중 오류가 발생했습니다.</p>;
   }
 
   const { stats, recentSales, bestSellers, salesByMonth } = data;
-  const hasSales = stats.totalSales > 0;
   const hasMonthlySales = salesByMonth.some(month => month.total > 0);
 
 
   return (
     <div className="space-y-8">
-      <CardHeader className="p-0">
-        <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
-        <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
-      </CardHeader>
+        <CardHeader className="p-0">
+            <CardTitle className="text-xl md:text-2xl font-bold tracking-tight font-headline">{SELLER_STRINGS.ANALYTICS_TITLE}</CardTitle>
+            <CardDescription>{SELLER_STRINGS.ANALYTICS_DESC}</CardDescription>
+        </CardHeader>
 
        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-sm rounded-xl hover:bg-muted/5 transition">
@@ -207,7 +206,7 @@ export default function SellerAnalyticsPage() {
                             <TableRow key={product.id}>
                                 <TableCell>
                                     <div className="flex items-center gap-4">
-                                        <Image src={product.image} alt={product.title} width={64} height={48} className="rounded-md object-cover" data-ai-hint="abstract design" />
+                                        <Image src={product.image} alt={product.title} width={64} height={48} className="rounded-md object-cover" data-ai-hint={product.aiHint ?? 'abstract design'} />
                                         <span className="font-medium">{product.title}</span>
                                     </div>
                                 </TableCell>
