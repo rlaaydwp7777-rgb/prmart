@@ -1,10 +1,11 @@
+
 "use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Sparkles, LayoutDashboard, Package, Settings, LifeBuoy, Landmark, Star, Users, BarChart2 } from "lucide-react";
-import { SIDEBAR_STRINGS } from "@/lib/string-constants";
+import { SIDEBAR_STRINGS, AUTH_STRINGS } from "@/lib/string-constants";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -21,7 +22,6 @@ const sidebarNavItems = [
   { href: "/seller/payouts", icon: Landmark, title: SIDEBAR_STRINGS.PAYOUTS },
   { href: "/seller/settings", icon: Settings, title: SIDEBAR_STRINGS.SETTINGS },
 ];
-
 
 export default function SellerLayout({ children }: { children: React.ReactNode; }) {
   const { user, loading, signOut } = useAuth();
