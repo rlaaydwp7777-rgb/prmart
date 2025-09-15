@@ -194,9 +194,11 @@ export async function registerProductAction(prevState: FormState, formData: Form
           author,
           sellerId,
           visibility,
+          sellOnce,
         });
 
         revalidatePath('/seller/dashboard');
+        revalidatePath('/seller/products');
 
         return { 
             success: true,

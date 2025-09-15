@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap } from "lucide-react";
+import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap, Clock } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ import type { Category, Prompt } from "@/lib/types";
 import { useAuth } from "@/components/auth/auth-provider";
 import { PromptCard } from "./prompt-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { format } from 'date-fns';
 
 const mockReviews = [
     { id: 1, author: "김지훈", avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요." },
@@ -91,6 +92,12 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                     <span className="font-medium">{rating.toFixed(1)}</span>
                     <span>({reviews.toLocaleString()})</span>
                 </div>
+                 {prompt.updatedAt && (
+                    <div className="flex items-center gap-1">
+                        <Clock className="w-4 h-4"/>
+                        <span>업데이트: {format(new Date(prompt.updatedAt), "yyyy-MM-dd")}</span>
+                    </div>
+                )}
             </div>
           </div>
 

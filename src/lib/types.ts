@@ -19,6 +19,7 @@ export interface Prompt {
   rank?: number;
   isExample?: boolean;
   visibility: PromptVisibility;
+  sellOnce?: boolean;
   createdAt: string; // Changed from Timestamp to string
   updatedAt?: string; // Changed from Timestamp to string
   stats: {

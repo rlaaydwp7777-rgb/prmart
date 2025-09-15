@@ -236,6 +236,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     isExample: true,
                     visibility: 'public',
                     createdAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
+                    updatedAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     stats: {
                         views: Math.floor(Math.random() * 2000) + 100,
                         likes: Math.floor(Math.random() * 300) + 10,
@@ -433,11 +434,13 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     });
 }
 
-export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'stats' | 'rating' | 'reviews'>) {
+export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
     try {
+        const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "products"), {
             ...productData,
-            createdAt: Timestamp.now(),
+            createdAt: now,
+            updatedAt: now,
             stats: { views: 0, likes: 0, sales: 0 },
             rating: 0,
             reviews: 0,
