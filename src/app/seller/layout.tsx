@@ -23,12 +23,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 function SellerHeader() {
   return (
-     <div className="flex items-center justify-between md:justify-end mb-4">
+     <div className="flex items-center justify-between md:justify-end mb-4 h-14 px-4 border-b md:border-b-0 md:h-auto md:px-0 md:mb-0">
         <div className="md:hidden">
-            <SidebarTrigger/>
+            <Link href="/" className="flex items-center gap-2">
+              <Sparkles className="h-6 w-6 text-primary" />
+              <span className="font-bold text-lg font-headline tracking-tight">prmart</span>
+            </Link>
         </div>
-        <div>
+        <div className="flex items-center gap-2">
            <AuthButtons />
+           <div className="md:hidden">
+            <SidebarTrigger/>
+           </div>
         </div>
     </div>
   )
@@ -126,12 +132,12 @@ export default function SellerLayout({
             </SidebarMenu>
           </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
-          <div className="p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col flex-1">
             <SellerHeader />
-            {children}
-          </div>
-        </SidebarInset>
+            <main className="p-4 sm:p-6 lg:p-8 flex-1">
+                {children}
+            </main>
+        </div>
       </div>
     </SidebarProvider>
   );
