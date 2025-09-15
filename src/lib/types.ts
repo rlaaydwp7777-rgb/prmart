@@ -95,11 +95,11 @@ export interface SellerStats {
 
 export interface SellerProfile {
     sellerName: string;
-    sellerBio: string;
+    sellerBio?: string;
     photoUrl?: string;
-    bankName: string;
-    accountNumber: string;
-    accountHolder: string;
+    bankName?: string;
+    accountNumber?: string;
+    accountHolder?: string;
 }
 
 export interface Review {

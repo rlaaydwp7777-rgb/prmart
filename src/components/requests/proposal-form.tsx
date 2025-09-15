@@ -80,8 +80,6 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
             <input type="hidden" name="authorId" value={user.uid} />
-            <input type="hidden" name="authorName" value={user.displayName || user.email!} />
-            <input type="hidden" name="authorAvatar" value={user.photoURL || ''} />
 
             <Textarea
                 name="content"

@@ -281,8 +281,6 @@ const proposalSchema = z.object({
   content: z.string().min(10, "제안 내용은 10자 이상이어야 합니다."),
   requestId: z.string(),
   authorId: z.string(),
-  authorName: z.string(),
-  authorAvatar: z.string().url().or(z.literal('')),
 });
 
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -298,7 +296,22 @@ export async function createProposalAction(prevState: FormState, formData: FormD
     }
 
     try {
-        await saveProposal(validatedFields.data);
+        const { authorId } = validatedFields.data;
+        const authorProfile = await getSellerProfile(authorId);
+
+        if (!authorProfile) {
+            return {
+                success: false,
+                message: "제안을 제출하려면 먼저 판매자 프로필을 설정해야 합니다.",
+            };
+        }
+
+        await saveProposal({
+            ...validatedFields.data,
+            authorName: authorProfile.sellerName,
+            authorAvatar: authorProfile.photoUrl || "",
+        });
+
         revalidatePath(`/requests/${validatedFields.data.requestId}`);
         return {
             success: true,
@@ -357,6 +370,7 @@ export async function updateSellerProfileAction(prevState: any, formData: FormDa
     });
     
     revalidatePath('/seller/settings');
+    revalidatePath(`/seller/${userId}`); // Revalidate public seller page
     
     return { success: true, message: "프로필 정보가 성공적으로 저장되었습니다." };
   } catch (error) {
