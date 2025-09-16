@@ -34,14 +34,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    if (!loading) {
-      const isAuthPage = pathname === '/login' || pathname === '/signup';
-      if (user && isAuthPage) {
-        router.replace('/');
-      } else if (!user && (pathname.startsWith('/seller') || pathname.startsWith('/account'))) {
-        router.replace('/login');
-      }
+    if (loading) return;
+
+    const isAuthPage = pathname === '/login' || pathname === '/signup';
+
+    // If user is logged in and on an auth page, redirect to home
+    if (user && isAuthPage) {
+      router.replace('/');
+      return;
     }
+    
+    // If user is not logged in and trying to access a protected route
+    if (!user && (pathname.startsWith('/seller') || pathname.startsWith('/account'))) {
+      router.replace('/login');
+      return;
+    }
+
   }, [user, loading, pathname, router]);
 
   const signOut = async () => {
