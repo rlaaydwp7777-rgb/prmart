@@ -39,6 +39,7 @@ export interface IdeaRequest {
     title: string;
     description: string;
     author: string;
+    authorId: string;
     category: string;
     categorySlug: string;
     budget: number;

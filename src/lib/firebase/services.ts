@@ -1,6 +1,6 @@
 
 
-import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc, Transaction, runTransaction, FieldValue } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist, Proposal } from "@/lib/types";
 
@@ -265,14 +265,15 @@ const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
 const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, index) => {
     const examples = [
-        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", budget: 0, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
-        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", budget: 0, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
+        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", authorId: "user-example-1", budget: 0, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
+        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", authorId: "user-example-2", budget: 0, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
     ];
     const example = examples[index % examples.length];
     return {
         id: `req-${index + 1}`,
         title: example.title,
         author: example.author,
+        authorId: example.authorId,
         category: category.name,
         categorySlug: category.slug,
         budget: example.budget,
@@ -302,6 +303,15 @@ function serializeDoc(doc: any): any {
         }
     }
     return serializedData;
+}
+
+// Helper to chunk arrays for Firestore 'in' queries
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size));
+  }
+  return chunks;
 }
 
 
@@ -393,16 +403,41 @@ export async function getCategories(): Promise<Category[]> {
     });
 }
 
-export async function getIdeaRequests(): Promise<IdeaRequest[]> {
-    return fetchFromCache('ideaRequests', async () => {
+export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
+    const cacheKey = ids ? `ideaRequests_${ids.join('_')}` : 'ideaRequests_all';
+    
+    return fetchFromCache(cacheKey, async () => {
         try {
-            const snapshot = await getDocs(query(collection(db, "ideaRequests"), orderBy("createdAt", "desc")));
-            const dbRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
-             if (dbRequests.length === 0) {
-                console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
-                return EXAMPLE_IDEA_REQUESTS;
+            let dbRequests: IdeaRequest[] = [];
+            if (ids && ids.length > 0) {
+                 // Firestore 'in' query supports up to 30 elements.
+                const idChunks = chunkArray(ids, 30);
+                const queryPromises = idChunks.map(chunk => 
+                    getDocs(query(collection(db, "ideaRequests"), where("__name__", "in", chunk)))
+                );
+                const snapshotChunks = await Promise.all(queryPromises);
+                snapshotChunks.forEach(snapshot => {
+                    const chunkRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
+                    dbRequests.push(...chunkRequests);
+                });
+            } else {
+                 const snapshot = await getDocs(query(collection(db, "ideaRequests"), orderBy("createdAt", "desc")));
+                 dbRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
             }
-            return [...dbRequests, ...EXAMPLE_IDEA_REQUESTS];
+
+            const combinedRequests = [...dbRequests, ...EXAMPLE_IDEA_REQUESTS];
+            // If specific IDs were requested, filter the combined list.
+            if(ids && ids.length > 0){
+                const idSet = new Set(ids);
+                return combinedRequests.filter(req => idSet.has(req.id));
+            }
+
+            if (dbRequests.length === 0 && !ids) {
+                console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
+                return EXAMPLE_IDEA_REQUESTS.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            }
+
+            return combinedRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error("Error fetching idea requests, returning example data:", error);
             return EXAMPLE_IDEA_REQUESTS;
@@ -450,7 +485,7 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
     }
 }
 
-export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
+export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'>) {
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "ideaRequests"), {
@@ -465,15 +500,6 @@ export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'cre
     }
 }
 
-
-// Helper to chunk arrays for Firestore 'in' queries
-function chunk<T>(arr: T[], size: number): T[][] {
-    const res: T[][] = [];
-    for (let i = 0; i < arr.length; i += size) {
-        res.push(arr.slice(i, i + size));
-    }
-    return res;
-}
 
 export async function getSellerDashboardData(sellerId: string) {
     const cacheKey = `seller_dashboard_${sellerId}`;
@@ -631,25 +657,29 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
 
 export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
     try {
-        const now = Timestamp.now();
-        const docRef = await addDoc(collection(db, "proposals"), {
-            ...proposalData,
-            createdAt: now,
-            status: 'pending',
+        const docRef = await runTransaction(db, async (transaction: Transaction) => {
+            const now = Timestamp.now();
+            const newProposalRef = doc(collection(db, "proposals"));
+            
+            transaction.set(newProposalRef, {
+                ...proposalData,
+                createdAt: now,
+                status: 'pending',
+            });
+
+            const requestRef = doc(db, "ideaRequests", proposalData.requestId);
+            transaction.update(requestRef, { proposals: (await transaction.get(requestRef)).data()?.proposals + 1 || 1 });
+            
+            return newProposalRef;
         });
-        // This is a simplified simulation. In a real app, you'd use a transaction or a cloud function.
-        const requestRef = doc(db, "ideaRequests", proposalData.requestId);
-        const requestSnap = await getDoc(requestRef);
-        if(requestSnap.exists()){
-            const currentProposals = requestSnap.data().proposals || 0;
-            await setDoc(requestRef, { proposals: currentProposals + 1}, { merge: true });
-        }
+        
         return docRef.id;
     } catch (error) {
         console.error("Error saving proposal: ", error);
         throw new Error("제안을 데이터베이스에 저장하는 데 실패했습니다.");
     }
 }
+
 
 export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]> {
     const cacheKey = `proposals_by_author_${authorId}`;
