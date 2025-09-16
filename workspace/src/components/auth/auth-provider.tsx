@@ -2,7 +2,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User, signOut as firebaseSignOut, Auth } from "firebase/auth";
+import { onAuthStateChanged, User, signOut as firebaseSignOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [safeAuth, setSafeAuth] = useState<Auth | null>(null);
+  const [safeAuth, setSafeAuth] = useState<any>(null);
 
   useEffect(() => {
     const authInstance = auth();
