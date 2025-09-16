@@ -66,7 +66,7 @@ export async function signUpWithEmailAction(prevState: AuthState, formData: Form
     const { email, password } = validatedFields.data;
 
     try {
-        await createUserWithEmailAndPassword(auth, email, password);
+        await createUserWithEmailAndPassword(auth(), email, password);
         return { success: true, message: "회원가입에 성공했습니다! 메인 페이지로 이동합니다." };
     } catch (error) {
         if (error instanceof FirebaseError) {
@@ -96,7 +96,7 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
     const { email, password } = validatedFields.data;
 
     try {
-        await signInWithEmailAndPassword(auth, email, password);
+        await signInWithEmailAndPassword(auth(), email, password);
         return { success: true, message: "로그인에 성공했습니다!" };
     } catch (error) {
          if (error instanceof FirebaseError) {
@@ -136,7 +136,7 @@ export async function resetPasswordAction(prevState: AuthState, formData: FormDa
   }
 
   try {
-    await sendPasswordResetEmail(auth, validatedFields.data.email);
+    await sendPasswordResetEmail(auth(), validatedFields.data.email);
     return { success: true, message: `${validatedFields.data.email} 주소로 비밀번호 재설정 링크를 보냈습니다. 이메일을 확인해주세요.` };
   } catch (error) {
     if (error instanceof FirebaseError) {
@@ -328,6 +328,7 @@ const proposalSchema = z.object({
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
     const rawData = Object.fromEntries(formData.entries());
     const validatedFields = proposalSchema.safeParse(rawData);
+    const safeAuth = auth();
 
     if (!validatedFields.success) {
         return {
@@ -347,9 +348,9 @@ export async function createProposalAction(prevState: FormState, formData: FormD
         if (authorProfile) {
             authorName = authorProfile.sellerName;
             authorAvatar = authorProfile.photoUrl || "";
-        } else if (auth.currentUser) {
-            authorName = auth.currentUser.displayName || auth.currentUser.email || "익명";
-            authorAvatar = auth.currentUser.photoURL || "";
+        } else if (safeAuth.currentUser) {
+            authorName = safeAuth.currentUser.displayName || safeAuth.currentUser.email || "익명";
+            authorAvatar = safeAuth.currentUser.photoURL || "";
         } else {
              return {
                 success: false,
@@ -390,6 +391,7 @@ const sellerProfileSchema = z.object({
 
 export async function updateSellerProfileAction(prevState: any, formData: FormData) {
   const rawData = Object.fromEntries(formData.entries());
+  const safeAuth = auth();
   
   const validatedFields = sellerProfileSchema.safeParse(rawData);
 
@@ -402,13 +404,13 @@ export async function updateSellerProfileAction(prevState: any, formData: FormDa
   
   const { userId, sellerName, photoUrl, ...sellerProfileData } = validatedFields.data;
 
-  if (!auth.currentUser || auth.currentUser.uid !== userId) {
+  if (!safeAuth.currentUser || safeAuth.currentUser.uid !== userId) {
     return { success: false, message: "인증 정보가 일치하지 않습니다." };
   }
 
   try {
     // Update Firebase Auth profile
-    await updateProfile(auth.currentUser, {
+    await updateProfile(safeAuth.currentUser, {
         displayName: sellerName,
         photoURL: photoUrl,
     });

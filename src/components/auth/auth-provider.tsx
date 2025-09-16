@@ -34,16 +34,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const safeAuth = auth();
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    if(!safeAuth.app) {
+      setLoading(false);
+      return;
+    }
+    const unsubscribe = onAuthStateChanged(safeAuth, (user) => {
       setUser(user);
       setTokenCookie(user); // Set or clear the cookie on auth state change
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [safeAuth]);
 
   useEffect(() => {
     if (loading) return;
@@ -68,7 +73,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await firebaseSignOut(auth);
+      await firebaseSignOut(safeAuth);
       // The onAuthStateChanged listener will handle cookie clearing
       router.push('/');
     } catch (error) {
