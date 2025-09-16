@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
+import { getAuth, type Auth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -14,19 +15,40 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-let app: FirebaseApp;
-let db: Firestore;
+function validateConfig(config: typeof firebaseConfig) {
+  const missing = Object.entries(config)
+    .filter(([key, value]) => !value && key !== 'measurementId') // measurementId is optional
+    .map(([key]) => key);
 
-if (firebaseConfig.apiKey && firebaseConfig.projectId) {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-    db = getFirestore(app);
-} else {
-    console.warn("Firebase configuration is missing or incomplete. Firebase services will be disabled. Please check your .env file and ensure NEXT_PUBLIC_FIREBASE_* variables are set.");
-    // Provide dummy instances to prevent crashing the app
-    app = {} as FirebaseApp;
-    db = {} as Firestore;
+  if (missing.length > 0) {
+    console.warn(
+      `🚨 Firebase 환경변수가 누락되었습니다: ${missing.join(", ")}. Firebase 기능이 비활성화됩니다.`
+    );
+    return false;
+  }
+  return true;
 }
 
+let app: FirebaseApp | null = null;
+let db: Firestore | null = null;
+let auth: Auth | null = null;
 
-export { app, db };
+if (validateConfig(firebaseConfig)) {
+  if (!getApps().length) {
+    try {
+      app = initializeApp(firebaseConfig);
+    } catch (e) {
+      console.error("Firebase 초기화 중 오류 발생", e);
+      app = null;
+    }
+  } else {
+    app = getApp();
+  }
+}
+
+if (app) {
+  db = getFirestore(app);
+  auth = getAuth(app);
+}
+
+export { app as firebaseApp, db, auth };

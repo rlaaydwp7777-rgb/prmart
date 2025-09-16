@@ -1,5 +1,4 @@
 import {
-  getAuth,
   signInWithPopup,
   GoogleAuthProvider,
   signOut as firebaseSignOut,
@@ -10,29 +9,16 @@ import {
   type UserCredential,
   type Auth
 } from "firebase/auth";
-import { app } from "@/lib/firebase";
-
-// This will be a singleton instance once initialized on the client.
-let authInstance: Auth | null = null;
-
-const isFirebaseInitialized = app && app.options && app.options.apiKey;
+import { auth as firebaseAuth } from "@/lib/firebase";
 
 /**
- * Gets the Firebase Auth instance.
+ * Gets the Firebase Auth instance safely.
  * This function is designed to be called on the client side.
- * It initializes Auth only once.
+ * It returns the initialized Auth instance or a dummy object if not initialized.
  */
 export const auth = (): Auth => {
-  if (!isFirebaseInitialized) {
-    // Return a dummy auth object to prevent app crash if Firebase is not initialized
-    return {} as Auth;
-  }
-  if (!authInstance) {
-    authInstance = getAuth(app);
-  }
-  return authInstance;
+  return firebaseAuth || {} as Auth;
 };
-
 
 const googleProvider = new GoogleAuthProvider();
 

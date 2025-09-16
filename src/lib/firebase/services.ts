@@ -316,6 +316,10 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 
 
 export async function getProducts(): Promise<Prompt[]> {
+    if (!db) {
+      console.warn("Firebase not initialized. Returning example products.");
+      return EXAMPLE_PROMPTS;
+    }
     return fetchFromCache('products', async () => {
         try {
             const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
@@ -333,6 +337,10 @@ export async function getProducts(): Promise<Prompt[]> {
 }
 
 export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
+    if (!db) {
+      console.warn("Firebase not initialized. Returning example products for seller.");
+      return EXAMPLE_PROMPTS.filter(p => p.sellerId === sellerId);
+    }
     return fetchFromCache(`products_by_seller_${sellerId}`, async () => {
          try {
             const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
@@ -351,12 +359,15 @@ export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
 
 
 export async function getProduct(id: string): Promise<Prompt | null> {
+    if (id.startsWith('ex-')) {
+      return EXAMPLE_PROMPTS.find(p => p.id === id) || null;
+    }
+    if (!db) {
+      console.warn("Firebase not initialized. Cannot fetch product from DB.");
+      return null;
+    }
     const cacheKey = `product_${id}`;
     return fetchFromCache(cacheKey, async () => {
-        if (id.startsWith('ex-')) {
-            const exampleProduct = EXAMPLE_PROMPTS.find(p => p.id === id);
-            return exampleProduct || null;
-        }
         try {
             const docRef = doc(db, "products", id);
             const docSnap = await getDoc(docRef);
@@ -382,6 +393,10 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
 }
 
 export async function getCategories(): Promise<Category[]> {
+    if (!db) {
+      console.warn("Firebase not initialized. Returning example categories.");
+      return EXAMPLE_CATEGORIES;
+    }
     return fetchFromCache('categories', async () => {
         try {
             const snapshot = await getDocs(collection(db, "categories"));
@@ -404,6 +419,10 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
+    if (!db) {
+      console.warn("Firebase not initialized. Returning example idea requests.");
+      return ids ? EXAMPLE_IDEA_REQUESTS.filter(r => ids.includes(r.id)) : EXAMPLE_IDEA_REQUESTS;
+    }
     const cacheKey = ids ? `ideaRequests_${ids.join('_')}` : 'ideaRequests_all';
     
     return fetchFromCache(cacheKey, async () => {
@@ -446,12 +465,15 @@ export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
 }
 
 export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
+    if (id.startsWith('req-')) {
+        return EXAMPLE_IDEA_REQUESTS.find(r => r.id === id) || null;
+    }
+    if (!db) {
+      console.warn("Firebase not initialized. Cannot fetch idea request.");
+      return null;
+    }
     const cacheKey = `ideaRequest_${id}`;
     return fetchFromCache(cacheKey, async () => {
-        if (id.startsWith('req-')) {
-            const exampleRequest = EXAMPLE_IDEA_REQUESTS.find(r => r.id === id);
-            return exampleRequest || null;
-        }
         try {
             const docRef = doc(db, "ideaRequests", id);
             const docSnap = await getDoc(docRef);
@@ -467,6 +489,9 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
 }
 
 export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
+    if (!db) {
+        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+    }
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "products"), {
@@ -486,6 +511,9 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
 }
 
 export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'>) {
+    if (!db) {
+        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+    }
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "ideaRequests"), {
@@ -503,6 +531,15 @@ export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'cre
 
 export async function getSellerDashboardData(sellerId: string) {
     const cacheKey = `seller_dashboard_${sellerId}`;
+     if (!db) {
+        console.warn("Firebase not initialized. Returning empty dashboard data.");
+        return {
+            stats: { totalRevenue: 0, totalSales: 0, productCount: 0, averageRating: 0, reviewCount: 0 },
+            recentSales: [],
+            bestSellers: [],
+            salesByMonth: Array.from({ length: 12 }, (_, i) => ({ name: `${i+1}월`, total: 0 }))
+        };
+    }
     return fetchFromCache(cacheKey, async () => {
         try {
             // 1. Fetch orders by sellerId directly for better performance
@@ -577,6 +614,18 @@ export async function getSellerDashboardData(sellerId: string) {
 }
 
 export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
+    if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch seller profile.");
+         const exampleUser = EXAMPLE_PROMPTS.find(p => p.sellerId === userId);
+         if (exampleUser) {
+            return {
+                sellerName: exampleUser.author,
+                sellerBio: `${exampleUser.author}의 프로필입니다.`,
+                photoUrl: exampleUser.sellerPhotoUrl
+            }
+         }
+         return null;
+    }
     const cacheKey = `seller_profile_${userId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -602,11 +651,18 @@ export async function getSellerProfile(userId: string): Promise<SellerProfile | 
 }
 
 export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
+    if (!db) {
+        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+    }
     const docRef = doc(db, 'sellers', userId);
     await setDoc(docRef, profile, { merge: true });
 }
 
 export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
+    if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch orders.");
+        return [];
+    }
     const cacheKey = `orders_by_buyer_${buyerId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -622,6 +678,10 @@ export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
 }
 
 export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
+    if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch reviews.");
+        return [];
+    }
     const cacheKey = `reviews_by_author_${authorId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -638,6 +698,10 @@ export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
 
 
 export async function getWishlistByUserId(userId: string): Promise<Wishlist | null> {
+     if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch wishlist.");
+        return { userId, productIds: [] };
+    }
     const cacheKey = `wishlist_by_user_${userId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -656,6 +720,9 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
 
 
 export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
+    if (!db) {
+        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+    }
     try {
         const docRef = await runTransaction(db, async (transaction: Transaction) => {
             const now = Timestamp.now();
@@ -668,7 +735,12 @@ export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdA
             });
 
             const requestRef = doc(db, "ideaRequests", proposalData.requestId);
-            transaction.update(requestRef, { proposals: (await transaction.get(requestRef)).data()?.proposals + 1 || 1 });
+            const requestDoc = await transaction.get(requestRef);
+            if (!requestDoc.exists()) {
+                throw "Document does not exist!";
+            }
+            const newProposalsCount = (requestDoc.data().proposals || 0) + 1;
+            transaction.update(requestRef, { proposals: newProposalsCount });
             
             return newProposalRef;
         });
@@ -682,6 +754,10 @@ export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdA
 
 
 export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]> {
+     if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch proposals.");
+        return [];
+    }
     const cacheKey = `proposals_by_author_${authorId}`;
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -726,6 +802,14 @@ export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]
 
 // Admin services
 export async function getAdminDashboardData() {
+  if (!db) {
+    console.warn("Firebase not initialized. Returning empty admin dashboard data.");
+    return {
+      kpi: { totalRevenue: { value: 0, change: 0 }, totalSales: { value: 0, change: 0 }, totalProducts: { value: 0, change: 0 }, avgRating: { value: 0, totalReviews: 0 } },
+      pendingProducts: [],
+      recentUsers: [],
+    };
+  }
   // In a real app, you'd fetch real data.
   // For now, we'll return some mock data.
   const kpi = {

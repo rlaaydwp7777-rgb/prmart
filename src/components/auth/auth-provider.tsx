@@ -1,9 +1,10 @@
 
+
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User, signOut as firebaseSignOut, Auth } from "firebase/auth";
-import { auth } from "@/lib/firebase/auth";
+import { onAuthStateChanged, User, signOut as firebaseSignOut, type Auth } from "firebase/auth";
+import { auth as getSafeAuth } from "@/lib/firebase/auth";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface AuthContextType {
@@ -37,11 +38,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [safeAuth, setSafeAuth] = useState<Auth | null>(null);
 
   useEffect(() => {
-    const authInstance = auth();
+    // This now only runs on the client
+    const authInstance = getSafeAuth();
     setSafeAuth(authInstance);
 
-    // Ensure authInstance is valid before setting up the listener
-    if (!authInstance.app) {
+    if(!authInstance.app) {
       console.warn("Firebase not initialized in AuthProvider, auth features will be disabled.");
       setLoading(false);
       return;
@@ -49,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       setUser(user);
-      setTokenCookie(user); // Set or clear the cookie on auth state change
+      setTokenCookie(user);
       setLoading(false);
     });
 
@@ -84,7 +85,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
       await firebaseSignOut(safeAuth);
-      // The onAuthStateChanged listener will handle cookie clearing
       router.push('/');
     } catch (error) {
       console.error("Sign out error", error);
