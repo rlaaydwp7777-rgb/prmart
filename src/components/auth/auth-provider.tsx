@@ -4,7 +4,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { onAuthStateChanged, User, signOut as firebaseSignOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
@@ -18,15 +18,27 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
 });
 
+async function setTokenCookie(user: User | null) {
+    if(user) {
+        const token = await user.getIdToken();
+        document.cookie = `firebaseIdToken=${token}; path=/;`;
+    } else {
+        document.cookie = 'firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    }
+}
+
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      setTokenCookie(user); // Set or clear the cookie on auth state change
       setLoading(false);
     });
 
@@ -37,24 +49,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loading) return;
 
     const isAuthPage = pathname === '/login' || pathname === '/signup';
-
-    // If user is logged in and on an auth page, redirect to home
+    
+    // If user is logged in, redirect from auth pages to where they were going or home
     if (user && isAuthPage) {
-      router.replace('/');
-      return;
+        const continueUrl = searchParams.get('continueUrl');
+        router.replace(continueUrl || '/');
+        return;
     }
     
-    // If user is not logged in and trying to access a protected route
-    if (!user && (pathname.startsWith('/seller') || pathname.startsWith('/account'))) {
-      router.replace('/login');
-      return;
+    // If user is not logged in and tries to access a protected route
+    if (!user && (pathname.startsWith('/seller'))) {
+        const continueUrl = pathname;
+        router.replace(`/login?continueUrl=${encodeURIComponent(continueUrl)}`);
+        return;
     }
 
-  }, [user, loading, pathname, router]);
+  }, [user, loading, pathname, router, searchParams]);
 
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
+      // The onAuthStateChanged listener will handle cookie clearing
       router.push('/');
     } catch (error) {
       console.error("Sign out error", error);

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -23,14 +24,14 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { AUTH_STRINGS, BUTTONS } from "@/lib/string-constants";
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, use } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2, Sparkles, Send } from "lucide-react";
 import { signInWithGoogleAction, signInWithEmailAction, resetPasswordAction, type AuthState } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
 function GoogleSignInButton() {
@@ -63,13 +64,22 @@ function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChan
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.success && state.message) {
-      toast({
-        title: "성공",
-        description: state.message,
-      });
-      onOpenChange(false);
-      formRef.current?.reset();
+    if (state.message) {
+      if (state.success) {
+        toast({
+          title: "성공",
+          description: state.message,
+        });
+        onOpenChange(false);
+        formRef.current?.reset();
+      } else if (state.error && !state.errorType) {
+        // Handle general errors with a toast
+         toast({
+          title: "오류",
+          description: state.error,
+          variant: "destructive",
+        });
+      }
     }
   }, [state, toast, onOpenChange]);
 
@@ -105,8 +115,8 @@ function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChan
               type="email"
             />
              {state?.errorType === 'email' && <p className="text-sm text-destructive">{state.error}</p>}
-             {state?.errorType === 'general' && <p className="text-sm text-destructive">{state.error}</p>}
           </div>
+           {state?.errorType === 'general' && <p className="text-sm text-destructive mt-2">{state.error}</p>}
           <DialogFooter>
             <SubmitButton />
           </DialogFooter>
@@ -122,32 +132,35 @@ export default function LoginPage() {
     const [emailState, emailAction] = useActionState(signInWithEmailAction, { success: false, message: "" });
     const { toast } = useToast();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, loading } = useAuth();
     const [resetDialogOpen, setResetDialogOpen] = useState(false);
+
+    const continueUrl = searchParams.get('continueUrl');
 
     useEffect(() => {
         if(googleState.success) {
             toast({ title: "성공", description: googleState.message });
-            router.push("/");
+            router.push(continueUrl || "/");
         } else if (googleState.error && googleState.errorType === 'general') {
             toast({ title: "오류", description: googleState.error, variant: "destructive" });
         }
-    }, [googleState, toast, router]);
+    }, [googleState, toast, router, continueUrl]);
 
     useEffect(() => {
         if(emailState.success) {
             toast({ title: "성공", description: emailState.message });
-            router.push("/");
+            router.push(continueUrl || "/");
         } else if (emailState.error && emailState.errorType === 'general') {
-            toast({ title: "오류", description: emailState.error, variant: "destructive" });
+            // General errors are now shown below the form
         }
-    }, [emailState, toast, router]);
+    }, [emailState, toast, router, continueUrl]);
 
     useEffect(() => {
         if (!loading && user) {
-            router.replace("/");
+            router.replace(continueUrl || "/");
         }
-    }, [user, loading, router]);
+    }, [user, loading, router, continueUrl]);
 
 
     if(loading || user) {

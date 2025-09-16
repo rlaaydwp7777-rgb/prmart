@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
@@ -112,9 +113,9 @@ export async function signInWithGoogleAction(): Promise<AuthState> {
         return { success: true, message: "Google 계정으로 로그인했습니다." };
     } catch (error) {
          if (error instanceof FirebaseError) {
-             return { success: false, message: "Google 로그인 실패", error: getFirebaseAuthErrorMessage(error) };
+             return { success: false, message: "Google 로그인 실패", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
         }
-        return { success: false, message: "Google 로그인 실패", error: "알 수 없는 오류가 발생했습니다." };
+        return { success: false, message: "Google 로그인 실패", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
     }
 }
 

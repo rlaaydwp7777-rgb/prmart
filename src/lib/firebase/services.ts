@@ -722,3 +722,29 @@ export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]
         }
     }, 10000);
 }
+
+
+// Admin services
+export async function getAdminDashboardData() {
+  // In a real app, you'd fetch real data.
+  // For now, we'll return some mock data.
+  const kpi = {
+    totalRevenue: { value: 5231890, change: 0.201 },
+    totalSales: { value: 2350, change: 1.801 },
+    totalProducts: { value: 12234, change: 0.19 },
+    avgRating: { value: 4.8, totalReviews: 231 },
+  };
+
+  const pendingProducts = EXAMPLE_PROMPTS.slice(0, 5).map(p => ({
+      ...p,
+      status: 'pending'
+  }));
+
+  const recentUsers = [
+      { name: 'Olivia Martin', email: 'olivia.martin@email.com', avatar: 'https://i.pravatar.cc/150?img=1', amount: '+₩1,999.00' },
+      { name: 'Jackson Lee', email: 'jackson.lee@email.com', avatar: 'https://i.pravatar.cc/150?img=2', amount: '+₩39.00' },
+      { name: 'Isabella Nguyen', email: 'isabella.nguyen@email.com', avatar: 'https://i.pravatar.cc/150?img=3', amount: '+₩299.00' },
+  ]
+
+  return { kpi, pendingProducts, recentUsers };
+}
