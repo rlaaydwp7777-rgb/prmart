@@ -10,22 +10,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { AUTH_STRINGS, BUTTONS } from "@/lib/string-constants";
 import Link from "next/link";
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
-import { Loader2, Sparkles } from "lucide-react";
-import { signInWithGoogleAction } from "../actions";
+import { Loader2, Sparkles, Send } from "lucide-react";
+import { signInWithGoogleAction, signInWithEmailAction, resetPasswordAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
 import { useRouter } from "next/navigation";
-import { FirebaseError } from "firebase/app";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "@/lib/firebase/auth";
+
 
 function GoogleSignInButton() {
     const { pending } = useFormStatus();
@@ -51,41 +58,83 @@ function EmailSignInButton() {
      )
 }
 
+function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChange: (open: boolean) => void}) {
+  const [state, formAction] = useActionState(resetPasswordAction, { success: false, message: "" });
+  const formRef = useRef<HTMLFormElement>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (state.message) {
+      toast({
+        title: state.success ? "성공" : "오류",
+        description: state.message,
+        variant: state.success ? "default" : "destructive",
+      });
+    }
+    if(state.success) {
+      onOpenChange(false);
+      formRef.current?.reset();
+    }
+  }, [state, toast, onOpenChange]);
+
+  const SubmitButton = () => {
+    const { pending } = useFormStatus();
+    return (
+      <Button type="submit" disabled={pending}>
+        {pending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
+        재설정 링크 받기
+      </Button>
+    )
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>비밀번호 재설정</DialogTitle>
+          <DialogDescription>
+            가입했던 이메일 주소를 입력하세요. 비밀번호를 재설정할 수 있는 링크를 보내드립니다.
+          </DialogDescription>
+        </DialogHeader>
+        <form ref={formRef} action={formAction} className="grid gap-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="reset-email" className="sr-only">
+              이메일
+            </Label>
+            <Input
+              id="reset-email"
+              name="email"
+              placeholder="name@example.com"
+              required
+              type="email"
+            />
+             {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
+          </div>
+          <DialogFooter>
+            <SubmitButton />
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
 
 export default function LoginPage() {
     const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
+    const [emailState, emailAction] = useActionState(signInWithEmailAction, { success: false, message: "" });
     const { toast } = useToast();
     const router = useRouter();
     const { user, loading } = useAuth();
-    const [emailState, emailAction] = useActionState(async (prevState, formData) => {
-         const email = formData.get("email") as string;
-         const password = formData.get("password") as string;
-
-         if (!email || !password) {
-             return { success: false, message: "이메일과 비밀번호를 입력해주세요."};
-         }
-         try {
-             await signInWithEmailAndPassword(auth, email, password);
-             return { success: true, message: "로그인에 성공했습니다." };
-         } catch (error) {
-             if (error instanceof FirebaseError) {
-                 const message = error.code === 'auth/invalid-credential' 
-                     ? '이메일 또는 비밀번호를 잘못 입력했습니다.'
-                     : '로그인에 실패했습니다. 다시 시도해주세요.';
-                 return { success: false, message };
-             }
-             return { success: false, message: "알 수 없는 오류가 발생했습니다." };
-         }
-    }, { success: false, message: "" });
-
+    const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
     useEffect(() => {
         const state = googleState || emailState;
         if(state?.success) {
             toast({ title: "성공", description: state.message });
-            router.push("/"); // Redirect to home for now.
-        } else if (state?.message) {
-            toast({ title: "오류", description: state.message, variant: "destructive" });
+            router.push("/");
+        } else if (state?.error) {
+            toast({ title: "오류", description: state.error, variant: "destructive" });
         }
     }, [googleState, emailState, toast, router]);
 
@@ -97,7 +146,6 @@ export default function LoginPage() {
 
 
     if(loading || user) {
-      // AuthProvider is checking for user or user exists, show loading or let AuthProvider redirect.
       return (
          <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin" />
@@ -143,9 +191,9 @@ export default function LoginPage() {
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
                         <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
-                        <Link href="#" className="text-sm text-primary hover:underline">
+                        <Button type="button" variant="link" className="text-sm h-auto p-0" onClick={() => setResetDialogOpen(true)}>
                             {AUTH_STRINGS.FORGOT_PASSWORD}
-                        </Link>
+                        </Button>
                     </div>
                     <Input id="password" type="password" name="password" placeholder="••••••••" required />
                 </div>
@@ -162,6 +210,9 @@ export default function LoginPage() {
             </CardFooter>
         </Card>
       </main>
+      <ResetPasswordDialog open={resetDialogOpen} onOpenChange={setResetDialogOpen} />
     </div>
   );
 }
+
+    

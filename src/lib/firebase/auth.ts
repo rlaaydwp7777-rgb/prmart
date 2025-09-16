@@ -5,6 +5,7 @@ import {
   signOut as firebaseSignOut,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   User,
   UserCredential,
   type Auth
@@ -35,5 +36,8 @@ export const signOut = async (): Promise<void> => {
 
 export {
     createUserWithEmailAndPassword,
-    signInWithEmailAndPassword
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
 }
+
+    
