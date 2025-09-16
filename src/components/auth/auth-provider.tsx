@@ -2,18 +2,20 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User, signOut as firebaseSignOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
 import { usePathname, useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  signOut: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -35,22 +37,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (!loading) {
       const isAuthPage = pathname === '/login' || pathname === '/signup';
       if (user && isAuthPage) {
-        // User is logged in and on an auth page, redirect to home.
-        router.push('/');
-      } else if (!user && !isAuthPage && pathname.startsWith('/account')) {
-        // User is not logged in and trying to access a protected account page.
-        router.push('/login');
+        router.replace('/');
+      } else if (!user && (pathname.startsWith('/seller') || pathname.startsWith('/account'))) {
+        router.replace('/login');
       }
     }
   }, [user, loading, pathname, router]);
 
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error("Sign out error", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
 export const useAuth = () => useContext(AuthContext);
-
-    
