@@ -170,6 +170,11 @@ export const SELLER_STRINGS = {
     NOTIFICATIONS_DESC: "어떤 알림을 받을지 선택하세요.",
     NOTIFICATIONS_WIP: "이 기능은 현재 개발 중입니다.",
     SAVE_SETTINGS: "설정 저장",
+    PROPOSALS_DESC: "아이디어 요청에 대한 나의 제안을 관리합니다.",
+    PROPOSALS_TAB_ACTIVE: "제안 중",
+    PROPOSALS_TAB_ACCEPTED: "채택 완료",
+    PROPOSALS_EMPTY_ACTIVE: "아직 제안한 아이디어가 없습니다.",
+    PROPOSALS_EMPTY_ACCEPTED: "아직 채택된 제안이 없습니다.",
 }
 
 export const AUTH_STRINGS = {
@@ -202,6 +207,7 @@ export const HEADER_LINKS = {
 export const SIDEBAR_STRINGS = {
     DASHBOARD: "대시보드",
     PRODUCTS: "상품 관리",
+    PROPOSALS: "아이디어 제안",
     ANALYTICS: "판매 분석",
     SETTINGS: "설정",
     HELP: "도움말",
@@ -268,5 +274,3 @@ export const ACCOUNT_STRINGS = {
     SETTINGS_NOTI_SECURITY: "보안 알림",
     SETTINGS_NOTI_SECURITY_DESC: "계정 관련 중요 변경사항에 대한 알림입니다.",
 }
-
-    

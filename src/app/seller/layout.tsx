@@ -4,7 +4,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, BarChart2, LogOut, PlusCircle, ShoppingCart, Download, Heart, Cog } from "lucide-react";
+import { Sparkles, LayoutDashboard, Package, Settings, Landmark, Star, Users, BarChart2, LogOut, PlusCircle, ShoppingCart, Download, Heart, Cog, Lightbulb } from "lucide-react";
 import { useAuth } from "@/components/auth/auth-provider";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,6 +24,7 @@ const buyerNavItems = [
 const sellerNavItems = [
   { href: "/seller/dashboard", icon: LayoutDashboard, title: SIDEBAR_STRINGS.DASHBOARD },
   { href: "/seller/products", icon: Package, title: SIDEBAR_STRINGS.PRODUCTS },
+  { href: "/seller/proposals", icon: Lightbulb, title: SIDEBAR_STRINGS.PROPOSALS },
   { href: "/seller/analytics", icon: BarChart2, title: SIDEBAR_STRINGS.ANALYTICS },
   { href: "/seller/reviews", icon: Star, title: SIDEBAR_STRINGS.REVIEWS },
   { href: "/seller/customers", icon: Users, title: SIDEBAR_STRINGS.CUSTOMERS },
