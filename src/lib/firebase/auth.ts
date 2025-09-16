@@ -13,7 +13,7 @@ import {
 } from "firebase/auth";
 import { app } from "@/lib/firebase";
 
-let authInstance: Auth;
+let authInstance: Auth | null = null;
 const isFirebaseInitialized = app && Object.keys(app).length > 0;
 
 const getSafeAuth = () => {
@@ -65,3 +65,4 @@ export {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
 }
+
