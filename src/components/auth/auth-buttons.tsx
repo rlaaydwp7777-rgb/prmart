@@ -18,13 +18,16 @@ import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
 import { LayoutDashboard, Cog, LogOut, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function AuthButtons() {
   const { user, loading } = useAuth();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     try {
         await signOut(auth);
+        router.push('/');
     } catch(e) {
         console.error("Sign out error", e);
     }

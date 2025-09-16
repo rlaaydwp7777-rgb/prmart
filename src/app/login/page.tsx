@@ -89,6 +89,13 @@ export default function LoginPage() {
         }
     }, [googleState, emailState, toast, router]);
 
+    useEffect(() => {
+        if (!loading && user) {
+            router.replace("/");
+        }
+    }, [user, loading, router]);
+
+
     if(loading || user) {
       // AuthProvider is checking for user or user exists, show loading or let AuthProvider redirect.
       return (
@@ -134,8 +141,13 @@ export default function LoginPage() {
                 />
                 </div>
                 <div className="space-y-2">
-                <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
-                <Input id="password" type="password" name="password" placeholder="••••••••" required />
+                    <div className="flex items-center justify-between">
+                        <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
+                        <Link href="#" className="text-sm text-primary hover:underline">
+                            {AUTH_STRINGS.FORGOT_PASSWORD}
+                        </Link>
+                    </div>
+                    <Input id="password" type="password" name="password" placeholder="••••••••" required />
                 </div>
                 <EmailSignInButton />
             </form>

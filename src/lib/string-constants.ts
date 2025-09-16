@@ -187,6 +187,7 @@ export const AUTH_STRINGS = {
     EMAIL_LABEL: "이메일",
     EMAIL_PLACEHOLDER: "project@prmart.ai",
     PASSWORD_LABEL: "비밀번호",
+    FORGOT_PASSWORD: "비밀번호를 잊으셨나요?",
     PASSWORD_PLACEHOLDER: "••••••••",
     CONFIRM_PASSWORD_LABEL: "비밀번호 확인",
     ALREADY_HAVE_ACCOUNT: "이미 계정이 있으신가요?",
