@@ -126,14 +126,22 @@ export default function LoginPage() {
     const [resetDialogOpen, setResetDialogOpen] = useState(false);
 
     useEffect(() => {
-        const state = googleState || emailState;
-        if(state?.success) {
-            toast({ title: "성공", description: state.message });
+        if(googleState.success) {
+            toast({ title: "성공", description: googleState.message });
             router.push("/");
-        } else if (state?.error && state.errorType === 'general') { // Only show general errors as toasts
-            toast({ title: "오류", description: state.error, variant: "destructive" });
+        } else if (googleState.error && googleState.errorType === 'general') {
+            toast({ title: "오류", description: googleState.error, variant: "destructive" });
         }
-    }, [googleState, emailState, toast, router]);
+    }, [googleState, toast, router]);
+
+    useEffect(() => {
+        if(emailState.success) {
+            toast({ title: "성공", description: emailState.message });
+            router.push("/");
+        } else if (emailState.error && emailState.errorType === 'general') {
+            toast({ title: "오류", description: emailState.error, variant: "destructive" });
+        }
+    }, [emailState, toast, router]);
 
     useEffect(() => {
         if (!loading && user) {
