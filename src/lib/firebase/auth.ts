@@ -1,4 +1,3 @@
-
 import {
   getAuth,
   signInWithPopup,
@@ -16,7 +15,7 @@ import { app } from "@/lib/firebase";
 // This will be a singleton instance once initialized on the client.
 let authInstance: Auth | null = null;
 
-const isFirebaseInitialized = app && Object.keys(app).length > 0;
+const isFirebaseInitialized = app && app.options && app.options.apiKey;
 
 /**
  * Gets the Firebase Auth instance.
@@ -26,7 +25,6 @@ const isFirebaseInitialized = app && Object.keys(app).length > 0;
 export const auth = (): Auth => {
   if (!isFirebaseInitialized) {
     // Return a dummy auth object to prevent app crash if Firebase is not initialized
-    // This case should be handled by the warning in firebase.ts
     return {} as Auth;
   }
   if (!authInstance) {
