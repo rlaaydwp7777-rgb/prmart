@@ -629,12 +629,13 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
 }
 
 
-export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt'>): Promise<string> {
+export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
     try {
         const now = Timestamp.now();
         const docRef = await addDoc(collection(db, "proposals"), {
             ...proposalData,
             createdAt: now,
+            status: 'pending',
         });
         // This is a simplified simulation. In a real app, you'd use a transaction or a cloud function.
         const requestRef = doc(db, "ideaRequests", proposalData.requestId);
@@ -648,4 +649,46 @@ export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdA
         console.error("Error saving proposal: ", error);
         throw new Error("제안을 데이터베이스에 저장하는 데 실패했습니다.");
     }
+}
+
+export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]> {
+    const cacheKey = `proposals_by_author_${authorId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const q = query(collection(db, "proposals"), where("authorId", "==", authorId));
+            const snapshot = await getDocs(q);
+            const proposals = snapshot.docs.map(doc => serializeDoc(doc) as Proposal).filter(Boolean);
+            return proposals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        } catch (error) {
+            console.error(`Error fetching proposals for author ${authorId}:`, error);
+            // You might want to return mock proposals for example users
+            if(authorId.includes("seller-")){
+                 const mockProposals = [
+                    {
+                        id: "prop-1",
+                        requestId: "req-1",
+                        authorId: authorId,
+                        authorName: "DevMaster",
+                        authorAvatar: "https://picsum.photos/100/100?random=1",
+                        content: "제가 만든 Next.js 보일러플레이트가 딱 맞을 것 같네요!",
+                        productId: EXAMPLE_PROMPTS[0]?.id,
+                        createdAt: new Date().toISOString(),
+                        status: 'pending' as 'pending' | 'accepted'
+                    },
+                    {
+                        id: "prop-2",
+                        requestId: "req-2",
+                        authorId: authorId,
+                        authorName: "DevMaster",
+                        authorAvatar: "https://picsum.photos/100/100?random=1",
+                        content: "제 실전 코딩 테스트 문제 풀이집도 도움이 될 겁니다.",
+                        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+                        status: 'accepted' as 'pending' | 'accepted'
+                    }
+                ];
+                return mockProposals;
+            }
+            return [];
+        }
+    }, 10000);
 }

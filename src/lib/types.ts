@@ -119,7 +119,7 @@ export interface Wishlist {
 }
 
 export interface Proposal {
-    id?: string;
+    id: string;
     requestId: string;
     authorId: string;
     authorName: string;
@@ -127,4 +127,5 @@ export interface Proposal {
     content: string;
     productId?: string;
     createdAt: string;
+    status: 'pending' | 'accepted';
 }
