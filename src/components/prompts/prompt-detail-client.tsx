@@ -5,9 +5,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap, Clock } from "lucide-react";
+import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap, Clock, User, LogIn } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,10 +37,59 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   const isFree = prompt.price === 0;
-  // This would be replaced with actual purchase status logic
+  // This would be replaced with actual purchase status logic from user data
   const hasPurchased = false; 
 
-  const canViewContent = prompt.visibility === 'public' || (prompt.visibility === 'private' && hasPurchased);
+  const canViewContent = prompt.visibility === 'public' || (prompt.visibility === 'partial' && hasPurchased);
+
+  const handlePurchase = () => {
+    if (!user) {
+      router.push('/login');
+    } else {
+      // TODO: Implement actual purchase logic (e.g., redirect to checkout)
+      alert("결제 기능은 현재 준비 중입니다.");
+    }
+  };
+
+  const renderCtaButtons = () => {
+    if (!user) {
+      return (
+        <Button size="lg" className="w-full text-lg h-12" onClick={() => router.push('/login')}>
+          <LogIn className="mr-2"/>
+          {isFree ? "로그인 후 다운로드" : "로그인 후 구매"}
+        </Button>
+      );
+    }
+
+    if (isFree) {
+       return (
+        <Button size="lg" className="w-full text-lg h-12" onClick={() => alert('다운로드 시작!')}>
+            <Download className="mr-2"/>
+            무료 다운로드
+        </Button>
+      );
+    }
+    
+    // Logged in user, paid product
+    return (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col sm:flex-row gap-2">
+            <Button size="lg" variant="outline" className="w-full">
+                <Heart className="mr-2"/>
+                위시리스트
+            </Button>
+            <Button size="lg" variant="outline" className="w-full">
+                <ShoppingCart className="mr-2"/>
+                장바구니
+            </Button>
+        </div>
+        <Button size="lg" className="w-full text-lg h-12" onClick={handlePurchase}>
+            <Zap className="mr-2"/>
+            바로 구매
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="container px-4 md:px-6">
@@ -107,38 +156,9 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
             {isFree ? "무료" : `₩${prompt.price.toLocaleString()}`}
           </div>
 
-          { isFree ? (
-              <div className="flex flex-col gap-2 mt-auto">
-                  <Button size="lg" className="w-full">
-                      <Download className="mr-2"/>
-                      무료 다운로드
-                  </Button>
-              </div>
-          ) : user ? (
-              <div className="flex flex-col gap-2 mt-auto">
-                  <div className="flex flex-col sm:flex-row gap-2">
-                      <Button size="lg" variant="outline" className="w-full">
-                          <Heart className="mr-2"/>
-                          위시리스트
-                      </Button>
-                      <Button size="lg" variant="outline" className="w-full">
-                          <ShoppingCart className="mr-2"/>
-                          장바구니
-                      </Button>
-                  </div>
-                  <Button size="lg" className="w-full text-lg h-12">
-                      <Zap className="mr-2"/>
-                      바로 구매
-                  </Button>
-              </div>
-          ) : (
-               <div className="flex flex-col gap-2 mt-auto">
-                    <Button size="lg" className="w-full text-lg h-12" onClick={() => router.push('/login')}>
-                      <Zap className="mr-2"/>
-                      로그인 후 구매
-                  </Button>
-               </div>
-          )}
+          <div className="mt-auto">
+            {renderCtaButtons()}
+          </div>
         </div>
       </div>
       
@@ -156,12 +176,12 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                             <AccordionContent>
                                 <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
                                     <p>{prompt.description}</p>
-                                    {prompt.visibility === 'partial' && (
+                                    {prompt.visibility === 'partial' && !hasPurchased && (
                                         <Alert className="mt-4">
                                             <Eye className="h-4 w-4" />
-                                            <AlertTitle>미리보기 정보</AlertTitle>
+                                            <AlertTitle>콘텐츠 미리보기</AlertTitle>
                                             <AlertDescription>
-                                                이 상품은 미리보기 후 전체 콘텐츠를 확인할 수 있습니다.
+                                                구매하시면 전체 콘텐츠를 확인하실 수 있습니다. 아래 내용은 일부만 공개됩니다.
                                             </AlertDescription>
                                         </Alert>
                                     )}
@@ -179,7 +199,19 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                         <AccordionItem value="item-2">
                             <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
                             <AccordionContent>
-                                ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)
+                                {prompt.contentUrl ? 
+                                    ( hasPurchased || isFree ? 
+                                        <Button asChild>
+                                            <a href={prompt.contentUrl} target="_blank" rel="noopener noreferrer">
+                                                <Download className="mr-2 h-4 w-4" />
+                                                콘텐츠 다운로드
+                                            </a>
+                                        </Button> :
+                                        <p>구매 후 콘텐츠 링크를 확인할 수 있습니다.</p>
+                                    ) : (
+                                        <p>ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)</p>
+                                    )
+                                }
                             </AccordionContent>
                         </AccordionItem>
                         <AccordionItem value="item-3">
@@ -195,7 +227,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                         <Lock className="h-12 w-12 text-muted-foreground mb-4" />
                         <h3 className="text-xl font-bold font-headline">구매자 전용 콘텐츠입니다</h3>
                         <p className="text-muted-foreground mt-2">이 상품의 상세 정보는 구매한 사용자에게만 공개됩니다.</p>
-                        <Button className="mt-6">
+                         <Button className="mt-6" onClick={handlePurchase}>
                             <Zap className="mr-2 h-4 w-4"/>
                             구매하고 콘텐츠 보기
                         </Button>

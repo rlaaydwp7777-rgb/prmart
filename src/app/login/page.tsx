@@ -15,16 +15,17 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { AUTH_STRINGS, BUTTONS } from "@/lib/string-constants";
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2, Sparkles } from "lucide-react";
 import { signInWithGoogleAction } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
+import { useRouter } from "next/navigation";
+import { FirebaseError } from "firebase/app";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/auth";
-import { FirebaseError } from "firebase/app";
 
 function GoogleSignInButton() {
     const { pending } = useFormStatus();
@@ -40,51 +41,53 @@ function GoogleSignInButton() {
     )
 }
 
+function EmailSignInButton() {
+     const { pending } = useFormStatus();
+     return (
+        <Button type="submit" className="w-full" disabled={pending}>
+            {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {AUTH_STRINGS.LOGIN}
+        </Button>
+     )
+}
+
+
 export default function LoginPage() {
     const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
     const { toast } = useToast();
+    const router = useRouter();
     const { user, loading } = useAuth();
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const formRef = useRef<HTMLFormElement>(null);
+    const [emailState, emailAction] = useActionState(async (prevState, formData) => {
+         const email = formData.get("email") as string;
+         const password = formData.get("password") as string;
 
-    const handleEmailSignIn = async (formData: FormData) => {
-        setIsSubmitting(true);
-        const email = formData.get("email") as string;
-        const password = formData.get("password") as string;
-
-        if (!email || !password) {
-            toast({ title: "오류", description: "이메일과 비밀번호를 입력해주세요.", variant: "destructive" });
-            setIsSubmitting(false);
-            return;
-        }
-
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            toast({ title: "성공", description: "로그인에 성공했습니다." });
-            // AuthProvider will handle redirection
-        } catch (error) {
+         if (!email || !password) {
+             return { success: false, message: "이메일과 비밀번호를 입력해주세요."};
+         }
+         try {
+             await signInWithEmailAndPassword(auth, email, password);
+             return { success: true, message: "로그인에 성공했습니다." };
+         } catch (error) {
              if (error instanceof FirebaseError) {
-                const message = error.code === 'auth/invalid-credential' 
-                    ? '이메일 또는 비밀번호를 잘못 입력했습니다.'
-                    : '로그인에 실패했습니다. 다시 시도해주세요.';
-                toast({ title: "로그인 실패", description: message, variant: "destructive" });
-            } else {
-                toast({ title: "오류", description: "알 수 없는 오류가 발생했습니다.", variant: "destructive" });
-            }
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+                 const message = error.code === 'auth/invalid-credential' 
+                     ? '이메일 또는 비밀번호를 잘못 입력했습니다.'
+                     : '로그인에 실패했습니다. 다시 시도해주세요.';
+                 return { success: false, message };
+             }
+             return { success: false, message: "알 수 없는 오류가 발생했습니다." };
+         }
+    }, { success: false, message: "" });
 
 
     useEffect(() => {
-        if(googleState?.success) {
-            toast({ title: "성공", description: googleState.message });
-            // AuthProvider will handle redirection
-        } else if (googleState?.error) {
-            toast({ title: "오류", description: googleState.error, variant: "destructive" });
+        const state = googleState || emailState;
+        if(state?.success) {
+            toast({ title: "성공", description: state.message });
+            router.push("/"); // Redirect to home for now.
+        } else if (state?.message) {
+            toast({ title: "오류", description: state.message, variant: "destructive" });
         }
-    }, [googleState, toast]);
+    }, [googleState, emailState, toast, router]);
 
     if(loading || user) {
       // AuthProvider is checking for user or user exists, show loading or let AuthProvider redirect.
@@ -119,7 +122,7 @@ export default function LoginPage() {
                 <span className="text-xs text-muted-foreground">OR</span>
                 <Separator className="flex-1" />
             </div>
-            <form ref={formRef} action={handleEmailSignIn} className="space-y-4">
+            <form action={emailAction} className="space-y-4">
                 <div className="space-y-2">
                 <Label htmlFor="email">{AUTH_STRINGS.EMAIL_LABEL}</Label>
                 <Input
@@ -134,10 +137,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
                 <Input id="password" type="password" name="password" placeholder="••••••••" required />
                 </div>
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {AUTH_STRINGS.LOGIN}
-                </Button>
+                <EmailSignInButton />
             </form>
             </CardContent>
             <CardFooter className="justify-center text-sm">
@@ -153,5 +153,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    
