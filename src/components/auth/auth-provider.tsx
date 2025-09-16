@@ -40,10 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const authInstance = auth();
     setSafeAuth(authInstance);
 
-    if(!authInstance.app) {
+    // Ensure authInstance is valid before setting up the listener
+    if (!authInstance.app) {
+      console.warn("Firebase not initialized in AuthProvider, auth features will be disabled.");
       setLoading(false);
       return;
     }
+
     const unsubscribe = onAuthStateChanged(authInstance, (user) => {
       setUser(user);
       setTokenCookie(user); // Set or clear the cookie on auth state change
