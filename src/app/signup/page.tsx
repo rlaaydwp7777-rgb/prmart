@@ -50,7 +50,7 @@ function EmailSignUpButton() {
 
 
 export default function SignUpPage() {
-    const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
+    const [googleState, googleAction] = useActionState(signInWithGoogleAction, { success: false, message: "" });
     const [emailState, emailAction] = useActionState(signUpWithEmailAction, { message: "", success: false });
     const { toast } = useToast();
     const router = useRouter();
@@ -65,11 +65,11 @@ export default function SignUpPage() {
 
 
     useEffect(() => {
-        const state = emailState || googleState;
+        const state = emailState.success ? emailState : googleState;
         if(state?.success) {
             toast({ title: "성공", description: state.message });
             router.push("/");
-        } else if (state?.error) {
+        } else if (state?.error && state.errorType === 'general') {
             toast({ title: "오류", description: state.error, variant: "destructive" });
         }
     }, [emailState, googleState, toast, router]);
@@ -114,15 +114,19 @@ export default function SignUpPage() {
                     placeholder={AUTH_STRINGS.EMAIL_PLACEHOLDER}
                     required
                 />
+                 {emailState?.errorType === 'email' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
                 <div className="space-y-2">
                 <Label htmlFor="password">{AUTH_STRINGS.PASSWORD_LABEL}</Label>
                 <Input id="password" type="password" name="password" placeholder="••••••••" required />
+                {emailState?.errorType === 'password' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
                 <div className="space-y-2">
                 <Label htmlFor="confirm-password">{AUTH_STRINGS.CONFIRM_PASSWORD_LABEL}</Label>
                 <Input id="confirm-password" type="password" name="confirmPassword" placeholder="••••••••" required />
+                {emailState?.errorType === 'confirmPassword' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
+                {emailState?.errorType === 'general' && <p className="text-sm text-destructive mt-2">{emailState.error}</p>}
                 <EmailSignUpButton />
             </form>
             </CardContent>

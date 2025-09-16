@@ -17,7 +17,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,7 +26,7 @@ import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { Loader2, Sparkles, Send } from "lucide-react";
-import { signInWithGoogleAction, signInWithEmailAction, resetPasswordAction } from "../actions";
+import { signInWithGoogleAction, signInWithEmailAction, resetPasswordAction, type AuthState } from "../actions";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useAuth } from "@/components/auth/auth-provider";
@@ -64,14 +63,11 @@ function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChan
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.message) {
+    if (state.success && state.message) {
       toast({
-        title: state.success ? "성공" : "오류",
+        title: "성공",
         description: state.message,
-        variant: state.success ? "default" : "destructive",
       });
-    }
-    if(state.success) {
       onOpenChange(false);
       formRef.current?.reset();
     }
@@ -108,7 +104,8 @@ function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChan
               required
               type="email"
             />
-             {state?.error && <p className="text-sm text-destructive">{state.error}</p>}
+             {state?.errorType === 'email' && <p className="text-sm text-destructive">{state.error}</p>}
+             {state?.errorType === 'general' && <p className="text-sm text-destructive">{state.error}</p>}
           </div>
           <DialogFooter>
             <SubmitButton />
@@ -121,7 +118,7 @@ function ResetPasswordDialog({ open, onOpenChange }: { open: boolean, onOpenChan
 
 
 export default function LoginPage() {
-    const [googleState, googleAction] = useActionState(signInWithGoogleAction, null);
+    const [googleState, googleAction] = useActionState(signInWithGoogleAction, { success: false, message: "" });
     const [emailState, emailAction] = useActionState(signInWithEmailAction, { success: false, message: "" });
     const { toast } = useToast();
     const router = useRouter();
@@ -133,7 +130,7 @@ export default function LoginPage() {
         if(state?.success) {
             toast({ title: "성공", description: state.message });
             router.push("/");
-        } else if (state?.error) {
+        } else if (state?.error && state.errorType === 'general') { // Only show general errors as toasts
             toast({ title: "오류", description: state.error, variant: "destructive" });
         }
     }, [googleState, emailState, toast, router]);
@@ -187,6 +184,7 @@ export default function LoginPage() {
                     placeholder={AUTH_STRINGS.EMAIL_PLACEHOLDER}
                     required
                 />
+                 {emailState?.errorType === 'email' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -196,7 +194,9 @@ export default function LoginPage() {
                         </Button>
                     </div>
                     <Input id="password" type="password" name="password" placeholder="••••••••" required />
+                     {emailState?.errorType === 'password' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
+                {emailState?.errorType === 'general' && <p className="text-sm text-destructive mt-2">{emailState.error}</p>}
                 <EmailSignInButton />
             </form>
             </CardContent>
@@ -214,5 +214,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

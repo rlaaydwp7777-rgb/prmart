@@ -37,6 +37,7 @@ const getFirebaseAuthErrorMessage = (error: FirebaseError) => {
 export type AuthState = {
     message: string;
     success: boolean;
+    errorType?: 'email' | 'password' | 'confirmPassword' | 'general';
     error?: string | null;
 }
 
@@ -54,11 +55,11 @@ export async function signUpWithEmailAction(prevState: AuthState, formData: Form
     const validatedFields = signUpSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
-        return {
-            success: false,
-            message: "입력 값을 다시 확인해주세요.",
-            error: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
-        };
+        const fieldErrors = validatedFields.error.flatten().fieldErrors;
+        if(fieldErrors.email) return { success: false, message: "", errorType: 'email', error: fieldErrors.email[0] };
+        if(fieldErrors.password) return { success: false, message: "", errorType: 'password', error: fieldErrors.password[0] };
+        if(fieldErrors.confirmPassword) return { success: false, message: "", errorType: 'confirmPassword', error: fieldErrors.confirmPassword[0] };
+        return { success: false, message: "", errorType: 'general', error: "입력 값을 다시 확인해주세요." };
     }
     
     const { email, password } = validatedFields.data;
@@ -68,9 +69,11 @@ export async function signUpWithEmailAction(prevState: AuthState, formData: Form
         return { success: true, message: "회원가입에 성공했습니다! 메인 페이지로 이동합니다." };
     } catch (error) {
         if (error instanceof FirebaseError) {
-             return { success: false, message: "회원가입 실패", error: getFirebaseAuthErrorMessage(error) };
+             const errorMessage = getFirebaseAuthErrorMessage(error);
+             const errorType = error.code === 'auth/email-already-in-use' ? 'email' : 'general';
+             return { success: false, message: "", errorType, error: errorMessage };
         }
-        return { success: false, message: "회원가입 실패", error: "알 수 없는 오류가 발생했습니다." };
+        return { success: false, message: "", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
     }
 }
 
@@ -83,11 +86,10 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
      const validatedFields = signInSchema.safeParse(Object.fromEntries(formData.entries()));
 
     if (!validatedFields.success) {
-        return {
-            success: false,
-            message: "입력 값을 다시 확인해주세요.",
-            error: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
-        };
+        const fieldErrors = validatedFields.error.flatten().fieldErrors;
+        if(fieldErrors.email) return { success: false, message: "", errorType: 'email', error: fieldErrors.email[0] };
+        if(fieldErrors.password) return { success: false, message: "", errorType: 'password', error: fieldErrors.password[0] };
+        return { success: false, message: "", errorType: 'general', error: "입력 값을 다시 확인해주세요." };
     }
     
     const { email, password } = validatedFields.data;
@@ -97,9 +99,9 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
         return { success: true, message: "로그인에 성공했습니다!" };
     } catch (error) {
          if (error instanceof FirebaseError) {
-             return { success: false, message: "로그인 실패", error: getFirebaseAuthErrorMessage(error) };
+             return { success: false, message: "", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
         }
-        return { success: false, message: "로그인 실패", error: "알 수 없는 오류가 발생했습니다." };
+        return { success: false, message: "", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
     }
 }
 
@@ -126,7 +128,8 @@ export async function resetPasswordAction(prevState: AuthState, formData: FormDa
   if (!validatedFields.success) {
     return {
       success: false,
-      message: "입력 값을 다시 확인해주세요.",
+      message: "",
+      errorType: 'email',
       error: validatedFields.error.flatten().fieldErrors.email?.[0],
     };
   }
@@ -137,11 +140,11 @@ export async function resetPasswordAction(prevState: AuthState, formData: FormDa
   } catch (error) {
     if (error instanceof FirebaseError) {
       if (error.code === 'auth/user-not-found') {
-        return { success: false, message: "가입되지 않은 이메일입니다." };
+        return { success: false, message: "", errorType: 'email', error: "가입되지 않은 이메일입니다." };
       }
-      return { success: false, message: getFirebaseAuthErrorMessage(error) };
+      return { success: false, message: "", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
     }
-    return { success: false, message: "비밀번호 재설정 중 오류가 발생했습니다." };
+    return { success: false, message: "", errorType: 'general', error: "비밀번호 재설정 중 오류가 발생했습니다." };
   }
 }
 
@@ -403,7 +406,7 @@ export async function updateSellerProfileAction(prevState: any, formData: FormDa
     // Update Seller Profile in Firestore
     await saveSellerProfile(userId, {
         sellerName,
-        photoUrl,
+        photoUrl: photoUrl || "",
         ...sellerProfileData,
     });
     
@@ -416,5 +419,3 @@ export async function updateSellerProfileAction(prevState: any, formData: FormDa
     return { success: false, message: "프로필 저장 중 오류가 발생했습니다." };
   }
 }
-
-    
