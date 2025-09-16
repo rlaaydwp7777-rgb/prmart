@@ -340,17 +340,26 @@ export async function createProposalAction(prevState: FormState, formData: FormD
         const { authorId } = validatedFields.data;
         const authorProfile = await getSellerProfile(authorId);
 
-        if (!authorProfile) {
-            return {
+        let authorName: string;
+        let authorAvatar: string;
+
+        if (authorProfile) {
+            authorName = authorProfile.sellerName;
+            authorAvatar = authorProfile.photoUrl || "";
+        } else if (auth.currentUser) {
+            authorName = auth.currentUser.displayName || auth.currentUser.email || "익명";
+            authorAvatar = auth.currentUser.photoURL || "";
+        } else {
+             return {
                 success: false,
-                message: "제안을 제출하려면 먼저 판매자 프로필을 설정해야 합니다.",
+                message: "제안을 제출하려면 먼저 판매자 프로필을 설정하거나 로그인해야 합니다.",
             };
         }
 
         await saveProposal({
             ...validatedFields.data,
-            authorName: authorProfile.sellerName,
-            authorAvatar: authorProfile.photoUrl || "",
+            authorName: authorName,
+            authorAvatar: authorAvatar,
         });
 
         revalidatePath(`/requests/${validatedFields.data.requestId}`);
