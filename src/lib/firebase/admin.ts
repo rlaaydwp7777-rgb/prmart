@@ -1,5 +1,7 @@
+
 import { initializeApp, getApps, App } from 'firebase-admin/app';
 import { credential } from 'firebase-admin';
+import { getAuth } from 'firebase-admin/auth';
 
 // IMPORTANT: In a real production environment, use environment variables
 // and secret management instead of hardcoding service account keys.
