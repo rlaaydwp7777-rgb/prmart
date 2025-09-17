@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
@@ -22,7 +21,9 @@ const AuthContext = createContext<AuthContextType>({
 async function setTokenCookie(user: User | null) {
     if(user) {
         const token = await user.getIdToken();
-        document.cookie = `firebaseIdToken=${token}; path=/;`;
+        // Set cookie to expire in 1 hour, matching Firebase session
+        const expires = new Date(Date.now() + 60 * 60 * 1000).toUTCString();
+        document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; Secure`;
     } else {
         document.cookie = 'firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
     }
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const authInstance = getSafeAuth();
     setSafeAuth(authInstance);
 
-    if(!authInstance.app) {
+    if(!authInstance?.app) {
       console.warn("Firebase not initialized in AuthProvider, auth features will be disabled.");
       setLoading(false);
       return;
@@ -61,18 +62,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (loading) return;
 
     const isAuthPage = pathname === '/login' || pathname === '/signup';
+    const continueUrl = searchParams.get('continueUrl');
     
     // If user is logged in, redirect from auth pages to where they were going or home
     if (user && isAuthPage) {
-        const continueUrl = searchParams.get('continueUrl');
         router.replace(continueUrl || '/');
         return;
     }
     
     // If user is not logged in and tries to access a protected route
     if (!user && (pathname.startsWith('/seller'))) {
-        const continueUrl = pathname;
-        router.replace(`/login?continueUrl=${encodeURIComponent(continueUrl)}`);
+        const newContinueUrl = pathname + searchParams.toString();
+        router.replace(`/login?continueUrl=${encodeURIComponent(newContinueUrl)}`);
         return;
     }
 
