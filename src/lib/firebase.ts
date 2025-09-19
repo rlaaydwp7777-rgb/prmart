@@ -21,9 +21,12 @@ function validateConfig(config: typeof firebaseConfig) {
     .map(([key]) => key);
 
   if (missing.length > 0) {
-    console.warn(
-      `🚨 Firebase 환경변수가 누락되었습니다: ${missing.join(", ")}. Firebase 기능이 비활성화됩니다.`
-    );
+    const message = `🚨 Firebase 환경변수가 누락되었습니다: ${missing.join(", ")}. Firebase 기능이 비활성화됩니다.`;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(message);
+    } else {
+      console.warn(message);
+    }
     return false;
   }
   return true;

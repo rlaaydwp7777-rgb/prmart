@@ -42,21 +42,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // This now only runs on the client
     const authInstance = getSafeAuth();
     setSafeAuth(authInstance);
+  }, []);
 
-    if(!authInstance?.app) {
-      console.warn("Firebase not initialized in AuthProvider, auth features will be disabled.");
-      setLoading(false);
-      return;
-    }
-
-    const unsubscribe = onAuthStateChanged(authInstance, (user) => {
+  useEffect(() => {
+    if(!safeAuth) {
+        // If auth is not even initialized, we are not in a loading state.
+        // This can happen if Firebase env vars are missing.
+        if (loading) setLoading(false);
+        return;
+    };
+    
+    const unsubscribe = onAuthStateChanged(safeAuth, (user) => {
       setUser(user);
       setTokenCookie(user);
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [safeAuth, loading]);
 
   useEffect(() => {
     if (loading) return;
@@ -81,7 +84,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      if (!safeAuth || !safeAuth.app) {
+      if (!safeAuth) {
         console.warn("Firebase not initialized, signOut skipped.");
         return;
       }

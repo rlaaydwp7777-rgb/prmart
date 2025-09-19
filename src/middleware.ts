@@ -12,8 +12,8 @@ async function verifyToken(token: string) {
     try {
         const decodedToken = await adminAuth(app).verifyIdToken(token);
         return decodedToken;
-    } catch (error) {
-        console.warn('Middleware Warning: Invalid or expired token.', error.message);
+    } catch (error: any) {
+        console.warn('Middleware Warning: Invalid or expired token.', error?.message);
         return null;
     }
 }
@@ -40,14 +40,14 @@ export async function middleware(request: NextRequest) {
        return NextResponse.redirect(loginUrl);
     }
     
-    // Check if the user's email is the designated admin email.
-    if (decodedToken.email === 'prmart7777@gmail.com') {
+    // Check for admin role using Custom Claims.
+    if (decodedToken.role === 'admin') {
       console.log(`Middleware: Admin user ${decodedToken.email} granted access to ${pathname}.`);
       return NextResponse.next();
     }
     
-    // If not the admin email, redirect to home page.
-    console.log(`Middleware: Access denied for ${decodedToken.email}. User is not the designated admin. Redirecting to home.`);
+    // If not an admin, redirect to home page.
+    console.log(`Middleware: Access denied for ${decodedToken.email}. User is not an admin. Redirecting to home.`);
     return NextResponse.redirect(new URL('/', request.url));
   }
 
