@@ -142,7 +142,7 @@ export default function LoginPage() {
         if(googleState.success) {
             toast({ title: "성공", description: googleState.message });
             router.push(continueUrl || "/");
-        } else if (googleState.error && googleState.errorType === 'general') {
+        } else if (googleState.error) {
             toast({ title: "오류", description: googleState.error, variant: "destructive" });
         }
     }, [googleState, toast, router, continueUrl]);
@@ -151,7 +151,7 @@ export default function LoginPage() {
         if(emailState.success) {
             toast({ title: "성공", description: emailState.message });
             router.push(continueUrl || "/");
-        } else if (emailState.error && emailState.errorType === 'general') {
+        } else if (emailState.error && emailState.errorType !== 'email' && emailState.errorType !== 'password') {
             // General errors are now shown below the form
         }
     }, [emailState, toast, router, continueUrl]);
@@ -189,6 +189,7 @@ export default function LoginPage() {
             <CardContent>
                 <form action={googleAction} className="mb-4">
                     <GoogleSignInButton />
+                     {googleState?.errorType === 'general' && <p className="text-sm text-destructive mt-2">{googleState.error}</p>}
                 </form>
             <div className="flex items-center gap-4 my-4">
                 <Separator className="flex-1" />
@@ -217,7 +218,7 @@ export default function LoginPage() {
                     <Input id="password" type="password" name="password" placeholder="••••••••" required />
                      {emailState?.errorType === 'password' && <p className="text-sm text-destructive">{emailState.error}</p>}
                 </div>
-                {emailState?.errorType === 'general' && <p className="text-sm text-destructive mt-2">{emailState.error}</p>}
+                {emailState?.errorType === 'general' && <p className="text-sm text-destructive mt-2 text-center">{emailState.error}</p>}
                 <EmailSignInButton />
             </form>
             </CardContent>
