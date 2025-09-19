@@ -6,14 +6,14 @@ import { app } from './lib/firebase/admin';
 
 async function verifyToken(token: string) {
     if (!app) {
-        console.error("Firebase Admin SDK not initialized in middleware!");
+        console.error("Middleware Error: Firebase Admin SDK not initialized! Cannot verify token.");
         return null;
     }
     try {
         const decodedToken = await adminAuth(app).verifyIdToken(token);
         return decodedToken;
     } catch (error) {
-        console.warn('Invalid or expired token in middleware:', error);
+        console.warn('Middleware Warning: Invalid or expired token.', error.message);
         return null;
     }
 }
@@ -25,7 +25,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('firebaseIdToken')?.value;
 
     if (!token) {
-      console.log('Middleware: No token found, redirecting to login.');
+      console.log('Middleware: No token found. Redirecting to login.');
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('continueUrl', pathname);
       return NextResponse.redirect(loginUrl);
@@ -33,19 +33,22 @@ export async function middleware(request: NextRequest) {
 
     const decodedToken = await verifyToken(token);
 
-    // Development backdoor for specific admin email
-    if (decodedToken && decodedToken.email === 'prmart7777@gmail.com') {
-      console.log(`Middleware: Admin user ${decodedToken.email} granted access.`);
+    if (!decodedToken) {
+       console.log('Middleware: Token verification failed. Redirecting to login.');
+       const loginUrl = new URL('/login', request.url);
+       loginUrl.searchParams.set('continueUrl', pathname);
+       return NextResponse.redirect(loginUrl);
+    }
+    
+    // Check if the user's email is the designated admin email.
+    if (decodedToken.email === 'prmart7777@gmail.com') {
+      console.log(`Middleware: Admin user ${decodedToken.email} granted access to ${pathname}.`);
       return NextResponse.next();
     }
     
-    if (!decodedToken || decodedToken.role !== 'admin') {
-      console.log('Middleware: Invalid token or not an admin, redirecting to home.');
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-    
-    console.log('Middleware: Admin user verified.');
-    return NextResponse.next();
+    // If not the admin email, redirect to home page.
+    console.log(`Middleware: Access denied for ${decodedToken.email}. User is not the designated admin. Redirecting to home.`);
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();

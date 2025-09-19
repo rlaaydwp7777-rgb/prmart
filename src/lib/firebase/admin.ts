@@ -22,7 +22,7 @@ if (serviceAccount && !getApps().length) {
 } else if (getApps().length) {
     app = getApps()[0];
 } else {
-    console.warn("Firebase Admin SDK could not be initialized. Service account key is missing.");
+    console.warn("Firebase Admin SDK could not be initialized. Service account key is missing or invalid. Ensure FIREBASE_ADMIN_SERVICE_ACCOUNT is set in your environment.");
 }
 
 
