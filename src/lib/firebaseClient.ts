@@ -1,7 +1,7 @@
 // src/lib/firebaseClient.ts
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { getAuth, type Auth } from "firebase/auth";
+import { getFirestore, type Firestore } from "firebase/firestore";
 
 const clientConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,29 +12,31 @@ const clientConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-function validateConfig(config: typeof clientConfig): boolean {
-  // measurementId is optional
-  const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
-  const missingKeys = requiredKeys.filter(key => !config[key as keyof typeof config]);
+let firebaseClientApp: FirebaseApp | null = null;
+let firebaseAuth: Auth | null = null;
+let firebaseDb: Firestore | null = null;
 
-  if (missingKeys.length > 0) {
-    const message = `Firebase client config is missing: ${missingKeys.join(", ")}.`;
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(message + " This will cause the build to fail in production.");
-    } else {
-      console.warn(message + " Firebase services will be disabled in development.");
+if (clientConfig.apiKey && clientConfig.projectId) {
+  if (!getApps().length) {
+    try {
+      firebaseClientApp = initializeApp(clientConfig);
+    } catch (e) {
+      console.error("Firebase client initialization error", e);
     }
-    return false;
+  } else {
+    firebaseClientApp = getApp();
   }
-  return true;
+  
+  if (firebaseClientApp) {
+    firebaseAuth = getAuth(firebaseClientApp);
+    firebaseDb = getFirestore(firebaseClientApp);
+  }
+} else {
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("Missing NEXT_PUBLIC_FIREBASE_* env vars for production build.");
+  } else {
+    console.warn("Firebase client env missing; auth/firestore will be disabled in dev.");
+  }
 }
 
-
-let app: ReturnType<typeof initializeApp> | null = null;
-if (validateConfig(clientConfig)) {
-    app = getApps().length ? getApp() : initializeApp(clientConfig);
-}
-
-export const firebaseClientApp = app;
-export const firebaseAuth = app ? getAuth(app) : null;
-export const firebaseDb = app ? getFirestore(app) : null;
+export { firebaseClientApp, firebaseAuth, firebaseDb };
