@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getProduct, getProductsByCategorySlug, getCategories } from "@/lib/firebase/services";
-import type { Category, Prompt } from "@/lib/types";
+import type { Category } from "@/lib/types";
 import { PromptDetailClient } from "@/components/prompts/prompt-detail-client";
 
 export default async function PromptDetailPage({ params }: { params: { id: string } }) {

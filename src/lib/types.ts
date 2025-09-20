@@ -92,15 +92,6 @@ export interface SellerStats {
     reviewCount: number;
 }
 
-export interface UserProfile {
-  uid: string;
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  role: 'user' | 'admin';
-  createdAt: string;
-}
-
 export interface SellerProfile {
     sellerName: string;
     sellerBio?: string;

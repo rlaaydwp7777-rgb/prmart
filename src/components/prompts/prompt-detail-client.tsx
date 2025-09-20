@@ -12,7 +12,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Category, Prompt } from "@/lib/types";
-import { useAuth } from "@/components/auth/auth-provider";
 import { PromptCard } from "./prompt-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from 'date-fns';
@@ -30,37 +29,22 @@ interface PromptDetailClientProps {
 }
 
 export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: PromptDetailClientProps) {
-  const { user } = useAuth();
   const router = useRouter();
 
   const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   const isFree = prompt.price === 0;
-  // This would be replaced with actual purchase status logic from user data
   const hasPurchased = false; 
 
   const canViewContent = prompt.visibility === 'public' || (prompt.visibility === 'partial' && hasPurchased);
 
   const handlePurchase = () => {
-    if (!user) {
-      router.push('/login');
-    } else {
-      // TODO: Implement actual purchase logic (e.g., redirect to checkout)
-      alert("결제 기능은 현재 준비 중입니다.");
-    }
+    // TODO: Implement actual purchase logic (e.g., redirect to checkout)
+    alert("결제 기능은 현재 준비 중입니다.");
   };
 
   const renderCtaButtons = () => {
-    if (!user) {
-      return (
-        <Button size="lg" className="w-full text-lg h-12" onClick={() => router.push('/login')}>
-          <LogIn className="mr-2"/>
-          {isFree ? "로그인 후 다운로드" : "로그인 후 구매"}
-        </Button>
-      );
-    }
-
     if (isFree) {
        return (
         <Button size="lg" className="w-full text-lg h-12" onClick={() => alert('다운로드 시작!')}>
@@ -70,7 +54,6 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
       );
     }
     
-    // Logged in user, paid product
     return (
       <div className="flex flex-col gap-2">
         <div className="flex flex-col sm:flex-row gap-2">
