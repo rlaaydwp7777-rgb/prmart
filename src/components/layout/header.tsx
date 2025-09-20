@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { Sparkles, Menu } from "lucide-react";
-import { HEADER_LINKS } from "@/lib/string-constants";
+import { HEADER_LINKS, BUTTONS } from "@/lib/string-constants";
 import {
   DropdownMenu,
   DropdownMenuContent,

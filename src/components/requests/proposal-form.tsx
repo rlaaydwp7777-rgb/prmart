@@ -60,7 +60,8 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
             <input type="hidden" name="authorId" value="anonymous_user" />
-
+            <input type="hidden" name="authorName" value="익명의 제안자" />
+            
             <Textarea
                 name="content"
                 placeholder="여기에 제안 내용이나 댓글을 입력하세요... 자신의 상품을 링크할 수도 있습니다."

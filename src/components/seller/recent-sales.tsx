@@ -1,31 +1,46 @@
+import { NextResponse, type NextRequest } from 'next/server'
+import { app } from '@/lib/firebase/admin';
+import { getAuth } from 'firebase-admin/auth';
 
-"use client"
+export async function middleware(request: NextRequest) {
+  // Admin route protection
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const idToken = request.cookies.get('firebaseIdToken')?.value;
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import type { Order } from "@/lib/types"
+    if (!idToken) {
+      console.log('Middleware: No token, redirecting to home.');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
 
-interface RecentSalesProps {
-    sales: Order[];
+    try {
+      const decodedToken = await getAuth(app).verifyIdToken(idToken);
+
+      // IMPORTANT: Using a specific email for admin access as a temporary measure.
+      // This should be replaced with Custom Claims for a more robust solution.
+      if (decodedToken.email !== 'prmart7777@gmail.com') {
+        console.log(`Middleware: User ${decodedToken.email} is not admin. Redirecting.`);
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      
+      // User is the admin, allow access.
+      return NextResponse.next();
+    } catch (error) {
+      console.error('Middleware: Token verification failed', error);
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // Seller route protection (currently disabled as auth is removed)
+  if (request.nextUrl.pathname.startsWith('/seller')) {
+      // Since login is removed, we can just redirect or show a placeholder
+      // For now, let's redirect to home to avoid confusion.
+      return NextResponse.redirect(new URL('/', request.url));
+  }
+
+
+  return NextResponse.next();
 }
 
-export function RecentSales({ sales }: RecentSalesProps) {
-  return (
-    <div className="space-y-8">
-      {sales.map((sale) => (
-        <div key={sale.id} className="flex items-center">
-          <Avatar className="h-9 w-9">
-            <AvatarImage src={`https://avatar.vercel.sh/${sale.buyerEmail}.png`} alt={sale.buyerName} />
-            <AvatarFallback>{sale.buyerName.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div className="ml-4 space-y-1">
-            <p className="text-sm font-medium leading-none">{sale.buyerName}</p>
-            <p className="text-sm text-muted-foreground">
-              {sale.buyerEmail}
-            </p>
-          </div>
-          <div className="ml-auto font-medium">+₩{sale.amount.toLocaleString()}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
+export const config = {
+  matcher: ['/admin/:path*', '/seller/:path*'],
+};

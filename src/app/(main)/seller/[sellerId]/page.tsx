@@ -1,52 +1,46 @@
-import { notFound } from "next/navigation";
-import { getSellerProfile, getProductsBySeller } from "@/lib/firebase/services";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { PromptCard } from "@/components/prompts/prompt-card";
+import { NextResponse, type NextRequest } from 'next/server'
+import { app } from '@/lib/firebase/admin';
+import { getAuth } from 'firebase-admin/auth';
 
-interface SellerPageProps {
-  params: {
-    sellerId: string;
-  };
-}
+export async function middleware(request: NextRequest) {
+  // Admin route protection
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const idToken = request.cookies.get('firebaseIdToken')?.value;
 
-export default async function SellerPage({ params }: SellerPageProps) {
-  const { sellerId } = params;
-  const [sellerProfile, sellerProducts] = await Promise.all([
-    getSellerProfile(sellerId),
-    getProductsBySeller(sellerId),
-  ]);
+    if (!idToken) {
+      console.log('Middleware: No token, redirecting to home.');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
 
-  if (!sellerProfile) {
-    notFound();
+    try {
+      const decodedToken = await getAuth(app).verifyIdToken(idToken);
+
+      // IMPORTANT: Using a specific email for admin access as a temporary measure.
+      // This should be replaced with Custom Claims for a more robust solution.
+      if (decodedToken.email !== 'prmart7777@gmail.com') {
+        console.log(`Middleware: User ${decodedToken.email} is not admin. Redirecting.`);
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      
+      // User is the admin, allow access.
+      return NextResponse.next();
+    } catch (error) {
+      console.error('Middleware: Token verification failed', error);
+      return NextResponse.redirect(new URL('/', request.url));
+    }
   }
 
-  return (
-    <div className="container px-4 md:px-6">
-      <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 py-10 bg-muted/50 rounded-lg">
-        <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-            <AvatarImage src={sellerProfile.photoUrl} alt={sellerProfile.sellerName} data-ai-hint="person face" />
-            <AvatarFallback className="text-3xl">{sellerProfile.sellerName.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <div className="space-y-1">
-            <h1 className="text-3xl font-bold font-headline tracking-tight">{sellerProfile.sellerName}</h1>
-            <p className="text-muted-foreground max-w-xl">{sellerProfile.sellerBio || "아직 소개가 없습니다."}</p>
-        </div>
-      </div>
+  // Seller route protection (currently disabled as auth is removed)
+  if (request.nextUrl.pathname.startsWith('/seller')) {
+      // Since login is removed, we can just redirect or show a placeholder
+      // For now, let's redirect to home to avoid confusion.
+      return NextResponse.redirect(new URL('/', request.url));
+  }
 
-      <div>
-        <h2 className="text-2xl font-bold font-headline mb-6">판매 중인 상품 ({sellerProducts.length}개)</h2>
-        {sellerProducts.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {sellerProducts.map((prompt) => (
-              <PromptCard key={prompt.id} prompt={prompt} />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-20 border-2 border-dashed rounded-lg">
-            <p className="text-muted-foreground text-lg">아직 판매 중인 상품이 없습니다.</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+
+  return NextResponse.next();
 }
+
+export const config = {
+  matcher: ['/admin/:path*', '/seller/:path*'],
+};

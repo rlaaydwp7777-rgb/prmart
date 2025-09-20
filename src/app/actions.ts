@@ -5,7 +5,7 @@
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
 import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
-import { saveProduct, getCategories, saveIdeaRequest, saveProposal, getSellerProfile, saveSellerProfile } from "@/lib/firebase/services";
+import { saveProduct, getCategories, saveIdeaRequest, saveProposal } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
 
 
@@ -182,6 +182,8 @@ const proposalSchema = z.object({
   content: z.string().min(10, "제안 내용은 10자 이상이어야 합니다."),
   requestId: z.string(),
   authorId: z.string(),
+  authorName: z.string(),
+  authorAvatar: z.string().optional(),
 });
 
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -197,21 +199,9 @@ export async function createProposalAction(prevState: FormState, formData: FormD
     }
 
     try {
-        const { authorId } = validatedFields.data;
-        const authorProfile = await getSellerProfile(authorId);
-
-        let authorName = "익명";
-        let authorAvatar = "";
-
-        if (authorProfile) {
-            authorName = authorProfile.sellerName;
-            authorAvatar = authorProfile.photoUrl || "";
-        }
-
         await saveProposal({
             ...validatedFields.data,
-            authorName: authorName,
-            authorAvatar: authorAvatar,
+            authorAvatar: validatedFields.data.authorAvatar || '',
         });
 
         revalidatePath(`/requests/${validatedFields.data.requestId}`);

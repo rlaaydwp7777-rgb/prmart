@@ -1,32 +1,46 @@
+import { NextResponse, type NextRequest } from 'next/server'
+import { app } from '@/lib/firebase/admin';
+import { getAuth } from 'firebase-admin/auth';
 
-"use client"
+export async function middleware(request: NextRequest) {
+  // Admin route protection
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const idToken = request.cookies.get('firebaseIdToken')?.value;
 
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
+    if (!idToken) {
+      console.log('Middleware: No token, redirecting to home.');
+      return NextResponse.redirect(new URL('/', request.url));
+    }
 
-interface OverviewProps {
-    data: { name: string, total: number }[];
+    try {
+      const decodedToken = await getAuth(app).verifyIdToken(idToken);
+
+      // IMPORTANT: Using a specific email for admin access as a temporary measure.
+      // This should be replaced with Custom Claims for a more robust solution.
+      if (decodedToken.email !== 'prmart7777@gmail.com') {
+        console.log(`Middleware: User ${decodedToken.email} is not admin. Redirecting.`);
+        return NextResponse.redirect(new URL('/', request.url));
+      }
+      
+      // User is the admin, allow access.
+      return NextResponse.next();
+    } catch (error) {
+      console.error('Middleware: Token verification failed', error);
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+
+  // Seller route protection (currently disabled as auth is removed)
+  if (request.nextUrl.pathname.startsWith('/seller')) {
+      // Since login is removed, we can just redirect or show a placeholder
+      // For now, let's redirect to home to avoid confusion.
+      return NextResponse.redirect(new URL('/', request.url));
+  }
+
+
+  return NextResponse.next();
 }
 
-export function Overview({ data }: OverviewProps) {
-  return (
-    <ResponsiveContainer width="100%" height={350}>
-      <BarChart data={data}>
-        <XAxis
-          dataKey="name"
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-        />
-        <YAxis
-          stroke="#888888"
-          fontSize={12}
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => `₩${value / 1000}k`}
-        />
-        <Bar dataKey="total" fill="currentColor" radius={[4, 4, 0, 0]} className="fill-primary" />
-      </BarChart>
-    </ResponsiveContainer>
-  )
-}
+export const config = {
+  matcher: ['/admin/:path*', '/seller/:path*'],
+};
