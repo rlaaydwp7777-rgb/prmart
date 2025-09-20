@@ -6,8 +6,8 @@ import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-
 import { z } from "zod";
 import { saveProduct, getCategories, saveIdeaRequest, saveProposal, createUserProfile, getFirebaseAuthErrorMessage } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut } from "firebase/auth";
-import { auth } from '@/lib/firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, getAdditionalUserInfo } from "firebase/auth";
+import { auth, signInWithGoogle } from '@/lib/firebase/auth';
 
 // --- Auth Actions ---
 
@@ -70,6 +70,30 @@ export async function signInWithEmailAction(prevState: AuthState, formData: Form
     return { success: false, message: getFirebaseAuthErrorMessage(error.code), type: 'signin' };
   }
 }
+
+export async function signInWithGoogleAction(): Promise<AuthState> {
+    try {
+        const userCredential = await signInWithGoogle();
+        const user = userCredential.user;
+        const additionalInfo = getAdditionalUserInfo(userCredential);
+        
+        if (additionalInfo?.isNewUser) {
+            await createUserProfile(user.uid, {
+                email: user.email!,
+                displayName: user.displayName || user.email!.split('@')[0],
+                photoURL: user.photoURL || `https://avatar.vercel.sh/${user.email}`,
+                role: 'user',
+                createdAt: new Date().toISOString(),
+            });
+        }
+        
+        return { success: true, message: "Google 로그인 성공!", type: 'signin' };
+    } catch (error: any) {
+        console.error("Google Sign-In action error:", error);
+        return { success: false, message: getFirebaseAuthErrorMessage(error.code), type: 'signin' };
+    }
+}
+
 
 export async function signOutAction(): Promise<AuthState> {
     try {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState, useEffect } from "react";
@@ -7,10 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AUTH_STRINGS } from "@/lib/string-constants";
 import { Loader2 } from "lucide-react";
-import { signInWithEmailAction, type AuthState } from "@/app/actions";
+import { signInWithEmailAction, signInWithGoogleAction, type AuthState } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
-import { Separator } from "../ui/separator";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -41,6 +41,18 @@ export function LoginForm() {
         });
     }
   }, [state, toast]);
+
+  const handleGoogleSignIn = async () => {
+      const result = await signInWithGoogleAction();
+      if (!result.success) {
+          toast({
+              title: "Google 로그인 오류",
+              description: result.message,
+              variant: "destructive",
+          });
+      }
+  };
+
 
   return (
     <div className="grid gap-6">
@@ -78,9 +90,11 @@ export function LoginForm() {
             </span>
           </div>
         </div>
-      <Button variant="outline">
+      <Button variant="outline" onClick={handleGoogleSignIn}>
         {AUTH_STRINGS.CONTINUE_WITH_GOOGLE}
       </Button>
     </div>
   );
 }
+
+    

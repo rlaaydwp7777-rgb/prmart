@@ -1,32 +1,15 @@
+
 "use client";
 
-import { useActionState, useEffect } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AUTH_STRINGS } from "@/lib/string-constants";
 import { LoginForm } from "@/components/auth/login-form";
-import { signInWithGoogleAction } from "@/app/actions";
 import { useAuth } from "@/components/auth/auth-provider";
-import { useToast } from "@/hooks/use-toast";
 import Image from 'next/image';
 
-const initialState = { success: false, message: "", type: "general" as const };
-
 export default function LoginPage() {
-  const [googleState, googleAction] = useActionState(signInWithGoogleAction, initialState);
   const { loading } = useAuth();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (googleState.message && !googleState.success) {
-      toast({
-        title: "Google 로그인 오류",
-        description: googleState.message,
-        variant: "destructive",
-      });
-    }
-  }, [googleState, toast]);
 
   if (loading) {
     return (
@@ -59,3 +42,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    
