@@ -5,149 +5,8 @@
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";
 import { assessContentQuality, AssessContentQualityOutput } from "@/ai/flows/ai-content-quality-control";
 import { z } from "zod";
-import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithGoogle, sendPasswordResetEmail } from "@/lib/firebase/auth";
-import { FirebaseError } from "firebase/app";
 import { saveProduct, getCategories, saveIdeaRequest, saveProposal, getSellerProfile, saveSellerProfile } from "@/lib/firebase/services";
 import { revalidatePath } from "next/cache";
-import { updateProfile } from "firebase/auth";
-
-
-// --- Auth Actions ---
-
-const getFirebaseAuthErrorMessage = (error: FirebaseError) => {
-    switch (error.code) {
-        case 'auth/email-already-in-use':
-            return '이미 사용 중인 이메일입니다.';
-        case 'auth/invalid-email':
-            return '유효하지 않은 이메일 형식입니다.';
-        case 'auth/weak-password':
-            return '비밀번호는 6자리 이상이어야 합니다.';
-        case 'auth/user-not-found':
-        case 'auth/wrong-password':
-        case 'auth/invalid-credential':
-             return '이메일 또는 비밀번호를 잘못 입력했습니다.';
-        case 'auth/popup-closed-by-user':
-            return 'Google 로그인 팝업이 닫혔습니다. 다시 시도해주세요.';
-        default:
-            console.error("Firebase Auth Error:", error.code, error.message);
-            return '인증 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
-    }
-}
-
-
-export type AuthState = {
-    message: string;
-    success: boolean;
-    errorType?: 'email' | 'password' | 'confirmPassword' | 'general';
-    error?: string | null;
-}
-
-const signUpSchema = z.object({
-  email: z.string().email({ message: "유효한 이메일을 입력해주세요." }),
-  password: z.string().min(6, { message: "비밀번호는 6자 이상이어야 합니다." }),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "비밀번호가 일치하지 않습니다.",
-  path: ["confirmPassword"],
-});
-
-
-export async function signUpWithEmailAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-    const validatedFields = signUpSchema.safeParse(Object.fromEntries(formData.entries()));
-
-    if (!validatedFields.success) {
-        const fieldErrors = validatedFields.error.flatten().fieldErrors;
-        if(fieldErrors.email) return { success: false, message: "", errorType: 'email', error: fieldErrors.email[0] };
-        if(fieldErrors.password) return { success: false, message: "", errorType: 'password', error: fieldErrors.password[0] };
-        if(fieldErrors.confirmPassword) return { success: false, message: "", errorType: 'confirmPassword', error: fieldErrors.confirmPassword[0] };
-        return { success: false, message: "", errorType: 'general', error: "입력 값을 다시 확인해주세요." };
-    }
-    
-    const { email, password } = validatedFields.data;
-
-    try {
-        await createUserWithEmailAndPassword(auth(), email, password);
-        return { success: true, message: "회원가입에 성공했습니다! 메인 페이지로 이동합니다." };
-    } catch (error) {
-        if (error instanceof FirebaseError) {
-             const errorMessage = getFirebaseAuthErrorMessage(error);
-             const errorType = error.code === 'auth/email-already-in-use' ? 'email' : 'general';
-             return { success: false, message: "", errorType, error: errorMessage };
-        }
-        return { success: false, message: "", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
-    }
-}
-
-const signInSchema = z.object({
-  email: z.string().email({ message: "유효한 이메일을 입력해주세요." }),
-  password: z.string().min(1, { message: "비밀번호를 입력해주세요." }),
-});
-
-export async function signInWithEmailAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-     const validatedFields = signInSchema.safeParse(Object.fromEntries(formData.entries()));
-
-    if (!validatedFields.success) {
-        const fieldErrors = validatedFields.error.flatten().fieldErrors;
-        if(fieldErrors.email) return { success: false, message: "", errorType: 'email', error: fieldErrors.email[0] };
-        if(fieldErrors.password) return { success: false, message: "", errorType: 'password', error: fieldErrors.password[0] };
-        return { success: false, message: "", errorType: 'general', error: "입력 값을 다시 확인해주세요." };
-    }
-    
-    const { email, password } = validatedFields.data;
-
-    try {
-        await signInWithEmailAndPassword(auth(), email, password);
-        return { success: true, message: "로그인에 성공했습니다!" };
-    } catch (error) {
-         if (error instanceof FirebaseError) {
-             return { success: false, message: "", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
-        }
-        return { success: false, message: "", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
-    }
-}
-
-
-export async function signInWithGoogleAction(): Promise<AuthState> {
-    try {
-        await signInWithGoogle();
-        return { success: true, message: "Google 계정으로 로그인했습니다." };
-    } catch (error) {
-         if (error instanceof FirebaseError) {
-             return { success: false, message: "Google 로그인 실패", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
-        }
-        return { success: false, message: "Google 로그인 실패", errorType: 'general', error: "알 수 없는 오류가 발생했습니다." };
-    }
-}
-
-const resetPasswordSchema = z.object({
-  email: z.string().email({ message: "유효한 이메일을 입력해주세요." }),
-});
-
-export async function resetPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  const validatedFields = resetPasswordSchema.safeParse(Object.fromEntries(formData.entries()));
-
-  if (!validatedFields.success) {
-    return {
-      success: false,
-      message: "",
-      errorType: 'email',
-      error: validatedFields.error.flatten().fieldErrors.email?.[0],
-    };
-  }
-
-  try {
-    await sendPasswordResetEmail(auth(), validatedFields.data.email);
-    return { success: true, message: `${validatedFields.data.email} 주소로 비밀번호 재설정 링크를 보냈습니다. 이메일을 확인해주세요.` };
-  } catch (error) {
-    if (error instanceof FirebaseError) {
-      if (error.code === 'auth/user-not-found') {
-        return { success: false, message: "", errorType: 'email', error: "가입되지 않은 이메일입니다." };
-      }
-      return { success: false, message: "", errorType: 'general', error: getFirebaseAuthErrorMessage(error) };
-    }
-    return { success: false, message: "", errorType: 'general', error: "비밀번호 재설정 중 오류가 발생했습니다." };
-  }
-}
 
 
 // --- Product & Request Actions ---
@@ -328,7 +187,6 @@ const proposalSchema = z.object({
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
     const rawData = Object.fromEntries(formData.entries());
     const validatedFields = proposalSchema.safeParse(rawData);
-    const safeAuth = auth();
 
     if (!validatedFields.success) {
         return {
@@ -342,20 +200,12 @@ export async function createProposalAction(prevState: FormState, formData: FormD
         const { authorId } = validatedFields.data;
         const authorProfile = await getSellerProfile(authorId);
 
-        let authorName: string;
-        let authorAvatar: string;
+        let authorName = "익명";
+        let authorAvatar = "";
 
         if (authorProfile) {
             authorName = authorProfile.sellerName;
             authorAvatar = authorProfile.photoUrl || "";
-        } else if (safeAuth.currentUser) {
-            authorName = safeAuth.currentUser.displayName || safeAuth.currentUser.email || "익명";
-            authorAvatar = safeAuth.currentUser.photoURL || "";
-        } else {
-             return {
-                success: false,
-                message: "제안을 제출하려면 먼저 판매자 프로필을 설정하거나 로그인해야 합니다.",
-            };
         }
 
         await saveProposal({
@@ -376,58 +226,4 @@ export async function createProposalAction(prevState: FormState, formData: FormD
             message: "제안 등록 중 오류가 발생했습니다. 다시 시도해주세요.",
         };
     }
-}
-
-
-const sellerProfileSchema = z.object({
-  sellerName: z.string().min(2, "판매자 이름은 2자 이상이어야 합니다."),
-  sellerBio: z.string().max(100, "소개는 100자 이하여야 합니다.").optional(),
-  photoUrl: z.string().url("유효한 URL을 입력해주세요.").or(z.literal('')).optional(),
-  bankName: z.string().optional(),
-  accountNumber: z.string().optional(),
-  accountHolder: z.string().optional(),
-  userId: z.string(),
-});
-
-export async function updateSellerProfileAction(prevState: any, formData: FormData) {
-  const rawData = Object.fromEntries(formData.entries());
-  const safeAuth = auth();
-  
-  const validatedFields = sellerProfileSchema.safeParse(rawData);
-
-  if (!validatedFields.success) {
-    return {
-      success: false,
-      message: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat()[0] : "유효성 검사에 실패했습니다.",
-    };
-  }
-  
-  const { userId, sellerName, photoUrl, ...sellerProfileData } = validatedFields.data;
-
-  if (!safeAuth.currentUser || safeAuth.currentUser.uid !== userId) {
-    return { success: false, message: "인증 정보가 일치하지 않습니다." };
-  }
-
-  try {
-    // Update Firebase Auth profile
-    await updateProfile(safeAuth.currentUser, {
-        displayName: sellerName,
-        photoURL: photoUrl,
-    });
-    
-    // Update Seller Profile in Firestore
-    await saveSellerProfile(userId, {
-        sellerName,
-        photoUrl: photoUrl || "",
-        ...sellerProfileData,
-    });
-    
-    revalidatePath('/seller/settings');
-    revalidatePath(`/seller/${userId}`); // Revalidate public seller page
-    
-    return { success: true, message: "프로필 정보가 성공적으로 저장되었습니다." };
-  } catch (error) {
-    console.error("Error saving profile:", error);
-    return { success: false, message: "프로필 저장 중 오류가 발생했습니다." };
-  }
 }

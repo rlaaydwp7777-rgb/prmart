@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Loader2 } from "lucide-react";
-import { useAuth } from "@/components/auth/auth-provider";
 import Link from "next/link";
 import { createProposalAction } from "@/app/actions";
 import type { FormState } from "@/app/actions";
@@ -33,7 +32,6 @@ function SubmitButton() {
 }
 
 export function ProposalForm({ requestId }: ProposalFormProps) {
-  const { user, loading } = useAuth();
   const [state, formAction] = useActionState(createProposalAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -51,35 +49,17 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
     }
   }, [state, toast]);
 
-  if (loading) {
-    return <div className="h-24 w-full animate-pulse rounded-lg bg-muted" />;
-  }
-
-  if (!user) {
-    return (
-      <div className="text-center text-muted-foreground p-8 border rounded-lg bg-muted/50">
-        아이디어를 제안하려면 먼저{" "}
-        <Button asChild variant="link" className="p-0">
-          <Link href="/login">로그인</Link>
-        </Button>
-        해주세요.
-      </div>
-    );
-  }
-
-  const userInitial = user.displayName?.charAt(0) || user.email?.charAt(0) || "U";
-
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold font-headline">아이디어 제안하기</h2>
       <div className="flex gap-4 items-start">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={user.photoURL ?? ''} alt={user.displayName || "user"} data-ai-hint="person face" />
-          <AvatarFallback>{userInitial}</AvatarFallback>
+          <AvatarImage src={`https://avatar.vercel.sh/anonymous.png`} alt={"user"} data-ai-hint="person face" />
+          <AvatarFallback>익</AvatarFallback>
         </Avatar>
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
-            <input type="hidden" name="authorId" value={user.uid} />
+            <input type="hidden" name="authorId" value="anonymous_user" />
 
             <Textarea
                 name="content"

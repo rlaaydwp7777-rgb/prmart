@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Metadata } from 'next';
@@ -6,7 +5,6 @@ import { Inter, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { META } from '@/lib/string-constants';
-import { AuthProvider } from '@/components/auth/auth-provider';
 import { getCategories } from '@/lib/firebase/services';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
@@ -58,7 +56,6 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
-        <AuthProvider>
             <div className="flex flex-col min-h-screen">
                 {!isSellerPage && <Header categories={categories} />}
                 <main className={`flex-1 ${!isSellerPage ? 'pt-16' : ''}`}>
@@ -67,7 +64,6 @@ export default function RootLayout({
                 {!isSellerPage && <Footer />}
             </div>
           <Toaster />
-        </AuthProvider>
       </body>
     </html>
   );

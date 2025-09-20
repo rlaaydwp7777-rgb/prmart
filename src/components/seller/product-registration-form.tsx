@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useActionState } from "react";
@@ -23,7 +22,6 @@ import { BUTTONS, SELLER_STRINGS } from "@/lib/string-constants";
 import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
 import type { Category, PromptVisibility } from "@/lib/types";
-import { useAuth } from "../auth/auth-provider";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 const productSchema = z.object({
@@ -67,7 +65,6 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
   const formRef = useRef<HTMLFormElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchCategories() {
@@ -176,9 +173,9 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
   return (
     <>
       <form ref={formRef} action={formAction} className="space-y-6">
-        <input type="hidden" {...register("sellerId")} value={user?.uid || ''} />
-        <input type="hidden" {...register("author")} value={user?.displayName || user?.email || 'prmart seller'} />
-        <input type="hidden" {...register("sellerPhotoUrl")} value={user?.photoURL || ''} />
+        <input type="hidden" {...register("sellerId")} value={'anonymous_seller'} />
+        <input type="hidden" {...register("author")} value={'익명 판매자'} />
+        <input type="hidden" {...register("sellerPhotoUrl")} value={''} />
         
         <div className="space-y-2">
           <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
