@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { createOrUpdateUserDoc } from "@/lib/services";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -36,9 +37,17 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(firebaseAuth, provider);
-      // NOTE: Creating user doc on Google sign-in is now handled by a server action
-      // that should be called here or handled by a backend listener.
-      // For now, we assume a separate action/logic handles this.
+      const user = result.user;
+      
+      // On first sign in with Google, create a user document
+      await createOrUpdateUserDoc(user.uid, {
+        email: user.email,
+        displayName: user.displayName,
+        photoURL: user.photoURL,
+        role: 'user', // default role
+        createdAt: new Date().toISOString(),
+      });
+
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {

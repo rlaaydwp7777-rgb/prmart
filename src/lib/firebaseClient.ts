@@ -14,6 +14,7 @@ const clientConfig = {
 };
 
 function validateConfig(config: typeof clientConfig): boolean {
+  // measurementId is optional and can be excluded from required keys
   const requiredKeys: (keyof typeof clientConfig)[] = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
   const missingKeys = requiredKeys.filter(key => !config[key]);
 
