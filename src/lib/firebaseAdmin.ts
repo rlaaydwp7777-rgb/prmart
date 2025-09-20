@@ -15,12 +15,17 @@ function initAdmin() {
   if (hasServiceAccount) {
     try {
       if (json) {
-        // Replace escaped newlines if they exist
+        // Replace escaped newlines if they exist from some environments
         const formattedJson = json.replace(/\\n/g, '\n');
-        const parsed = JSON.parse(formattedJson);
-        admin.initializeApp({
-          credential: admin.credential.cert(parsed),
-        });
+        try {
+            const parsed = JSON.parse(formattedJson);
+            admin.initializeApp({
+              credential: admin.credential.cert(parsed),
+            });
+        } catch(e: any) {
+            // Throw a more specific error for JSON parsing failure
+            throw new Error(`[ADMIN_INIT_ERROR] Failed to parse FIREBASE_ADMIN_SDK_JSON. Please ensure it's a valid, unescaped JSON string. Details: ${e.message}`);
+        }
       } else {
         admin.initializeApp();
       }
@@ -29,7 +34,7 @@ function initAdmin() {
     } catch (e: any) {
        console.error("[ADMIN_INIT_ERROR] Firebase Admin SDK initialization failed:", e.message);
        if (process.env.NODE_ENV === "production") {
-         throw new Error("[ADMIN_INIT_ERROR] Firebase Admin SDK failed to initialize in production.");
+         throw new Error(`[ADMIN_INIT_ERROR] Firebase Admin SDK failed to initialize in production. Reason: ${e.message}`);
        }
        return null;
     }
