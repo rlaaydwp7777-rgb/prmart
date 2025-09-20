@@ -13,33 +13,26 @@ const clientConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-function validateConfig(config: typeof clientConfig): boolean {
-  // measurementId is optional and can be excluded from required keys
-  const requiredKeys: (keyof typeof clientConfig)[] = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
-  const missingKeys = requiredKeys.filter(key => !config[key]);
-
-  if (missingKeys.length > 0) {
-    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error(message + " This will cause the build to fail in production.");
-    } else {
-      console.warn(message + " Firebase services will be disabled in development.");
-    }
-    return false;
-  }
-  return true;
-}
-
 let firebaseClientApp: FirebaseApp | null = null;
 let firebaseAuth: Auth | null = null;
 let firebaseDb: Firestore | null = null;
 
-if (validateConfig(clientConfig)) {
+// 모든 필수 환경 변수가 있는지 확인
+const areAllKeysPresent = 
+  clientConfig.apiKey &&
+  clientConfig.authDomain &&
+  clientConfig.projectId &&
+  clientConfig.storageBucket &&
+  clientConfig.messagingSenderId &&
+  clientConfig.appId;
+
+if (areAllKeysPresent) {
   if (!getApps().length) {
     try {
       firebaseClientApp = initializeApp(clientConfig);
     } catch (e: any) {
       console.error("[CLIENT_INIT_ERROR] Firebase client initialization failed.", e);
+      // 초기화 실패 시 모든 것을 null로 설정
       firebaseClientApp = null;
     }
   } else {
@@ -49,6 +42,18 @@ if (validateConfig(clientConfig)) {
   if (firebaseClientApp) {
     firebaseAuth = getAuth(firebaseClientApp);
     firebaseDb = getFirestore(firebaseClientApp);
+  }
+} else {
+  // 필수 키가 누락된 경우
+  const missingKeys = Object.entries(clientConfig)
+    .filter(([key, value]) => ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'].includes(key) && !value)
+    .map(([key]) => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
+
+  const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(message + " This will cause the build to fail in production.");
+  } else {
+    console.warn(message + " Firebase services will be disabled in development.");
   }
 }
 
