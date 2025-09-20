@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "./auth-provider";
 import { Button } from "../ui/button";
-import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
+import { AUTH_STRINGS, BUTTONS } from "@/lib/string-constants";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "../ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { LayoutDashboard, LogOut, Settings } from "lucide-react";
