@@ -15,12 +15,13 @@ export async function middleware(req: NextRequest) {
     loginUrl.searchParams.set("continueUrl", pathname);
 
     if (!token) {
+      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}`);
       return NextResponse.redirect(loginUrl);
     }
 
     try {
       if (!adminAppInstance) {
-        console.warn("Admin SDK not available in middleware. Access denied.");
+        console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
         return NextResponse.redirect(new URL("/", req.url));
       }
       const decoded = await adminAppInstance.auth().verifyIdToken(token);
@@ -29,11 +30,11 @@ export async function middleware(req: NextRequest) {
       if (decoded.role === "admin") {
         return NextResponse.next();
       } else {
-        console.warn(`User ${decoded.email} with role '${decoded.role || 'user'}' attempted to access ${pathname}. Denied.`);
+        console.warn(`[MW_ACCESS_DENIED] User ${decoded.email} with role '${decoded.role || 'user'}' attempted to access ${pathname}. Denied.`);
         return NextResponse.redirect(new URL("/", req.url)); // Redirect non-admins to home
       }
     } catch (err: any) {
-      console.warn("Middleware token verification failed:", err.code);
+      console.error(`[MW_TOKEN_VERIFY_FAIL] Token verification failed for ${pathname}:`, err.code);
       // If token is expired or invalid, redirect to login
       return NextResponse.redirect(loginUrl);
     }

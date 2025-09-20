@@ -1,7 +1,6 @@
 // src/app/api/admin/set-admin/route.ts (POST { email })
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { adminAuth } from "@/lib/firebaseAdmin";
 import { setAdminClaimByEmail } from "@/lib/services";
 
 export async function POST(req: NextRequest) {
@@ -13,18 +12,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const email = body.email;
     if (!email) {
-      return NextResponse.json({ error: "Email is required" }, { status: 400 });
-    }
-    if (!adminAuth) {
-      return NextResponse.json({ error: "Admin SDK not initialized" }, { status: 500 });
+      return NextResponse.json({ error: "Email is required [API_SET_ADMIN_1]" }, { status: 400 });
     }
 
-    const user = await setAdminClaimByEmail(email);
-    console.log(`Successfully set admin claim for ${user.email} (UID: ${user.uid})`);
+    await setAdminClaimByEmail(email);
     
     return NextResponse.json({ ok: true, message: `Admin role granted to ${email}` });
   } catch (err: any) {
-    console.error("set-admin-claim error:", err);
+    console.error("[API_SET_ADMIN_FAIL] set-admin-claim error:", err);
     return NextResponse.json({ error: err.message || "An unknown error occurred" }, { status: 500 });
   }
 }

@@ -20,8 +20,9 @@ if (clientConfig.apiKey && clientConfig.projectId) {
   if (!getApps().length) {
     try {
       firebaseClientApp = initializeApp(clientConfig);
-    } catch (e) {
-      console.error("Firebase client initialization error", e);
+    } catch (e: any) {
+      console.error("[CLIENT_INIT_ERROR] Firebase client initialization failed.", e);
+      firebaseClientApp = null;
     }
   } else {
     firebaseClientApp = getApp();
@@ -32,10 +33,11 @@ if (clientConfig.apiKey && clientConfig.projectId) {
     firebaseDb = getFirestore(firebaseClientApp);
   }
 } else {
+  const errorMessage = "[CLIENT_ENV_MISSING] Firebase client environment variables are missing.";
   if (process.env.NODE_ENV === "production") {
-    throw new Error("Missing NEXT_PUBLIC_FIREBASE_* env vars for production build.");
+    throw new Error(errorMessage + " This will fail the production build.");
   } else {
-    console.warn("Firebase client env missing; auth/firestore will be disabled in dev.");
+    console.warn(errorMessage + " Auth/Firestore features will be disabled in development.");
   }
 }
 

@@ -10,7 +10,7 @@ export async function GET() {
     const users = await listAllUsers();
     return NextResponse.json({ users });
   } catch (err: any) {
-    console.error("list-users error:", err);
+    console.error("[API_LIST_USERS_FAIL] list-users error:", err);
     return NextResponse.json({ error: err.message || "An unknown error occurred" }, { status: 500 });
   }
 }

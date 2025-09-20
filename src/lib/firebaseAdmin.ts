@@ -9,14 +9,15 @@ function initAdmin() {
     return adminApp;
   }
 
-  // Prefer GOOGLE_APPLICATION_CREDENTIALS, fallback to JSON in env var
   const json = process.env.FIREBASE_ADMIN_SDK_JSON;
   const hasServiceAccount = process.env.GOOGLE_APPLICATION_CREDENTIALS || json;
 
   if (hasServiceAccount) {
     try {
       if (json) {
-        const parsed = JSON.parse(json);
+        // Replace escaped newlines if they exist
+        const formattedJson = json.replace(/\\n/g, '\n');
+        const parsed = JSON.parse(formattedJson);
         admin.initializeApp({
           credential: admin.credential.cert(parsed),
         });
@@ -26,20 +27,20 @@ function initAdmin() {
       adminApp = admin.app();
       return adminApp;
     } catch (e: any) {
-       console.error("Firebase Admin SDK initialization error:", e.message);
+       console.error("[ADMIN_INIT_ERROR] Firebase Admin SDK initialization failed:", e.message);
        if (process.env.NODE_ENV === "production") {
-         throw new Error("Firebase Admin SDK failed to initialize.");
+         throw new Error("[ADMIN_INIT_ERROR] Firebase Admin SDK failed to initialize in production.");
        }
        return null;
     }
   }
 
-  // Fail-fast in production if no config is found
+  const errorMessage = "[ADMIN_CONFIG_MISSING] Firebase Admin SDK not configured. Set GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_ADMIN_SDK_JSON.";
   if (process.env.NODE_ENV === "production") {
-    throw new Error("Firebase Admin SDK not configured. Set GOOGLE_APPLICATION_CREDENTIALS or FIREBASE_ADMIN_SDK_JSON.");
+    throw new Error(errorMessage);
   }
 
-  console.warn("Firebase Admin SDK not initialized (dev). Admin APIs will be disabled.");
+  console.warn(errorMessage + " Admin-only APIs will be disabled in development.");
   return null;
 }
 

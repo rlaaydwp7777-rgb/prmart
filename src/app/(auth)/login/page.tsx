@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { createOrUpdateUserDoc } from "@/lib/services";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function LoginPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firebaseAuth) return setErr("Auth service is not available.");
+    if (!firebaseAuth) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
     try {
       await signInWithEmailAndPassword(firebaseAuth, email, pw);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
@@ -32,10 +33,21 @@ export default function LoginPage() {
   };
 
   const onGoogle = async () => {
-    if (!firebaseAuth) return setErr("Auth service is not available.");
+    if (!firebaseAuth) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(firebaseAuth, provider);
+      const result = await signInWithPopup(firebaseAuth, provider);
+      const user = result.user;
+
+      // Create user doc on first Google login
+      await createOrUpdateUserDoc(user.uid, { 
+        email: user.email, 
+        displayName: user.displayName || user.email?.split("@")[0],
+        photoURL: user.photoURL,
+        role: "user", 
+        createdAt: new Date().toISOString() 
+      });
+
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {
