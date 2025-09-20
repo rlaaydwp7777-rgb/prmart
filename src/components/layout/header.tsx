@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Sparkles, Menu } from "lucide-react";
-import { HEADER_LINKS, BUTTONS } from "@/lib/string-constants";
+import { HEADER_LINKS } from "@/lib/string-constants";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +15,7 @@ import type { Category } from "@/lib/types";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { useState } from "react";
+import { AuthButtons } from "../auth/auth-buttons";
 
 interface HeaderProps {
   categories: Category[];
@@ -82,11 +83,7 @@ export function Header({ categories }: HeaderProps) {
           </div>
           
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-2">
-                <Button asChild>
-                  <Link href="/requests">{HEADER_LINKS.START_SELLING}</Link>
-                </Button>
-            </div>
+            <AuthButtons />
             <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="md:hidden">

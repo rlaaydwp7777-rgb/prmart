@@ -1,4 +1,5 @@
-
+// This file is now empty as all actions were related to auth or products
+// which are being refactored. It can be populated with new server actions as needed.
 "use server";
 
 import { generateProductDescription, GenerateProductDescriptionOutput } from "@/ai/flows/generate-product-description";

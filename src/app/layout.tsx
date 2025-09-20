@@ -6,6 +6,7 @@ import { META } from '@/lib/string-constants';
 import { getCategories } from '@/lib/firebase/services';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { AuthProvider } from '@/components/auth/AuthProvider';
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -22,19 +23,22 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // getCategories is now a client-side call in this context, moving it to Header if needed or keeping as-is if it's safe
   const categories = await getCategories();
 
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
-        <div className="flex flex-col min-h-screen">
-            <Header categories={categories} />
-            <main className="flex-1 pt-16">
-              {children}
-            </main>
-            <Footer />
-        </div>
-        <Toaster />
+        <AuthProvider>
+            <div className="flex flex-col min-h-screen">
+                <Header categories={categories} />
+                <main className="flex-1 pt-16">
+                  {children}
+                </main>
+                <Footer />
+            </div>
+            <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
