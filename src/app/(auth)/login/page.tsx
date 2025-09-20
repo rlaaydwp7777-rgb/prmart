@@ -1,8 +1,7 @@
 // src/app/(auth)/login/page.tsx
 "use client";
 import React, { useState } from "react";
-import { firebaseAuth, firebaseDb } from "@/lib/firebaseClient";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { getSafeAuth, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,24 +9,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
+import { getFirebaseApp } from "@/lib/firebase/client";
 
 
 async function createOrUpdateUserClient(uid: string, data: Record<string, any>) {
-  if (!firebaseDb) {
-    console.error("[CLIENT_DB_FAIL] Firestore client not available.");
-    return;
-  }
-  
-  const userRef = doc(firebaseDb, "users", uid);
-  const userSnap = await getDoc(userRef);
+  try {
+    const app = getFirebaseApp();
+    const db = getFirestore(app);
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
 
-  // Create doc only if it doesn't exist
-  if (!userSnap.exists()) {
-    try {
+    if (!userSnap.exists()) {
         await setDoc(userRef, data, { merge: true });
-    } catch(e) {
-        console.error("[CLIENT_DB_WRITE_FAIL] Failed to create user document on client.", e);
     }
+  } catch(e) {
+    console.error("[CLIENT_DB_WRITE_FAIL] Failed to create user document on client.", e);
   }
 }
 
@@ -42,9 +39,10 @@ export default function LoginPage() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!firebaseAuth) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
+    const auth = getSafeAuth();
+    if (!auth.app) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
     try {
-      await signInWithEmailAndPassword(firebaseAuth, email, pw);
+      await signInWithEmailAndPassword(auth, email, pw);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {
@@ -53,13 +51,13 @@ export default function LoginPage() {
   };
 
   const onGoogle = async () => {
-    if (!firebaseAuth) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
+    const auth = getSafeAuth();
+    if (!auth.app) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
+    
     try {
-      const provider = new GoogleAuthProvider();
-      const result = await signInWithPopup(firebaseAuth, provider);
+      const result = await signInWithGoogle();
       const user = result.user;
       
-      // On first sign in with Google, create a user document
       await createOrUpdateUserClient(user.uid, {
         email: user.email,
         displayName: user.displayName,
