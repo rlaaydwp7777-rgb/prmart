@@ -12,19 +12,29 @@ const clientConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-if (!clientConfig.apiKey || !clientConfig.projectId) {
-  // In production builds, this will throw an error to fail the build.
-  // In development, it will warn in the console.
-  if (process.env.NODE_ENV === "production") {
-    throw new Error("Missing NEXT_PUBLIC_FIREBASE_* env vars for production build.");
-  } else {
-    console.warn("Firebase client env missing; auth/firestore will be disabled in dev.");
+function validateConfig(config: typeof clientConfig): boolean {
+  // measurementId is optional
+  const requiredKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+  const missingKeys = requiredKeys.filter(key => !config[key as keyof typeof config]);
+
+  if (missingKeys.length > 0) {
+    const message = `Firebase client config is missing: ${missingKeys.join(", ")}.`;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(message + " This will cause the build to fail in production.");
+    } else {
+      console.warn(message + " Firebase services will be disabled in development.");
+    }
+    return false;
   }
+  return true;
 }
 
-// Initialize Firebase client app (if not already initialized)
-export const firebaseClientApp = getApps().length === 0 ? initializeApp(clientConfig) : getApps()[0];
 
-// Get Auth and Firestore instances only on the client-side
-export const firebaseAuth = (typeof window !== "undefined") ? getAuth(firebaseClientApp) : null;
-export const firebaseDb = (typeof window !== "undefined") ? getFirestore(firebaseClientApp) : null;
+let app: ReturnType<typeof initializeApp> | null = null;
+if (validateConfig(clientConfig)) {
+    app = getApps().length ? getApp() : initializeApp(clientConfig);
+}
+
+export const firebaseClientApp = app;
+export const firebaseAuth = app ? getAuth(app) : null;
+export const firebaseDb = app ? getFirestore(app) : null;

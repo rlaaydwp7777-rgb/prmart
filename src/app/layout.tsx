@@ -23,7 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // getCategories is now a client-side call in this context, moving it to Header if needed or keeping as-is if it's safe
   const categories = await getCategories();
 
   return (
