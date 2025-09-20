@@ -1,6 +1,6 @@
 // src/app/(auth)/login/page.tsx
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { firebaseAuth } from "@/lib/firebaseClient";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,7 +9,6 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { SignUpForm } from "@/components/auth/signup-form";
 
 export default function LoginPage() {
   const router = useRouter();
