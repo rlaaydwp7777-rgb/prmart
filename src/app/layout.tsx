@@ -6,6 +6,7 @@ import { META } from '@/lib/string-constants';
 import { getCategories } from '@/lib/firebase/services';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
+import { AuthProvider } from '@/components/auth/auth-provider';
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -27,6 +28,7 @@ export default async function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={`${inter.variable} ${spaceGrotesk.variable} font-body antialiased`}>
+          <AuthProvider>
             <div className="flex flex-col min-h-screen">
                 <Header categories={categories} />
                 <main className="flex-1 pt-16">
@@ -34,6 +36,7 @@ export default async function RootLayout({
                 </main>
                 <Footer />
             </div>
+          </AuthProvider>
           <Toaster />
       </body>
     </html>

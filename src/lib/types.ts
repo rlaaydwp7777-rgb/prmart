@@ -1,5 +1,3 @@
-
-
 import type { LucideIcon } from "lucide-react";
 
 export type PromptVisibility = 'public' | 'private' | 'partial';
@@ -92,6 +90,15 @@ export interface SellerStats {
     productCount: number;
     averageRating: number;
     reviewCount: number;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  photoURL?: string;
+  role: 'user' | 'admin';
+  createdAt: string;
 }
 
 export interface SellerProfile {

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useActionState } from "react";
@@ -23,6 +22,7 @@ import { Switch } from "../ui/switch";
 import { getCategories } from "@/lib/firebase/services";
 import type { Category, PromptVisibility } from "@/lib/types";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { useAuth } from "../auth/auth-provider";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
@@ -33,8 +33,8 @@ const productSchema = z.object({
   contentUrl: z.string().url("유효한 URL을 입력해주세요.").optional().or(z.literal('')),
   sellOnce: z.boolean().optional(),
   visibility: z.enum(['public', 'private', 'partial']),
-  sellerId: z.string().optional(),
-  author: z.string().optional(),
+  sellerId: z.string().min(1, "판매자 정보가 누락되었습니다."),
+  author: z.string().min(1, "판매자 이름이 누락되었습니다."),
   sellerPhotoUrl: z.string().optional(),
 });
 
@@ -60,6 +60,7 @@ interface ProductRegistrationFormProps {
 }
 
 export function ProductRegistrationForm({ onProductRegistered }: ProductRegistrationFormProps) {
+  const { user } = useAuth();
   const [formState, formAction] = useActionState(registerProductAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -85,8 +86,19 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
       contentUrl: "",
       sellOnce: false,
       visibility: "public",
+      sellerId: user?.uid,
+      author: user?.displayName || user?.email,
+      sellerPhotoUrl: user?.photoURL || "",
     }
   });
+  
+  useEffect(() => {
+      if(user) {
+          setValue('sellerId', user.uid);
+          setValue('author', user.displayName || user.email!);
+          setValue('sellerPhotoUrl', user.photoURL || "");
+      }
+  }, [user, setValue]);
   
   const titleValue = watch("title");
   const categoryValue = watch("category");
@@ -173,9 +185,9 @@ export function ProductRegistrationForm({ onProductRegistered }: ProductRegistra
   return (
     <>
       <form ref={formRef} action={formAction} className="space-y-6">
-        <input type="hidden" {...register("sellerId")} value={'anonymous_seller'} />
-        <input type="hidden" {...register("author")} value={'익명 판매자'} />
-        <input type="hidden" {...register("sellerPhotoUrl")} value={''} />
+        <input type="hidden" {...register("sellerId")} />
+        <input type="hidden" {...register("author")} />
+        <input type="hidden" {...register("sellerPhotoUrl")} />
         
         <div className="space-y-2">
           <Label htmlFor="title">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
@@ -11,6 +10,9 @@ import Link from "next/link";
 import { createProposalAction } from "@/app/actions";
 import type { FormState } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "../auth/auth-provider";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { LogIn } from "lucide-react";
 
 interface ProposalFormProps {
     requestId: string;
@@ -32,6 +34,7 @@ function SubmitButton() {
 }
 
 export function ProposalForm({ requestId }: ProposalFormProps) {
+  const { user, loading } = useAuth();
   const [state, formAction] = useActionState(createProposalAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -49,18 +52,38 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
     }
   }, [state, toast]);
 
+  if (loading) {
+    return <div className="h-48 flex items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>;
+  }
+  
+  if (!user) {
+    return (
+        <Alert>
+            <LogIn className="h-4 w-4" />
+            <AlertTitle>로그인 필요</AlertTitle>
+            <AlertDescription>
+                아이디어를 제안하려면 로그인이 필요합니다.
+                <Button asChild variant="link" className="p-1">
+                    <Link href={`/login?continueUrl=/requests/${requestId}`}>로그인 페이지로 이동</Link>
+                </Button>
+            </AlertDescription>
+        </Alert>
+    )
+  }
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold font-headline">아이디어 제안하기</h2>
       <div className="flex gap-4 items-start">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={`https://avatar.vercel.sh/anonymous.png`} alt={"user"} data-ai-hint="person face" />
-          <AvatarFallback>익</AvatarFallback>
+          <AvatarImage src={user.photoURL || ""} alt={user.displayName || "user"} data-ai-hint="person face" />
+          <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
         </Avatar>
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
-            <input type="hidden" name="authorId" value="anonymous_user" />
-            <input type="hidden" name="authorName" value="익명의 제안자" />
+            <input type="hidden" name="authorId" value={user.uid} />
+            <input type="hidden" name="authorName" value={user.displayName || user.email!} />
+            <input type="hidden" name="authorAvatar" value={user.photoURL || ""} />
             
             <Textarea
                 name="content"

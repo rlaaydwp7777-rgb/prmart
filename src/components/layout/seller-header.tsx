@@ -1,46 +1,61 @@
-import { NextResponse, type NextRequest } from 'next/server'
-import { app } from '@/lib/firebase/admin';
-import { getAuth } from 'firebase-admin/auth';
+"use client"
 
-export async function middleware(request: NextRequest) {
-  // Admin route protection
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    const idToken = request.cookies.get('firebaseIdToken')?.value;
+import { AuthButtons } from "../auth/auth-buttons"
+import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet"
+import { Button } from "../ui/button"
+import { Menu, Search } from "lucide-react"
+import { Input } from "../ui/input"
+import Link from "next/link"
 
-    if (!idToken) {
-      console.log('Middleware: No token, redirecting to home.');
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-
-    try {
-      const decodedToken = await getAuth(app).verifyIdToken(idToken);
-
-      // IMPORTANT: Using a specific email for admin access as a temporary measure.
-      // This should be replaced with Custom Claims for a more robust solution.
-      if (decodedToken.email !== 'prmart7777@gmail.com') {
-        console.log(`Middleware: User ${decodedToken.email} is not admin. Redirecting.`);
-        return NextResponse.redirect(new URL('/', request.url));
-      }
-      
-      // User is the admin, allow access.
-      return NextResponse.next();
-    } catch (error) {
-      console.error('Middleware: Token verification failed', error);
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-  }
-
-  // Seller route protection (currently disabled as auth is removed)
-  if (request.nextUrl.pathname.startsWith('/seller')) {
-      // Since login is removed, we can just redirect or show a placeholder
-      // For now, let's redirect to home to avoid confusion.
-      return NextResponse.redirect(new URL('/', request.url));
-  }
-
-
-  return NextResponse.next();
+export function Header() {
+  return (
+    <header className="sticky top-0 z-30 flex h-14 items-center gap-4 border-b bg-background px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6">
+       <Sheet>
+        <SheetTrigger asChild>
+          <Button size="icon" variant="outline" className="sm:hidden">
+            <Menu className="h-5 w-5" />
+            <span className="sr-only">Toggle Menu</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="sm:max-w-xs">
+          <nav className="grid gap-6 text-lg font-medium">
+            <Link
+              href="/seller/dashboard"
+              className="group flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-primary text-lg font-semibold text-primary-foreground md:text-base"
+            >
+              <Menu className="h-5 w-5 transition-all group-hover:scale-110" />
+              <span className="sr-only">prmart Seller</span>
+            </Link>
+             <Link
+              href="/seller/dashboard"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/seller/products"
+              className="flex items-center gap-4 px-2.5 text-foreground"
+            >
+              Products
+            </Link>
+            <Link
+              href="/seller/analytics"
+              className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
+            >
+              Analytics
+            </Link>
+          </nav>
+        </SheetContent>
+      </Sheet>
+      <div className="relative ml-auto flex-1 md:grow-0">
+        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="search"
+          placeholder="Search..."
+          className="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+        />
+      </div>
+      <AuthButtons />
+    </header>
+  )
 }
-
-export const config = {
-  matcher: ['/admin/:path*', '/seller/:path*'],
-};
