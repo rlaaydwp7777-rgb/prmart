@@ -33,7 +33,7 @@ if (clientConfig.apiKey && clientConfig.projectId) {
     firebaseDb = getFirestore(firebaseClientApp);
   }
 } else {
-  const errorMessage = "[CLIENT_ENV_MISSING] Firebase client environment variables are missing.";
+  const errorMessage = "[CLIENT_ENV_MISSING] Firebase client environment variables are missing. Please check your .env file for NEXT_PUBLIC_FIREBASE_* variables.";
   if (process.env.NODE_ENV === "production") {
     throw new Error(errorMessage + " This will fail the production build.");
   } else {
