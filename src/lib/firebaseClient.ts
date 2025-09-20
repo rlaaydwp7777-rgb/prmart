@@ -10,13 +10,30 @@ const clientConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
+
+function validateConfig(config: typeof clientConfig): boolean {
+  const requiredKeys: (keyof typeof clientConfig)[] = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+  const missingKeys = requiredKeys.filter(key => !config[key]);
+
+  if (missingKeys.length > 0) {
+    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(message + " This will cause the build to fail in production.");
+    } else {
+      console.warn(message + " Firebase services will be disabled in development.");
+    }
+    return false;
+  }
+  return true;
+}
 
 let firebaseClientApp: FirebaseApp | null = null;
 let firebaseAuth: Auth | null = null;
 let firebaseDb: Firestore | null = null;
 
-if (clientConfig.apiKey && clientConfig.projectId) {
+if (validateConfig(clientConfig)) {
   if (!getApps().length) {
     try {
       firebaseClientApp = initializeApp(clientConfig);
@@ -31,13 +48,6 @@ if (clientConfig.apiKey && clientConfig.projectId) {
   if (firebaseClientApp) {
     firebaseAuth = getAuth(firebaseClientApp);
     firebaseDb = getFirestore(firebaseClientApp);
-  }
-} else {
-  const errorMessage = "[CLIENT_ENV_MISSING] Firebase client environment variables are missing. Please check your .env file for NEXT_PUBLIC_FIREBASE_* variables.";
-  if (process.env.NODE_ENV === "production") {
-    throw new Error(errorMessage + " This will fail the production build.");
-  } else {
-    console.warn(errorMessage + " Auth/Firestore features will be disabled in development.");
   }
 }
 
