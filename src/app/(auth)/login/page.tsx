@@ -1,7 +1,7 @@
 // src/app/(auth)/login/page.tsx
 "use client";
 import React, { useState } from "react";
-import { firebaseAuth } from "@/lib/firebaseClient";
+import { firebaseAuth, firebaseDb } from "@/lib/firebaseClient";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,27 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { createOrUpdateUserDoc } from "@/lib/services";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+
+
+async function createOrUpdateUserClient(uid: string, data: Record<string, any>) {
+  if (!firebaseDb) {
+    console.error("[CLIENT_DB_FAIL] Firestore client not available.");
+    return;
+  }
+  
+  const userRef = doc(firebaseDb, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  // Create doc only if it doesn't exist
+  if (!userSnap.exists()) {
+    try {
+        await setDoc(userRef, data, { merge: true });
+    } catch(e) {
+        console.error("[CLIENT_DB_WRITE_FAIL] Failed to create user document on client.", e);
+    }
+  }
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,7 +60,7 @@ export default function LoginPage() {
       const user = result.user;
       
       // On first sign in with Google, create a user document
-      await createOrUpdateUserDoc(user.uid, {
+      await createOrUpdateUserClient(user.uid, {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
