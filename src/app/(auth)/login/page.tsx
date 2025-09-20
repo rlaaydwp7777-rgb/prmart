@@ -1,6 +1,6 @@
 // src/app/(auth)/login/page.tsx
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { firebaseAuth } from "@/lib/firebaseClient";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { createOrUpdateUserDoc } from "@/lib/services";
+import { SignUpForm } from "@/components/auth/signup-form";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,17 +37,9 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(firebaseAuth, provider);
-      const user = result.user;
-
-      // Create user doc on first Google login
-      await createOrUpdateUserDoc(user.uid, { 
-        email: user.email, 
-        displayName: user.displayName || user.email?.split("@")[0],
-        photoURL: user.photoURL,
-        role: "user", 
-        createdAt: new Date().toISOString() 
-      });
-
+      // NOTE: Creating user doc on Google sign-in is now handled by a server action
+      // that should be called here or handled by a backend listener.
+      // For now, we assume a separate action/logic handles this.
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {

@@ -1,30 +1,8 @@
-// src/lib/services.ts (server + client compatible minimal helpers)
-import { firebaseDb } from "./firebaseClient";
+// src/lib/services.ts
 import { adminDb, adminAuth } from "./firebaseAdmin";
 import { doc, setDoc } from "firebase/firestore";
 
-/* CLIENT: read-only helpers using firebaseDb; SERVER: adminDb for privileged ops */
-
-// Create or update user doc in Firestore (called after signup)
-// This should ideally be a server-side operation for security.
-// For simplicity in this context, we allow client-side creation on signup.
-export async function createOrUpdateUserDoc(uid: string, data: Record<string, any>) {
-  if (!firebaseDb && !adminDb) {
-    throw new Error("[SERVICE_DB_INSTANCE_MISSING] No Firestore instance available.");
-  }
-  const db = adminDb ? adminDb.collection("users").doc(uid) : doc(firebaseDb!, "users", uid);
-  
-  try {
-    if(adminDb){
-      await (db as admin.firestore.DocumentReference).set(data, { merge: true });
-    } else {
-       await setDoc(db, data, { merge: true });
-    }
-  } catch (error: any) {
-      console.error(`[SERVICE_USER_DOC_FAIL] Failed to create/update user doc for UID: ${uid}`, error);
-      throw new Error(`[SERVICE_USER_DOC_FAIL] User document operation failed.`);
-  }
-}
+/* This file is intended for SERVER-SIDE use for privileged operations. */
 
 // Server: set custom claim
 export async function setAdminClaimByEmail(email: string) {
@@ -50,7 +28,7 @@ export async function setAdminClaimByEmail(email: string) {
 
 // Server: list users (admin only endpoint will call)
 export async function listAllUsers(limit = 1000) {
-  if (!adminAuth) throw new Error("[SERVICE_ADMIN_AUTH_MISSING] Admin Auth not initialized.");
+  if (!adminAuth) throw new Error('[SERVICE_ADMIN_AUTH_MISSING] Admin Auth not initialized.');
   try {
     const res = await adminAuth.listUsers(limit);
     return res.users.map(u => ({
