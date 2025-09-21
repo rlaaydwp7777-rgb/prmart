@@ -26,13 +26,24 @@ export async function middleware(req: NextRequest) {
       }
       const decoded = await adminAppInstance.auth().verifyIdToken(token);
       
-      // For both /admin and /seller, require 'admin' role
-      if (decoded.role === "admin") {
-        return NextResponse.next();
-      } else {
-        console.warn(`[MW_ACCESS_DENIED] User ${decoded.email} with role '${decoded.role || 'user'}' attempted to access ${pathname}. Denied.`);
-        return NextResponse.redirect(new URL("/", req.url)); // Redirect non-admins to home
+      if (isAdminRoute) {
+        if (decoded.role === "admin") {
+          return NextResponse.next();
+        } else {
+           console.warn(`[MW_ACCESS_DENIED] User ${decoded.email} with role '${decoded.role || 'user'}' attempted to access admin route ${pathname}. Denied.`);
+           return NextResponse.redirect(new URL("/", req.url));
+        }
       }
+
+      if (isSellerRoute) {
+        if (decoded.role === "admin" || decoded.role === "seller") {
+          return NextResponse.next();
+        } else {
+           console.warn(`[MW_ACCESS_DENIED] User ${decoded.email} with role '${decoded.role || 'user'}' attempted to access seller route ${pathname}. Denied.`);
+           return NextResponse.redirect(new URL("/", req.url));
+        }
+      }
+
     } catch (err: any) {
       console.error(`[MW_TOKEN_VERIFY_FAIL] Token verification failed for ${pathname}:`, err.code);
       // If token is expired or invalid, redirect to login

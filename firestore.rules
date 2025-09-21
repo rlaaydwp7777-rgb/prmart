@@ -1,62 +1,36 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Default: Deny all reads and writes
-    match /{document=**} {
-      allow read, write: if false;
+    // 사용자 정보: 본인만 쓰기 가능, 로그인한 사용자는 읽기 가능
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth.uid == userId;
     }
 
-    // Products can be read by anyone, but only created/updated/deleted by their seller
+    // 상품: 누구나 읽기 가능, 판매자/관리자만 쓰기 가능
     match /products/{productId} {
       allow read: if true;
-      allow create: if request.auth != null && request.resource.data.sellerId == request.auth.uid;
-      allow update, delete: if request.auth != null && resource.data.sellerId == request.auth.uid;
+      allow write: if request.auth != null && (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role in ['seller', 'admin']);
     }
 
-    // Categories can be read by anyone, but only written by admins (future implementation)
+    // 카테고리: 누구나 읽기 가능, 관리자만 쓰기 가능
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if false; // To be replaced with admin check
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Idea Requests can be read by anyone, created by any logged-in user
+    // 아이디어 요청: 누구나 읽기 가능, 인증된 사용자는 쓰기 가능
     match /ideaRequests/{requestId} {
       allow read: if true;
-      allow create: if request.auth != null;
-      // Only the author can update/delete their request
-      allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
+      allow write: if request.auth != null;
     }
 
-    // Proposals can be created by any logged-in user
+    // 제안: 누구나 읽기 가능, 인증된 사용자는 쓰기 가능
     match /proposals/{proposalId} {
-        allow read: if true;
-        allow create: if request.auth != null;
-        allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
-    }
-
-    // Seller profiles can be read by anyone, but only written by the user themselves
-    match /sellers/{userId} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == userId;
-    }
-    
-    // Orders can only be read/written by the buyer or seller involved
-    match /orders/{orderId} {
-      allow read: if request.auth != null && (request.auth.uid == resource.data.buyerId || request.auth.uid == resource.data.sellerId);
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.buyerId;
-    }
-
-    // Reviews can be created by a logged-in user, but only modified by the author
-    match /reviews/{reviewId} {
-      allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && resource.data.authorId == request.auth.uid;
-    }
-
-    // Wishlists can only be read/written by the owner
-    match /wishlists/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow write: if request.auth != null;
     }
   }
 }
