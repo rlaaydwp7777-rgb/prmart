@@ -7,19 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap, Clock, User, LogIn } from "lucide-react";
+import { Download, Eye, Heart, Lock, Send, ShoppingCart, Star, Zap, Clock, User, LogIn, MessageCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { Category, Prompt } from "@/lib/types";
+import type { Category, Prompt, Review } from "@/lib/types";
 import { PromptCard } from "./prompt-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from 'date-fns';
 
-const mockReviews = [
-    { id: 1, author: "김지훈", avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요." },
-    { id: 2, author: "박서연", avatar: "https://picsum.photos/100/100?random=11", rating: 4, content: "디자인이 깔끔하고 사용하기 편합니다. 몇 가지 컴포넌트가 더 추가되면 좋겠어요." },
-    { id: 3, author: "최민준", avatar: "https://picsum.photos/100/100?random=12", rating: 5, content: "AI 기능 연동이 정말 쉬워서 놀랐습니다. 강력 추천!" },
+// This is still mock data, but will be replaced by a fetch from Firestore.
+const mockReviews: Review[] = [
+    // { id: 'rev1', author: "김지훈", authorId: 'user1', productId: 'prod1', productTitle: 'test', avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요.", createdAt: new Date().toISOString() },
 ];
 
 interface PromptDetailClientProps {
@@ -32,7 +31,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   const router = useRouter();
 
   const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
-  const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
+  const reviewsCount = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   const isFree = prompt.price === 0;
   const hasPurchased = false; // This will be dynamic based on user auth and purchase history
@@ -221,7 +220,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                <div className="flex items-center gap-1">
                     <Star className="w-4 h-4 text-amber-400" />
                     <span className="font-medium">{rating.toFixed(1)}</span>
-                    <span>({reviews.toLocaleString()})</span>
+                    <span>({reviewsCount.toLocaleString()})</span>
                 </div>
                  {prompt.updatedAt && (
                     <div className="flex items-center gap-1">
@@ -259,10 +258,10 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
             <div>
                  <h2 className="text-2xl font-bold font-headline mb-4">구매자 후기 ({mockReviews.length})</h2>
                  <div className="space-y-6">
-                    {mockReviews.map((review) => (
+                    {mockReviews.length > 0 ? mockReviews.map((review) => (
                        <div key={review.id} className="flex gap-4">
                             <Avatar>
-                                <AvatarImage src={review.avatar} alt={review.author} data-ai-hint="person face" />
+                                <AvatarImage src={review.authorAvatar} alt={review.author} data-ai-hint="person face" />
                                 <AvatarFallback>{review.author.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div className="flex-1">
@@ -277,7 +276,13 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                                 <p className="text-sm text-foreground/90 mt-1">{review.content}</p>
                             </div>
                        </div>
-                    ))}
+                    )) : (
+                        <div className="flex flex-col items-center justify-center text-center p-8 border-2 border-dashed rounded-lg">
+                            <MessageCircle className="h-10 w-10 text-muted-foreground mb-4" />
+                            <h3 className="font-semibold">아직 등록된 후기가 없습니다.</h3>
+                            <p className="text-sm text-muted-foreground mt-1">이 상품의 첫 번째 후기를 작성해주세요!</p>
+                        </div>
+                    )}
                  </div>
             </div>
         </div>

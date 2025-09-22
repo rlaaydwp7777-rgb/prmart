@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "./AuthProvider";
 import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
 import { Skeleton } from "../ui/skeleton";
+import { Gift } from "lucide-react";
 
 export function AuthButtons() {
     const { user, loading, signOut } = useAuth();
@@ -50,6 +51,12 @@ export function AuthButtons() {
                     )}
                     <DropdownMenuItem asChild>
                         <Link href="/account">{SIDEBAR_STRINGS.ACCOUNT}</Link>
+                    </DropdownMenuItem>
+                     <DropdownMenuItem asChild>
+                        <Link href="/account/referrals" className="text-primary hover:!text-primary">
+                            <Gift className="mr-2 h-4 w-4" />
+                            <span>친구 초대 & 리워드</span>
+                        </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut}>
