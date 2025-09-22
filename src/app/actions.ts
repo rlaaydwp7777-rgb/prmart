@@ -32,9 +32,13 @@ async function getUserRole(token: string | undefined): Promise<string | null> {
 
 // --- Auth Actions ---
 const signupSchema = z.object({
+  uid: z.string().optional(), // For Google Sign in
   email: z.string().email("유효한 이메일 주소를 입력해주세요."),
-  password: z.string().min(6, "비밀번호는 6자 이상이어야 합니다."),
+  password: z.string().min(6, "비밀번호는 6자 이상이어야 합니다.").optional(),
   referralCode: z.string().optional(),
+  displayName: z.string().optional(), // For Google Sign in
+  photoURL: z.string().optional(), // For Google Sign in
+  isGoogleSignIn: z.string().optional(), // Flag for Google Sign in
 });
 
 export async function signUpAction(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -43,7 +47,7 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
   }
   const rawData = Object.fromEntries(formData);
   const validatedFields = signupSchema.safeParse(rawData);
-
+  
   if (!validatedFields.success) {
     return {
       success: false,
@@ -52,9 +56,30 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     };
   }
 
-  const { email, password, referralCode } = validatedFields.data;
+  const { email, password, referralCode, uid, displayName: googleDisplayName, photoURL, isGoogleSignIn } = validatedFields.data;
 
   try {
+    // Handle Google Sign-in user creation/update
+    if (isGoogleSignIn === 'true' && uid && email) {
+        const userRef = adminDb.collection("users").doc(uid);
+        const userSnap = await userRef.get();
+        if (!userSnap.exists()) {
+             await userRef.set({
+                email,
+                displayName: googleDisplayName,
+                photoURL: photoURL,
+                role: 'user',
+                createdAt: new Date().toISOString(),
+             }, { merge: true });
+        }
+        return { success: true, message: "Google 로그인 사용자 정보가 확인되었습니다." };
+    }
+
+
+    if (!password) {
+        return { success: false, message: "비밀번호를 입력해주세요." };
+    }
+
     const auth = getAuth(adminAppInstance);
     
     let referredBy: string | null = null;
@@ -110,6 +135,7 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     };
   }
 }
+
 
 // --- Product Actions ---
 const productSchema = z.object({
