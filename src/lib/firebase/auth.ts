@@ -11,7 +11,7 @@ import {
     type User,
     type UserCredential
 } from "firebase/auth";
-import { firebaseApp } from "./client";
+import { getFirebaseApp } from "./client";
 
 let authInstance: Auth | null = null;
 
@@ -27,13 +27,14 @@ function getSafeAuth(): Auth {
     }
     
     try {
-        // firebaseApp is already initialized safely in client.ts
-        if (!firebaseApp.options?.apiKey) {
-           console.warn("[AUTH_INIT_WARN] Firebase app not fully initialized. Auth features may be disabled.");
-           return {} as Auth;
+        const app = getFirebaseApp(); // This function is SSR-safe
+        // If app initialization failed (e.g., missing config), getFirebaseApp will throw.
+        if (app && app.options && app.options.apiKey) {
+            authInstance = getAuth(app);
+            return authInstance;
         }
-        authInstance = getAuth(firebaseApp);
-        return authInstance;
+        console.warn("[AUTH_INIT_WARN] Firebase app not fully initialized. Auth features may be disabled.");
+        return {} as Auth;
     } catch (e: any) {
         // This will catch the error if getAuth fails for some reason
         console.error("[AUTH_INIT_FAIL] Could not initialize Firebase Auth:", e.message);
