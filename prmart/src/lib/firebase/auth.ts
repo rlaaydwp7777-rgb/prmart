@@ -28,11 +28,7 @@ function getSafeAuth(): Auth {
     
     try {
         const app = getFirebaseApp(); // This function is SSR-safe
-        // If app initialization failed (e.g., missing config), app will be empty.
-        if (!app.options?.apiKey) {
-           console.warn("[AUTH_INIT_WARN] Firebase app not fully initialized. Auth features may be disabled.");
-           return {} as Auth;
-        }
+        // If app initialization failed (e.g., missing config), getFirebaseApp will throw.
         authInstance = getAuth(app);
         return authInstance;
     } catch (e: any) {
