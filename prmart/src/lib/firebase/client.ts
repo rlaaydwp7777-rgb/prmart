@@ -12,8 +12,7 @@ const clientConfig = {
 };
 
 // This function is safe to call on the server or client.
-// On the server, it returns a dummy object.
-// On the client, it initializes the app if not already initialized.
+// It ensures Firebase is only initialized on the client-side.
 export function getFirebaseApp(): FirebaseApp {
   if (typeof window === "undefined") {
     // On the server, return a dummy object to avoid errors during build.
