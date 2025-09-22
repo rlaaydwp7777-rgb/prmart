@@ -49,14 +49,18 @@ export function SignUpForm() {
     <form ref={formRef} action={formAction} className="grid gap-2">
       <Input name="email" required type="email" placeholder="email@example.com" />
       <Input name="password" required type="password" placeholder="비밀번호" />
+      <Input name="referralCode" type="text" placeholder="추천인 코드 (선택)" />
       <SubmitButton />
-      {state.issues && (
+      {state?.issues && (
         <div className="text-sm text-red-500">
-          {state.issues.map((issue) => (
-            <p key={issue}>- {issue}</p>
+          {state.issues.map((issue, i) => (
+            <p key={i}>- {issue}</p>
           ))}
         </div>
       )}
+       {!state.success && state.message && !state.issues && (
+            <p className="text-sm text-center text-red-500">{state.message}</p>
+        )}
     </form>
   );
 }

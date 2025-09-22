@@ -2,6 +2,18 @@ import type { LucideIcon } from "lucide-react";
 
 export type PromptVisibility = 'public' | 'private' | 'partial';
 
+export interface User {
+    uid: string;
+    email: string;
+    displayName: string;
+    photoURL?: string;
+    role: 'user' | 'admin' | 'seller';
+    createdAt: string;
+    // Referral System Fields
+    referralCode?: string; // This user's unique referral code
+    referredBy?: string;   // The referral code of the user who referred this user
+}
+
 export interface Prompt {
   id: string;
   title: string;
