@@ -23,10 +23,10 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         icon: "Rocket",
         subCategories: [
           { id: "sub-1-1", name: "ChatGPT 활용 프롬프트", slug: "chatgpt"},
-          { id: "sub-1-2", name: "이미지 생성 (미드저니, DALL-E)", slug: "dall-e" },
-          { id: "sub-1-3", name: "영상/음악 생성 (Sora, Pika)", slug: "sora-pika" },
-          { id: "sub-1-4", name: "업무 자동화 (RPA, Zapier)", slug: "rpa-zapier" },
-          { id: "sub-1-5", name: "기타 AI 및 생산성", slug: "ai" },
+          { id: "sub-1-2", name: "이미지 생성 (미드저니)", slug: "midjourney" },
+          { id: "sub-1-3", name: "영상/음악 생성 AI", slug: "video-music-ai" },
+          { id: "sub-1-4", name: "엑셀/업무 자동화", slug: "work-automation" },
+          { id: "sub-1-5", name: "기타 AI 및 생산성", slug: "etc-ai" },
         ]
       },
       { 
@@ -36,10 +36,10 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         icon: "Code",
         subCategories: [
           { id: "sub-2-1", name: "웹/앱 개발 템플릿", slug: "web-app-template" },
-          { id: "sub-2-2", name: "데이터 분석/시각화", slug: "data-analysis" },
-          { id: "sub-2-3", name: "업무 자동화 스크립트", slug: "automation-script" },
-          { id: "sub-2-4", name: "클라우드/인프라(IaC)", slug: "iac" },
-          { id: "sub-2-5", name: "기타 개발 및 IT", slug: "it" },
+          { id: "sub-2-2", name: "노코드/자동화 툴", slug: "nocode-automation" },
+          { id: "sub-2-3", name: "데이터 분석", slug: "data-analysis" },
+          { id: "sub-2-4", name: "개발자 취업/면접", slug: "dev-career" },
+          { id: "sub-2-5", name: "기타 개발 및 IT", slug: "etc-it" },
         ]
       },
       { 
@@ -48,11 +48,11 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         slug: "investment-fintech",
         icon: "LineChart",
         subCategories: [
-            { id: "sub-3-1", name: "주식/ETF 트레이딩 전략", slug: "etf-trading" },
-            { id: "sub-3-2", name: "부동산 투자 리포트", slug: "real-estate-report" },
+            { id: "sub-3-1", name: "주식/코인 트레이딩 전략", slug: "stock-crypto-trading" },
+            { id: "sub-3-2", name: "부동산 분석 리포트", slug: "real-estate-report" },
             { id: "sub-3-3", name: "N잡/부업 노하우", slug: "side-hustle" },
-            { id: "sub-3-4", name: "세금 및 절세 전략", slug: "tax-saving" },
-            { id: "sub-3-5", name: "기타 재테크 및 투자", slug: "investment" },
+            { id: "sub-3-4", "name": "세금 및 절세", "slug": "tax-saving" },
+            { id: "sub-3-5", name: "기타 재테크 및 투자", slug: "etc-investment" },
         ]
       },
       { 
@@ -61,11 +61,11 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         slug: "business-marketing",
         icon: "Briefcase",
         subCategories: [
-            { id: "sub-4-1", name: "콘텐츠/SNS 마케팅", slug: "sns-marketing" },
-            { id: "sub-4-2", name: "광고 운영 (GA, 메타)", slug: "ad-operation" },
-            { id: "sub-4-3", name: "사업 계획서/제안서", slug: "business-plan" },
+            { id: "sub-4-1", name: "블로그/SNS 콘텐츠", slug: "sns-contents" },
+            { id: "sub-4-2", name: "광고/퍼포먼스 마케팅", slug: "performance-marketing" },
+            { id: "sub-4-3", name: "사업계획서/제안서", slug: "business-plan" },
             { id: "sub-4-4", name: "브랜딩/퍼스널 브랜딩", slug: "branding" },
-            { id: "sub-4-5", name: "기타 비즈니스 및 마케팅", slug: "business" },
+            { id: "sub-4-5", name: "기타 비즈니스", slug: "etc-business" },
         ]
       },
       { 
@@ -74,11 +74,11 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         slug: "creation-design",
         icon: "Brush",
         subCategories: [
-            { id: "sub-5-1", name: "UX/UI 디자인 리소스", slug: "ux-ui-resource" },
-            { id: "sub-5-2", name: "PPT/Keynote 템플릿", slug: "presentation-template" },
+            { id: "sub-5-1", name: "PPT/Keynote 템플릿", slug: "presentation-template" },
+            { id: "sub-5-2", name: "디자인 리소스/소스", slug: "design-resource" },
             { id: "sub-5-3", name: "영상 편집 템플릿", slug: "video-editing-template" },
-            { id: "sub-5-4", name: "그래픽 디자인 소스", slug: "graphic-design-source" },
-            { id: "sub-5-5", name: "기타 창작 및 디자인", slug: "design" },
+            { id: "sub-5-4", name: "웹툰/캐릭터 드로잉", slug: "webtoon-drawing" },
+            { id: "sub-5-5", name: "기타 창작 및 디자인", slug: "etc-design" },
         ]
       },
       { 
@@ -90,8 +90,8 @@ export const EXAMPLE_CATEGORIES: Category[] = [
           { id: "sub-6-1", name: "직무 스킬업", slug: "job-skill-up" },
           { id: "sub-6-2", name: "외국어 학습 자료", slug: "language-learning" },
           { id: "sub-6-3", name: "자격증/시험 대비", slug: "certification-test" },
-          { id: "sub-6-4", name: "학습 노하우/방법론", slug: "learning-knowhow" },
-          { id: "sub-6-5", name: "기타 학습 및 자기계발", slug: "self-development" },
+          { id: "sub-6-4", name: "효율적인 공부법", slug: "learning-method" },
+          { id: "sub-6-5", name: "기타 학습", slug: "etc-learning" },
         ]
       },
       { 
@@ -100,11 +100,11 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         slug: "travel-life",
         icon: "Plane",
         subCategories: [
-          { id: "sub-7-1", name: "효율적인 여행 계획", slug: "travel-planning" },
-          { id: "sub-7-2", name: "알뜰 여행 꿀팁", slug: "budget-travel-tip" },
-          { id: "sub-7-3", name: "테마별 여행 코스", slug: "themed-travel-course" },
-          { id: "sub-7-4", name: "드론 및 VR 영상", slug: "drone-vr-video" },
-          { id: "sub-7-5", name: "기타 여행 및 라이프", slug: "travel" },
+          { id: "sub-7-1", name: "국내/해외 여행 계획", slug: "travel-planning" },
+          { id: "sub-7-2", name: "맛집/카페 리스트", slug: "foodie-list" },
+          { id: "sub-7-3", name: "취미/여가 활동 계획", slug: "hobby-leisure" },
+          { id: "sub-7-4", name: "사진/영상 촬영 노하우", slug: "photography-knowhow" },
+          { id: "sub-7-5", name: "기타 여행 및 라이프", slug: "etc-travel" },
         ]
       },
       { 
@@ -113,11 +113,11 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         slug: "living-parenting-tips",
         icon: "Users",
         subCategories: [
-          { id: "sub-8-1", name: "육아 노하우/템플릿", slug: "parenting-knowhow" },
-          { id: "sub-8-2", name: "건강 및 식단 관리", slug: "health-diet-management" },
-          { id: "sub-8-3", name: "현명한 절약 비법", slug: "saving-tip" },
+          { id: "sub-8-1", name: "육아 노하우/자료", slug: "parenting-knowhow" },
+          { id: "sub-8-2", name: "건강 및 식단 관리", slug: "health-diet" },
+          { id: "sub-8-3", name: "현명한 절약/재테크", slug: "saving-tip" },
           { id: "sub-8-4", name: "반려동물 케어", slug: "pet-care" },
-          { id: "sub-8-5", name: "기타 생활 및 노하우", slug: "living" },
+          { id: "sub-8-5", name: "기타 생활 노하우", slug: "etc-living" },
         ]
       },
       { 
@@ -128,17 +128,17 @@ export const EXAMPLE_CATEGORIES: Category[] = [
         subCategories: [
           { id: "sub-9-1", name: "신차/중고차 구매가이드", slug: "car-purchase-guide" },
           { id: "sub-9-2", name: "차량 관리 및 정비", slug: "car-maintenance" },
-          { id: "sub-9-3", name: "전기차 트렌드 및 보조금", slug: "electric-car-trend" },
-          { id: "sub-9-4", name: "미래 모빌리티 리포트", slug: "future-mobility-report" },
-          { id: "sub-9-5", name: "기타 모빌리티 및 자동차", slug: "mobility" },
+          { id: "sub-9-3", name: "전기차 정보/보조금", slug: "electric-car" },
+          { id: "sub-9-4", name: "즐거운 드라이브 코스", slug: "drive-course" },
+          { id: "sub-9-5", name: "기타 자동차 정보", slug: "etc-mobility" },
         ]
       },
       { id: "cat-10", name: "문서 & 서식", slug: "documents-templates", icon: "Home", subCategories: [
-          { id: "sub-10-1", name: "부동산 계약서", slug: "real-estate-contract" },
-          { id: "sub-10-2", name: "법률/행정 서식", slug: "legal-form" },
-          { id: "sub-10-3", name: "각종 보고서 템플릿", slug: "report-template" },
+          { id: "sub-10-1", name: "엑셀/스프레드시트 서식", slug: "spreadsheet-template" },
+          { id: "sub-10-2", name: "워드/구글독스 서식", slug: "document-template" },
+          { id: "sub-10-3", name: "각종 보고서/기획서", slug: "report-template" },
           { id: "sub-10-4", name: "개인/가계 양식", slug: "personal-form" },
-          { id: "sub-10-5", name: "기타 문서 및 서식", slug: "document" },
+          { id: "sub-10-5", name: "기타 문서 및 서식", slug: "etc-document" },
         ]
       },
 ];
@@ -152,15 +152,15 @@ const generateExamplePrompts = (): Prompt[] => {
             { title: "블로그 포스팅 자동화 프롬프트", desc: "주제만 입력하면 SEO에 최적화된 블로그 글을 자동으로 생성해주는 프롬프트 세트입니다." },
             { title: "유튜브 스크립트 작성 프롬프트", desc: "5분짜리 정보성 유튜브 영상의 도입부, 본문, 클로징 멘트를 한번에 작성해줍니다." },
         ],
-        "dall-e": [
+        "midjourney": [
             { title: "미드저니 V6 캐릭터 디자인 프롬프트", desc: "일관성 있는 웹소설, 게임 캐릭터를 만들기 위한 상세 파라미터가 포함된 프롬프트입니다." },
             { title: "DALL-E 3 PPT 배경 이미지 프롬프트", desc: "깔끔하고 전문적인 느낌의 프레젠테이션용 배경 이미지를 생성하는 프롬프트입니다." },
         ],
-        "sora-pika": [
+        "video-music-ai": [
             { title: "Pika Labs 숏폼 영상 제작 가이드", desc: "이미지 한장으로 역동적인 릴스, 숏츠 영상을 만드는 노하우를 담았습니다." },
             { title: "Suno AI 음악 생성 프롬프트", desc: "브이로그, 홍보영상에 어울리는 배경음악(BGM)을 장르별로 생성하는 프롬프트입니다." },
         ],
-        "rpa-zapier": [
+        "work-automation": [
             { title: "Zapier로 뉴스레터 발송 자동화하기", desc: "구글 시트에 명단을 추가하면 자동으로 메일침프, 스티비로 뉴스레터를 발송하는 워크플로우입니다." },
             { title: "RPA 부동산 데이터 수집 스크립트", desc: "특정 지역의 부동산 매물 정보를 매일 아침 자동으로 스크래핑하여 엑셀로 정리하는 스크립트입니다." },
         ],
@@ -172,15 +172,15 @@ const generateExamplePrompts = (): Prompt[] => {
             { title: "Looker Studio 매출 대시보드 템플릿", desc: "GA4 데이터를 연동하여 실시간 매출, 사용자 유입 경로를 한 눈에 파악할 수 있는 대시보드입니다." },
             { title: "Python 주식 데이터 분석 스크립트", desc: "특정 종목의 과거 주가 데이터를 분석하고 이동평균선 등 기술적 지표를 시각화하는 코드입니다." },
         ],
-         "automation-script": [
+         "nocode-automation": [
              { title: "Python 이메일 자동 분류 및 응답", desc: "Gmail API를 사용하여 특정 키워드가 포함된 이메일을 자동으로 분류하고 템플릿에 따라 회신합니다." },
              { title: "구글 시트 데이터 자동 취합 스크립트", desc: "여러 구글 시트 파일에 나뉘어 있는 데이터를 하나의 마스터 시트로 매일 새벽 자동으로 취합하고 정리합니다." },
         ],
-        "iac": [
+        "dev-career": [
             { title: "Terraform AWS VPC 구성 코드", desc: "보안 그룹, 서브넷, 라우팅 테이블이 포함된 기본적인 AWS VPC 환경을 코드로 배포합니다." },
             { title: "Docker 기반 Nginx/Node.js 환경", desc: "웹서버와 API서버를 Docker-compose로 한번에 실행할 수 있는 설정 파일입니다." },
         ],
-        "etf-trading": [
+        "stock-crypto-trading": [
             { title: "미국 배당주 포트폴리오 (엑셀)", desc: "장기적인 우상향이 기대되는 고배당 ETF 및 개별주 리스트와 비중 관리 시트입니다." },
             { title: "퀀트 투자 백테스팅 Python 코드", desc: "특정 투자 전략(e.g. 저PBR)의 과거 수익률을 검증해볼 수 있는 파이썬 백테스팅 스크립트입니다." },
         ],
@@ -192,7 +192,7 @@ const generateExamplePrompts = (): Prompt[] => {
             { title: "월 100만원 블로그 부수입 만들기", desc: "블로그 주제 선정부터 키워드 분석, 제휴 마케팅을 통해 수익을 창출하는 전체 과정을 담았습니다." },
             { title: "숨고, 크몽 전문가로 살아남기", desc: "재능 마켓 플랫폼에서 월 순수익 300만원을 달성한 프로필 작성, 고객 응대, 포트폴리오 관리 노하우입니다." },
         ],
-        "sns-marketing": [
+        "sns-contents": [
             { title: "인스타그램 릴스 떡상 공식", desc: "조회수 100만 이상을 기록한 릴스의 공통점을 분석한 리포트와 바로 적용 가능한 템플릿 5종을 제공합니다." },
             { title: "구매전환율 3배 높이는 블로그 글쓰기", desc: "정보성 콘텐츠를 통해 잠재 고객을 설득하고 실제 구매로 연결시키는 글쓰기 비법을 담았습니다." }
         ],
@@ -200,7 +200,7 @@ const generateExamplePrompts = (): Prompt[] => {
             { title: "정부지원사업 합격 사업계획서 템플릿", desc: "예비창업패키지, 청년창업사관학교 등 주요 정부지원사업에 합격한 사업계획서 원본과 작성 가이드입니다." },
             { title: "투자 유치용 IR 피치덱 템플릿(PPT)", desc: "VC 투자자들이 주목하는 핵심 내용을 담은 IR 발표자료 템플릿과 섹션별 작성 팁을 포함합니다." }
         ],
-        "ux-ui-resource": [
+        "presentation-template": [
             { title: "Figma 디자인 시스템 키트", desc: "컬러, 타이포그래피, 컴포넌트가 정의된 디자인 시스템으로, 앱/웹 디자인 시간을 50% 단축시켜줍니다." },
             { title: "모바일 앱 UX 라이팅 가이드", desc: "사용자의 행동을 유도하고 이탈을 막는 버튼, 오류 메시지, 툴팁 등 UX 라이팅 사례집입니다." }
         ],
@@ -829,3 +829,5 @@ export async function getAdminDashboardData() {
 
   return { kpi, pendingProducts, recentUsers };
 }
+
+    
