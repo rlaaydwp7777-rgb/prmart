@@ -1,7 +1,7 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, firebaseSignOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const auth = getSafeAuth();
 
     // If auth.app is falsy, it means we are on the server or client init failed.
-    if (!auth.app) {
+    if (!auth?.app) {
       console.warn("[AUTH_PROVIDER] Firebase auth not available on client. Auth features disabled.");
       setLoading(false);
       return;
@@ -49,7 +49,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await firebaseSignOut(getSafeAuth());
+      // It's important to use the same auth instance for sign-out.
+      await firebaseSignOut();
       // The onAuthStateChanged listener will clear the cookie.
       router.push("/");
     } catch(error) {
