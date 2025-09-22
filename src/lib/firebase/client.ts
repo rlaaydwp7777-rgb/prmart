@@ -13,8 +13,15 @@ const clientConfig = {
 
 let app: FirebaseApp;
 
-// Lazy initialization for the Firebase app
+// Lazy initialization for the Firebase app, safe for SSR
 export function getFirebaseApp(): FirebaseApp {
+  // On the server, return a dummy object to prevent errors during build.
+  if (typeof window === "undefined") {
+    // This is a mock/dummy app object for server-side rendering.
+    // It prevents crashes but doesn't have actual functionality on the server.
+    return {} as FirebaseApp;
+  }
+  
   if (getApps().length) {
     return getApp();
   }
@@ -32,12 +39,11 @@ export function getFirebaseApp(): FirebaseApp {
       .filter(([key, value]) => !value && key !== 'measurementId')
       .map(([key]) => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
     
-    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
+    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env.local file.`;
     
-    if (typeof window !== "undefined") {
-      console.warn(message);
-    }
-    // Return a dummy object or throw an error, but for now we let it fail on initializeApp
+    // Throw error only on client-side to avoid breaking server builds
+    // but still make it obvious for the developer.
+    throw new Error(message);
   }
 
   app = initializeApp(clientConfig);

@@ -26,7 +26,7 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="G-XXXXXXXXXX" # 선택 사항 (Google Analy
 # - 사용 위치: src/lib/firebaseAdmin.ts
 # - 설명: 서버(API Route, Middleware)가 관리자 권한으로 Firebase 서비스(DB 접근, 사용자 제어 등)를 사용하기 위한 비밀 키입니다.
 # - 획득 방법: Firebase Console > 프로젝트 설정 > 서비스 계정 > 새 비공개 키 생성
-# - 중요: 생성된 JSON 파일의 내용을 작은따옴표('')로 감싸서 그대로 붙여넣으세요.
+# - 중요: 생성된 JSON 파일의 내용을 작은따옴표('')로 감싸서 한 줄로 붙여넣어야 합니다.
 # ===================================================================
 FIREBASE_ADMIN_SDK_JSON='{"type": "service_account", "project_id": "...", ...}'
 
@@ -232,7 +232,7 @@ src
 - **해결법**:
   1. 이 문서의 **1번 항목**을 참조하여, Firebase 콘솔에서 **서비스 계정의 비공개 키(JSON 파일)를 생성**합니다.
   2. 다운로드한 JSON 파일의 **모든 내용을 복사**합니다.
-  3. `.env` 파일의 `FIREBASE_ADMIN_SDK_JSON=` 뒷부분에 **작은따옴표(`'`)로 감싸서** 그대로 붙여넣습니다.
+  3. `.env` 파일의 `FIREBASE_ADMIN_SDK_JSON=` 뒷부분에 **작은따옴표(`'`)로 감싸서 한 줄로** 그대로 붙여넣습니다. (여러 줄로 나뉘면 안 됨)
   4. 개발 서버를 재시작합니다.
 
 ### **Issue 3: `Module not found: Can't resolve 'child_process'`**
@@ -242,4 +242,3 @@ src
   1. 클라이언트 컴포넌트에서는 `src/lib/firebase/client.ts` 또는 `auth.ts` 와 같이 순수 클라이언트용으로 만들어진 파일만 `import` 해야 합니다.
   2. 서버 로직(DB 쓰기, 사용자 권한 변경 등)이 필요할 경우, 클라이언트에서 직접 함수를 호출하는 대신 **서버 액션(Server Action)을 정의**하고 폼(form)을 통해 호출합니다.
   3. `src/lib/services.ts` 와 같은 공용 서비스 파일에는 서버 전용 코드가 포함되지 않도록 주의해야 합니다. 필요시 파일을 `services.client.ts`, `services.server.ts`로 분리하는 전략도 유효합니다.
-```
