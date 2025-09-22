@@ -25,7 +25,7 @@ export async function middleware(req: NextRequest) {
     loginUrl.searchParams.set("continueUrl", pathname);
 
     if (!token) {
-      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}`);
+      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
       return NextResponse.redirect(loginUrl);
     }
 
@@ -62,7 +62,7 @@ export async function middleware(req: NextRequest) {
       }
 
     } catch (err: any) {
-      console.error(`[MW_TOKEN_VERIFY_FAIL] Token verification failed for ${pathname}:`, err.code);
+      console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, error=${err.code || 'UNKNOWN_ERROR'}, message=${err.message}`);
       // If token is expired or invalid, redirect to login
       return NextResponse.redirect(loginUrl);
     }
