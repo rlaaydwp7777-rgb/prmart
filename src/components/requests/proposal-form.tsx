@@ -12,6 +12,7 @@ import type { FormState } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { LogIn } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 interface ProposalFormProps {
     requestId: string;
@@ -36,6 +37,7 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
   const [state, formAction] = useActionState(createProposalAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (state.message) {
@@ -50,11 +52,16 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
     }
   }, [state, toast]);
 
-  const mockUser = {
-      uid: "mock-user-id",
-      displayName: "방문객",
-      email: "visitor@prmart.ai",
-      photoURL: "https://avatar.vercel.sh/visitor.png",
+  if (!user) {
+    return (
+        <Alert>
+            <LogIn className="h-4 w-4" />
+            <AlertTitle>로그인이 필요합니다</AlertTitle>
+            <AlertDescription>
+                아이디어를 제안하려면 먼저 <Link href="/login" className="font-bold underline hover:text-primary">로그인</Link>해주세요.
+            </AlertDescription>
+        </Alert>
+    )
   }
 
   return (
@@ -62,14 +69,14 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
       <h2 className="text-2xl font-bold font-headline">아이디어 제안하기</h2>
       <div className="flex gap-4 items-start">
         <Avatar className="h-10 w-10">
-          <AvatarImage src={mockUser.photoURL || ""} alt={mockUser.displayName || "user"} data-ai-hint="person face" />
-          <AvatarFallback>{mockUser.displayName?.charAt(0) || mockUser.email?.charAt(0) || 'U'}</AvatarFallback>
+          <AvatarImage src={user.photoURL || ""} alt={user.displayName || "user"} data-ai-hint="person face" />
+          <AvatarFallback>{user.displayName?.charAt(0) || user.email?.charAt(0) || 'U'}</AvatarFallback>
         </Avatar>
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
-            <input type="hidden" name="authorId" value={mockUser.uid} />
-            <input type="hidden" name="authorName" value={mockUser.displayName || mockUser.email!} />
-            <input type="hidden" name="authorAvatar" value={mockUser.photoURL || ""} />
+            <input type="hidden" name="authorId" value={user.uid} />
+            <input type="hidden" name="authorName" value={user.displayName || user.email!} />
+            <input type="hidden" name="authorAvatar" value={user.photoURL || ""} />
             
             <Textarea
                 name="content"

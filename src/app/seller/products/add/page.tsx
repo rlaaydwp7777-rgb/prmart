@@ -19,6 +19,7 @@ import { getCategories } from '@/lib/firebase/services';
 import { assessContentQuality } from '@/ai/flows/ai-content-quality-control';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
 import { saveProductAction, type FormState } from '@/app/actions';
+import { useAuth } from '@/components/auth/AuthProvider';
 
 const initialState: FormState = {
   message: '',
@@ -40,6 +41,7 @@ export default function AddProductPage() {
   const [state, formAction] = useActionState(saveProductAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
+  const { user } = useAuth();
   
   // AI Feature States
   const [isGenerating, setIsGenerating] = useState(false);
@@ -115,6 +117,15 @@ export default function AddProductPage() {
       }
   }
 
+  if (!user) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+            <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
+            <p className="text-muted-foreground mb-6">상품을 등록하려면 먼저 로그인해주세요.</p>
+        </div>
+    )
+  }
+
   return (
     <div className="max-w-4xl mx-auto">
         <header className="mb-8">
@@ -126,7 +137,7 @@ export default function AddProductPage() {
         <Card>
           <CardHeader>
             <CardTitle>{SELLER_STRINGS.STEP_1}</CardTitle>
-            <CardDescription>상품의 기본 정보를 입력하고 AI의 도움을 받아 설명을 완성하세요.</CardDescription>
+            <CardDescription>상품의 제목만 입력하고 AI의 도움을 받아 설명을 완성하세요.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -147,26 +158,6 @@ export default function AddProductPage() {
                 </Button>
               </div>
             </div>
-            
-             <div className="space-y-2">
-              <Label htmlFor="image" className="text-base">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
-              <div className="flex items-center justify-center w-full">
-                <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted">
-                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                        <Upload className="w-8 h-8 mb-4 text-muted-foreground"/>
-                        <p className="mb-2 text-sm text-muted-foreground">{SELLER_STRINGS.PRODUCT_IMAGES_HINT}</p>
-                    </div>
-                    <Input id="dropzone-file" name="imageFile" type="file" className="hidden" />
-                </label>
-              </div> 
-               <Input name="image" placeholder="https://picsum.photos/seed/product/400/300" defaultValue="https://picsum.photos/seed/product/400/300"/>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="contentUrl" className="text-base">{SELLER_STRINGS.PRODUCT_CONTENT_URL}</Label>
-              <Input id="contentUrl" name="contentUrl" placeholder={SELLER_STRINGS.PRODUCT_CONTENT_URL_PLACEHOLDER} className="text-base h-11" />
-              <p className="text-sm text-muted-foreground">{SELLER_STRINGS.PRODUCT_CONTENT_URL_HINT}</p>
-            </div>
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-base">{SELLER_STRINGS.PRODUCT_DESCRIPTION_LABEL}</Label>
@@ -180,6 +171,29 @@ export default function AddProductPage() {
                 required
               />
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                 <div className="space-y-2">
+                  <Label htmlFor="image" className="text-base">{SELLER_STRINGS.PRODUCT_IMAGES_LABEL}</Label>
+                  <div className="flex items-center justify-center w-full">
+                    <label htmlFor="dropzone-file" className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-muted/50 hover:bg-muted">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                            <Upload className="w-8 h-8 mb-2 text-muted-foreground"/>
+                            <p className="text-xs text-muted-foreground">{SELLER_STRINGS.PRODUCT_IMAGES_HINT}</p>
+                        </div>
+                        <Input id="dropzone-file" name="imageFile" type="file" className="hidden" />
+                    </label>
+                  </div> 
+                   <Input name="image" placeholder="또는 이미지 URL 입력: https://picsum.photos/seed/product/400/300" defaultValue="https://picsum.photos/seed/product/400/300"/>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="contentUrl" className="text-base">{SELLER_STRINGS.PRODUCT_CONTENT_URL}</Label>
+                  <Input id="contentUrl" name="contentUrl" placeholder={SELLER_STRINGS.PRODUCT_CONTENT_URL_PLACEHOLDER} className="text-base h-11" />
+                  <p className="text-sm text-muted-foreground">{SELLER_STRINGS.PRODUCT_CONTENT_URL_HINT}</p>
+                </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">{SELLER_STRINGS.CATEGORY_LABEL}</Label>
