@@ -11,38 +11,36 @@ const clientConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// This function is safe to call on the server or client.
-// On the server, it returns a dummy object.
-// On the client, it initializes the app if not already initialized.
-export function getFirebaseApp(): FirebaseApp {
+function getFirebaseApp(): FirebaseApp {
+  // This check prevents running initialization on the server.
   if (typeof window === "undefined") {
-    // On the server, return a dummy object to avoid errors during build.
     return {} as FirebaseApp;
   }
-  
+
+  // If the app is already initialized, return it.
   if (getApps().length) {
     return getApp();
   }
+  
+  // Validate that all required keys are present.
+  const requiredKeys: (keyof typeof clientConfig)[] = [
+    'apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'
+  ];
+  
+  const missingKeys = requiredKeys.filter(key => !clientConfig[key]);
 
-  const areAllKeysPresent =
-    clientConfig.apiKey &&
-    clientConfig.authDomain &&
-    clientConfig.projectId &&
-    clientConfig.storageBucket &&
-    clientConfig.messagingSenderId &&
-    clientConfig.appId;
-
-  if (!areAllKeysPresent) {
-    const missingKeys = Object.entries(clientConfig)
-      .filter(([key, value]) => !value && key !== 'measurementId')
-      .map(([key]) => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
+  if (missingKeys.length > 0) {
+    const errorKeyNames = missingKeys.map(key => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
+    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${errorKeyNames.join(", ")}. Please check your .env file.`;
     
-    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
-    
-    // This will only throw on the client-side, preventing server build failures
-    // but making it obvious for the developer during runtime.
+    // This will only throw on the client-side, making it obvious during runtime without breaking server builds.
     throw new Error(message);
   }
 
+  // Initialize the Firebase app.
   return initializeApp(clientConfig);
 }
+
+// Export a memoized instance of the app.
+const firebaseApp = getFirebaseApp();
+export { firebaseApp };
