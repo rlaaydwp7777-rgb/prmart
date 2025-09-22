@@ -16,8 +16,6 @@ import { useToast } from '@/hooks/use-toast';
 import { SELLER_STRINGS } from '@/lib/string-constants';
 import type { Category } from '@/lib/types';
 import { getCategories } from '@/lib/firebase/services';
-import { assessContentQuality } from '@/ai/flows/ai-content-quality-control';
-import { generateProductDescription } from '@/ai/flows/generate-product-description';
 import { saveProductAction, type FormState } from '@/app/actions';
 import { useAuth } from '@/components/auth/AuthProvider';
 
@@ -42,16 +40,6 @@ export default function AddProductPage() {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const { user } = useAuth();
-  
-  // AI Feature States
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [generatedCategory, setGeneratedCategory] = useState('');
-  const [tags, setTags] = useState<string[]>([]);
-  const [price, setPrice] = useState<number | string>('');
-  const [reviewResult, setReviewResult] = useState<any>(null);
 
   useEffect(() => {
     getCategories().then(setCategories);
@@ -67,55 +55,9 @@ export default function AddProductPage() {
     }
     if (state.success) {
       formRef.current?.reset();
-      // Reset all states
-      setTitle('');
-      setDescription('');
-      setGeneratedCategory('');
-      setTags([]);
-      setPrice('');
-      setReviewResult(null);
     }
   }, [state, toast]);
-
-  const handleGenerateDescription = async () => {
-    if (!title || title.length < 5) {
-      toast({
-        title: SELLER_STRINGS.GENERATION_ERROR,
-        description: SELLER_STRINGS.GENERATION_ERROR_DESC_NO_TITLE,
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsGenerating(true);
-    try {
-      const result = await generateProductDescription({ productTitle: title });
-      setDescription(result.productDescription);
-      setGeneratedCategory(result.category);
-      setTags(result.tags);
-      setPrice(result.price);
-      toast({
-        title: SELLER_STRINGS.GENERATION_COMPLETE,
-        description: SELLER_STRINGS.GENERATION_COMPLETE_DESC,
-      });
-    } catch (e: any) {
-      toast({ title: SELLER_STRINGS.GENERATION_ERROR, description: e.message, variant: "destructive" });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
   
-  const handleQualityReview = async () => {
-      setIsReviewing(true);
-      setReviewResult(null);
-      try {
-          const result = await assessContentQuality({ title, description, category: generatedCategory, tags });
-          setReviewResult(result);
-      } catch (e: any) {
-          toast({ title: "검수 오류", description: e.message, variant: "destructive" });
-      } finally {
-          setIsReviewing(false);
-      }
-  }
 
   if (!user) {
     return (
@@ -130,33 +72,29 @@ export default function AddProductPage() {
     <div className="max-w-4xl mx-auto">
         <header className="mb-8">
             <h1 className="text-3xl font-bold tracking-tight">{SELLER_STRINGS.ADD_NEW_PRODUCT}</h1>
-            <p className="text-muted-foreground mt-1">{SELLER_STRINGS.AI_ASSISTANT_DESCRIPTION}</p>
+            <p className="text-muted-foreground mt-1">판매할 상품의 정보를 입력해주세요.</p>
         </header>
       
       <form ref={formRef} action={formAction} className="space-y-8">
+        <input type="hidden" name="sellerId" value={user.uid} />
+        <input type="hidden" name="author" value={user.displayName || user.email!} />
+        <input type="hidden" name="sellerPhotoUrl" value={user.photoURL || ''} />
+
         <Card>
           <CardHeader>
             <CardTitle>{SELLER_STRINGS.STEP_1}</CardTitle>
-            <CardDescription>상품의 제목만 입력하고 AI의 도움을 받아 설명을 완성하세요.</CardDescription>
+            <CardDescription>상품의 기본 정보를 정확하게 입력해주세요.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="title" className="text-base">{SELLER_STRINGS.PRODUCT_TITLE_LABEL}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="title"
-                  name="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder={SELLER_STRINGS.PRODUCT_TITLE_PLACEHOLDER}
-                  className="text-base h-12"
-                  required
-                />
-                <Button type="button" size="lg" className="h-12" onClick={handleGenerateDescription} disabled={isGenerating}>
-                  {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2" />}
-                  {SELLER_STRINGS.GENERATE_WITH_AI}
-                </Button>
-              </div>
+              <Input
+                id="title"
+                name="title"
+                placeholder={SELLER_STRINGS.PRODUCT_TITLE_PLACEHOLDER}
+                className="text-base h-12"
+                required
+              />
             </div>
 
             <div className="space-y-2">
@@ -164,8 +102,6 @@ export default function AddProductPage() {
               <Textarea
                 id="description"
                 name="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
                 placeholder={SELLER_STRINGS.PRODUCT_DESCRIPTION_PLACEHOLDER}
                 className="min-h-48 text-base"
                 required
@@ -184,7 +120,7 @@ export default function AddProductPage() {
                         <Input id="dropzone-file" name="imageFile" type="file" className="hidden" />
                     </label>
                   </div> 
-                   <Input name="image" placeholder="또는 이미지 URL 입력: https://picsum.photos/seed/product/400/300" defaultValue="https://picsum.photos/seed/product/400/300"/>
+                   <Input name="image" placeholder="또는 이미지 URL 입력: https://picsum.photos/seed/product/400/300" />
                 </div>
 
                 <div className="space-y-2">
@@ -197,7 +133,7 @@ export default function AddProductPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="category">{SELLER_STRINGS.CATEGORY_LABEL}</Label>
-                <Select name="category" value={generatedCategory} onValueChange={setGeneratedCategory} required>
+                <Select name="category" required>
                   <SelectTrigger id="category">
                     <SelectValue placeholder={SELLER_STRINGS.CATEGORY_PLACEHOLDER} />
                   </SelectTrigger>
@@ -210,11 +146,11 @@ export default function AddProductPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="price">{SELLER_STRINGS.PRICE_LABEL}</Label>
-                <Input id="price" name="price" type="number" placeholder={SELLER_STRINGS.PRICE_PLACEHOLDER} value={price} onChange={(e) => setPrice(e.target.value)} required />
+                <Input id="price" name="price" type="number" placeholder={SELLER_STRINGS.PRICE_PLACEHOLDER} required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="tags">{SELLER_STRINGS.TAGS_LABEL}</Label>
-                <Input id="tags" name="tags" placeholder={SELLER_STRINGS.TAGS_PLACEHOLDER} value={tags.join(', ')} onChange={(e) => setTags(e.target.value.split(',').map(t => t.trim()))} />
+                <Input id="tags" name="tags" placeholder={SELLER_STRINGS.TAGS_PLACEHOLDER} />
                 <p className="text-sm text-muted-foreground">{SELLER_STRINGS.TAGS_HINT}</p>
               </div>
             </div>
@@ -223,34 +159,6 @@ export default function AddProductPage() {
               <Label htmlFor="sellOnce">{SELLER_STRINGS.SELL_ONCE_LABEL}</Label>
             </div>
           </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle>{SELLER_STRINGS.STEP_2}</CardTitle>
-                <CardDescription>AI 품질 검수를 통해 상품의 매력도를 확인하고 개선점을 찾아보세요.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <Button type="button" onClick={handleQualityReview} disabled={isReviewing || !title || !description}>
-                    {isReviewing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Info className="mr-2" />}
-                    AI 품질 검수 실행
-                </Button>
-                 {reviewResult && (
-                    <Card className={reviewResult.isApproved ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}>
-                        <CardHeader>
-                             <CardTitle className="flex items-center justify-between">
-                                {SELLER_STRINGS.QUALITY_REVIEW_RESULT}
-                                <Button variant="ghost" size="icon" onClick={() => setReviewResult(null)}><X className="h-4 w-4"/></Button>
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-2 text-sm">
-                            <p><strong>{SELLER_STRINGS.SCORE}:</strong> <span className="font-bold">{Math.round(reviewResult.qualityScore * 100)}점</span></p>
-                            <p><strong>{SELLER_STRINGS.STATUS}:</strong> <span className={reviewResult.isApproved ? 'text-green-700 font-semibold' : 'text-red-700 font-semibold'}>{reviewResult.isApproved ? SELLER_STRINGS.APPROVED : SELLER_STRINGS.PENDING_REVIEW}</span></p>
-                            <p><strong>{SELLER_STRINGS.REASON}:</strong> {reviewResult.reason}</p>
-                        </CardContent>
-                    </Card>
-                 )}
-            </CardContent>
         </Card>
         
         <Card>

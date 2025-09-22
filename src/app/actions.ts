@@ -4,9 +4,11 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getAuth } from 'firebase-admin/auth';
 import { adminAppInstance, adminDb } from '@/lib/firebaseAdmin';
+import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb } from "@/lib/firebase/services";
+import type { Prompt, IdeaRequest, Category, Proposal } from "@/lib/types";
 
 // --- Form State ---
-export type AuthState = {
+export type FormState = {
   message: string;
   success: boolean;
   issues?: string[];
@@ -21,7 +23,7 @@ const signupSchema = z.object({
   referralCode: z.string().optional(),
 });
 
-export async function signUpAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+export async function signUpAction(prevState: FormState, formData: FormData): Promise<FormState> {
   if (!adminAppInstance) {
     return { success: false, message: "[ACTION_SIGNUP_FAIL] Admin SDK not available." };
   }
@@ -52,7 +54,7 @@ export async function signUpAction(prevState: AuthState, formData: FormData): Pr
             message: "유효하지 않은 추천인 코드입니다.",
         }
       }
-      referredBy = referralCode;
+      referredBy = snapshot.docs[0].id;
     }
     
     const displayName = email.split('@')[0];
@@ -95,4 +97,167 @@ export async function signUpAction(prevState: AuthState, formData: FormData): Pr
       message,
     };
   }
+}
+
+// --- Product Actions ---
+const productSchema = z.object({
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
+  image: z.string().url("유효한 이미지 URL을 입력해주세요.").optional().or(z.literal('')),
+  contentUrl: z.string().url("유효한 콘텐츠 URL을 입력해주세요.").optional().or(z.literal('')),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  price: z.coerce.number().min(0, "가격은 0 이상이어야 합니다."),
+  tags: z.string().optional(),
+  visibility: z.enum(['public', 'private', 'partial']),
+  sellOnce: z.string().optional(),
+  sellerId: z.string().min(1, "판매자 정보가 필요합니다."),
+  author: z.string().min(1, "판매자 이름이 필요합니다."),
+  sellerPhotoUrl: z.string().optional(),
+});
+
+export async function saveProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
+  
+  const rawData = Object.fromEntries(formData);
+  const validatedFields = productSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+    return {
+      success: false,
+      message: "입력 값을 다시 확인해주세요.",
+      issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : [],
+    };
+  }
+
+  const { title, description, image, contentUrl, category, price, tags, visibility, sellOnce, sellerId, author, sellerPhotoUrl } = validatedFields.data;
+
+  try {
+    const categories: Category[] = await fetch('http://localhost:9002/api/categories').then(res => res.json());
+    const categorySlug = categories.find(c => c.name === category)?.slug || '';
+    
+    const productData = {
+      title,
+      description,
+      image: image || `https://picsum.photos/seed/${encodeURIComponent(title)}/400/300`,
+      aiHint: `${tags?.split(',')[0] || 'digital product'}`,
+      contentUrl,
+      category,
+      categorySlug,
+      price,
+      tags: tags ? tags.split(',').map(t => t.trim()) : [],
+      visibility,
+      sellOnce: sellOnce === 'on',
+      sellerId,
+      author,
+      sellerPhotoUrl,
+    };
+    
+    await saveProductToDb(productData as Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>);
+    
+    revalidatePath("/seller/products");
+    revalidatePath("/");
+
+    return { success: true, message: "상품이 성공적으로 등록되었습니다!" };
+  } catch (error: any) {
+    console.error("[ACTION_SAVE_PRODUCT_FAIL]", error);
+    return { success: false, message: error.message || "상품 등록 중 오류가 발생했습니다." };
+  }
+}
+
+// --- Idea Request Actions ---
+const ideaRequestSchema = z.object({
+  title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
+  description: z.string().min(10, "설명은 10자 이상이어야 합니다."),
+  category: z.string().min(1, "카테고리를 선택해주세요."),
+  budget: z.coerce.number().min(0).optional(),
+  author: z.string(), // Assuming anonymous for now
+});
+
+export async function createIdeaRequestAction(prevState: FormState, formData: FormData): Promise<FormState> {
+  const rawData = Object.fromEntries(formData);
+  const validatedFields = ideaRequestSchema.safeParse(rawData);
+
+  if (!validatedFields.success) {
+     return {
+      success: false,
+      message: "입력 값을 다시 확인해주세요.",
+      issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : [],
+    };
+  }
+
+  const { title, description, category, budget, author } = validatedFields.data;
+
+  try {
+    const categories: Category[] = await fetch('http://localhost:9002/api/categories').then(res => res.json());
+    const categorySlug = categories.find(c => c.name === category)?.slug || '';
+
+    const requestData = {
+      title,
+      description,
+      category,
+      categorySlug,
+      budget: budget || 0,
+      author: author || "익명",
+      proposals: 0,
+    };
+    
+    await saveIdeaRequestToDb(requestData as Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'>);
+
+    revalidatePath('/requests');
+
+    return { success: true, message: "아이디어 요청이 성공적으로 등록되었습니다!" };
+
+  } catch(error: any) {
+     console.error("[ACTION_CREATE_REQUEST_FAIL]", error);
+     return { success: false, message: error.message || "아이디어 요청 등록 중 오류가 발생했습니다." };
+  }
+}
+
+
+// --- Proposal Actions ---
+const proposalSchema = z.object({
+  content: z.string().min(10, "제안 내용은 10자 이상이어야 합니다."),
+  requestId: z.string().min(1),
+  authorId: z.string().min(1),
+  authorName: z.string().min(1),
+  authorAvatar: z.string().optional(),
+});
+
+export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
+    const rawData = Object.fromEntries(formData);
+    const validatedFields = proposalSchema.safeParse(rawData);
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: "입력 값을 다시 확인해주세요.",
+            issues: validatedFields.error.flatten().fieldErrors ? Object.values(validatedFields.error.flatten().fieldErrors).flat() : [],
+        };
+    }
+
+    const { content, requestId, authorId, authorName, authorAvatar } = validatedFields.data;
+    
+    // Quick regex to find a prmart product URL
+    const productUrlMatch = content.match(/https?:\/\/[^\s]*\/p\/([a-zA-Z0-9_-]+)/);
+    const productId = productUrlMatch ? productUrlMatch[1] : undefined;
+
+    try {
+        const proposalData = {
+            requestId,
+            authorId,
+            authorName,
+            authorAvatar: authorAvatar || '',
+            content,
+            productId,
+        };
+        
+        await saveProposalToDb(proposalData as Omit<Proposal, 'id' | 'createdAt' | 'status'>);
+        
+        revalidatePath(`/requests/${requestId}`);
+
+        return { success: true, message: "제안이 성공적으로 제출되었습니다." };
+
+    } catch(error: any) {
+        console.error("[ACTION_CREATE_PROPOSAL_FAIL]", error);
+        return { success: false, message: error.message || "제안 제출 중 오류가 발생했습니다." };
+    }
 }
