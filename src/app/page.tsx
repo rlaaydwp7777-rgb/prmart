@@ -1,4 +1,5 @@
 
+
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -93,6 +94,16 @@ export default async function Home() {
     { title: "새로 등록된 아이디어", prompts: [...products].sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime()) },
     { title: "prmart 추천 아이디어", prompts: products.filter(p => (p.rating ?? 0) > 4.8) },
   ];
+  
+  // Reorder categories to prioritize AI and Development
+  const prioritizedCategories = [...categories].sort((a, b) => {
+    if (a.slug === 'ai-and-production') return -1;
+    if (b.slug === 'ai-and-production') return 1;
+    if (a.slug === 'development-it-automation') return -1;
+    if (b.slug === 'development-it-automation') return 1;
+    return 0;
+  });
+
 
   return (
     <>
@@ -165,7 +176,7 @@ export default async function Home() {
         <section id="categories" className="w-full py-12 md:py-20">
             <div className="container px-4 md:px-6">
                  <div className="mx-auto grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-5">
-                  {categories.map((category) => {
+                  {prioritizedCategories.map((category) => {
                     const isHighlighted = category.slug === "ai-and-production" || category.slug === "development-it-automation";
                     const Icon = iconMap[category.icon] || Sparkles;
                     return (
