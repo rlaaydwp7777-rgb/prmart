@@ -1,15 +1,15 @@
 // src/app/(auth)/login/page.tsx
 "use client";
 import React, { useState } from "react";
-import { getSafeAuth, signInWithEmailAndPassword, signInWithGoogle } from "@/lib/firebase/auth";
+import { getSafeAuth, signInWithGoogle } from "@/lib/firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
-import { signUpAction } from "@/app/actions"; // We can reuse a part of signup action or create a new one
-
+import { signUpAction } from "@/app/actions";
 
 async function createOrUpdateUser(user: any) {
     const formData = new FormData();
@@ -18,8 +18,6 @@ async function createOrUpdateUser(user: any) {
     formData.append('displayName', user.displayName || '');
     formData.append('photoURL', user.photoURL || '');
     formData.append('isGoogleSignIn', 'true');
-    // This is a bit of a hack to reuse the signUpAction. A dedicated action might be cleaner.
-    // For now, this avoids client-side DB writes.
     await signUpAction({success: false, message: ''}, formData);
 }
 
@@ -35,31 +33,25 @@ export default function LoginPage() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const auth = getSafeAuth();
-    if (!auth.app) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
+    if (!auth) return setErr("인증 서비스를 사용할 수 없습니다. 환경변수를 확인해주세요. [CLIENT_INIT_FAIL]");
     try {
       await signInWithEmailAndPassword(auth, email, pw);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {
-      setErr(error.message || "Login failed");
+      setErr(error?.message || "Login failed");
     }
   };
 
   const onGoogle = async () => {
-    const auth = getSafeAuth();
-    if (!auth.app) return setErr("인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]");
-    
     try {
       const result = await signInWithGoogle();
       const user = result.user;
-      
-      // Use a server action to create the user document if it doesn't exist.
       await createOrUpdateUser(user);
-
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {
-      setErr(error.message || "Google sign-in failed");
+      setErr(error?.message || "Google sign-in failed");
     }
   };
 
@@ -76,13 +68,9 @@ export default function LoginPage() {
           Google 계정으로 로그인
         </Button>
         <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
+          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              또는 이메일로 계속하기
-            </span>
+            <span className="bg-background px-2 text-muted-foreground">또는 이메일로 계속하기</span>
           </div>
         </div>
         <form onSubmit={onSubmit} className="grid gap-2">
