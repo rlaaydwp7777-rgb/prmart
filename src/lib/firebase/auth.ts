@@ -15,10 +15,10 @@ import { getFirebaseApp } from "./client";
 
 let authInstance: Auth | null = null;
 
+// This function is safe to call on the server or client.
 function getSafeAuth(): Auth {
-    // On the server, getFirebaseApp returns a dummy object, so auth.app will be null.
-    // This prevents server-side execution of client auth logic.
     if (typeof window === 'undefined') {
+        // On the server, return a mock object to prevent crashes.
         return { app: null } as unknown as Auth;
     }
 
@@ -27,16 +27,18 @@ function getSafeAuth(): Auth {
     }
     
     try {
-        const app = getFirebaseApp();
+        const app = getFirebaseApp(); // This function is SSR-safe
         // If app initialization failed (e.g., missing config), app will be empty.
-        if (!app.options.apiKey) {
-            return {} as Auth;
+        if (!app.options?.apiKey) {
+           console.warn("[AUTH_INIT_WARN] Firebase app not fully initialized. Auth features may be disabled.");
+           return {} as Auth;
         }
         authInstance = getAuth(app);
         return authInstance;
     } catch (e: any) {
+        // This will catch the error thrown by getFirebaseApp if config is missing
         console.error("[AUTH_INIT_FAIL] Could not initialize Firebase Auth:", e.message);
-        // Return a mock object to prevent app from crashing
+        // Return a mock object to prevent the app from crashing
         return {} as Auth;
     }
 }
@@ -51,20 +53,12 @@ async function signInWithGoogle(): Promise<UserCredential> {
   return signInWithPopup(auth, googleProvider);
 }
 
-async function signOut(): Promise<void> {
-  const auth = getSafeAuth();
-  if (!auth.app) {
-    console.warn("Authentication service is not available. Sign out skipped.");
-    return;
-  }
-  return firebaseSignOut(auth);
-}
-
+// Re-export original functions for use
 export { 
     getSafeAuth,
     onAuthStateChanged,
     signInWithGoogle,
-    signOut,
+    firebaseSignOut,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     type User,

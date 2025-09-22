@@ -1,7 +1,7 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, firebaseSignOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const auth = getSafeAuth();
 
     // If auth.app is falsy, it means we are on the server or client init failed.
-    if (!auth.app) {
+    if (!auth?.app) {
       console.warn("[AUTH_PROVIDER] Firebase auth not available on client. Auth features disabled.");
       setLoading(false);
       return;
@@ -33,13 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           // Set cookie for middleware server checks
           const token = await u.getIdToken(true); // Force refresh the token
           const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString(); // 23 hours
-          document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; Secure`;
+          const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
+          document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
         } else {
           // Clear cookie on logout
           document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
         }
       } catch (error) {
-          console.error("[AUTH_PROVIDER_COOKIE_FAIL] Failed to set auth token cookie:", error);
+          console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
           // Still proceed, but server-side protected routes might fail.
       }
     });
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // It's important to use the same auth instance for sign-out.
       await firebaseSignOut(getSafeAuth());
       // The onAuthStateChanged listener will clear the cookie.
       router.push("/");

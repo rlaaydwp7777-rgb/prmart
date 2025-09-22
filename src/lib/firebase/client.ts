@@ -11,14 +11,12 @@ const clientConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp;
-
-// Lazy initialization for the Firebase app, safe for SSR
+// This function is safe to call on the server or client.
+// On the server, it returns a dummy object.
+// On the client, it initializes the app if not already initialized.
 export function getFirebaseApp(): FirebaseApp {
-  // On the server, return a dummy object to prevent errors during build.
   if (typeof window === "undefined") {
-    // This is a mock/dummy app object for server-side rendering.
-    // It prevents crashes but doesn't have actual functionality on the server.
+    // On the server, return a dummy object to avoid errors during build.
     return {} as FirebaseApp;
   }
   
@@ -39,13 +37,12 @@ export function getFirebaseApp(): FirebaseApp {
       .filter(([key, value]) => !value && key !== 'measurementId')
       .map(([key]) => `NEXT_PUBLIC_${key.replace(/([A-Z])/g, '_$1').toUpperCase()}`);
     
-    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env.local file.`;
+    const message = `[CLIENT_INIT_FAIL] Firebase client config is missing required keys: ${missingKeys.join(", ")}. Please check your .env file.`;
     
-    // Throw error only on client-side to avoid breaking server builds
-    // but still make it obvious for the developer.
+    // This will only throw on the client-side, preventing server build failures
+    // but making it obvious for the developer during runtime.
     throw new Error(message);
   }
 
-  app = initializeApp(clientConfig);
-  return app;
+  return initializeApp(clientConfig);
 }
