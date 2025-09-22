@@ -228,7 +228,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     category: category.name,
                     categorySlug: category.slug,
                     subCategorySlug: subCategory.slug,
-                    price: 0, // 모든 예제 상품은 무료
+                    price: (promptIdCounter % 4 === 0) ? 0 : (Math.floor(Math.random() * 4) + 1) * 5000,
                     image: `https://picsum.photos/seed/${promptId}/400/300`,
                     aiHint: `${subCategory.name.split(' ')[0]}`,
                     tags: [category.name, subCategory.name, "예제"],

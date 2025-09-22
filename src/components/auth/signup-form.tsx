@@ -5,11 +5,11 @@ import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { signUpAction, type AuthState } from "@/app/actions";
+import { signUpAction, type FormState } from "@/app/actions";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const initialState: AuthState = {
+const initialState: FormState = {
   message: "",
   success: false,
 };
@@ -52,14 +52,14 @@ export function SignUpForm() {
       <Input name="referralCode" type="text" placeholder="추천인 코드 (선택)" />
       <SubmitButton />
       {state?.issues && (
-        <div className="text-sm text-red-500">
+        <div className="text-sm text-destructive">
           {state.issues.map((issue, i) => (
             <p key={i}>- {issue}</p>
           ))}
         </div>
       )}
        {!state.success && state.message && !state.issues && (
-            <p className="text-sm text-center text-red-500">{state.message}</p>
+            <p className="text-sm text-center text-destructive">{state.message}</p>
         )}
     </form>
   );

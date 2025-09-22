@@ -86,15 +86,19 @@ service cloud.firestore {
       allow write: if request.auth.uid == userId;
     }
 
-    // 상품, 카테고리, 아이디어 요청: 누구나 읽기 가능
+    // 상품: 누구나 읽기 가능, 쓰기는 소유자 또는 관리자만 가능
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null; // TODO: 판매자만 쓰도록 규칙 강화 필요
+      allow write: if request.auth != null && (request.auth.uid == resource.data.sellerId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
     }
+    
+    // 카테고리: 누구나 읽기 가능, 쓰기는 관리자만 가능
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if false; // TODO: 관리자만 쓰도록 규칙 강화 필요
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
+
+    // 아이디어 요청 및 제안: 누구나 읽기 가능, 쓰기는 로그인 사용자만 가능
     match /ideaRequests/{requestId} {
         allow read: if true;
         allow write: if request.auth != null;
@@ -139,7 +143,6 @@ src
 │   ├── (auth)/            # - 인증 페이지 그룹 (로그인, 회원가입)
 │   │   ├── login/page.tsx
 │   │   └── signup/page.tsx
-│   ├── (main)/            # - 메인 레이아웃 적용 그룹 (삭제됨, 구조 단순화)
 │   ├── admin/             # - 관리자 전용 페이지 그룹
 │   │   ├── layout.tsx
 │   │   ├── users/page.tsx
@@ -196,13 +199,14 @@ src
   - `email` (string): 이메일
   - `displayName` (string): 닉네임
   - `photoURL` (string, optional): 프로필 사진 URL
-  - `role` (string): 사용자 권한 (`user` | `admin`)
+  - `role` (string): 사용자 권한 (`user` | `admin` | `seller`)
   - `createdAt` (string, ISO): 가입일
+  - `referralCode` (string, optional): 이 사용자의 고유 추천인 코드
+  - `referredBy` (string, optional): 이 사용자를 추천한 사람의 추천인 코드
 
 ### `products`
 - **설명**: 판매 상품 정보
-- **필드**:
-  - `title`, `description`, `author`, `sellerId`, `category`, `categorySlug`, `price`, `image`, `contentUrl`, `tags`, `visibility` 등 `src/lib/types.ts`의 `Prompt` 타입 참조.
+- **필드**: `src/lib/types.ts`의 `Prompt` 타입 참조.
 
 ### `ideaRequests`
 - **설명**: 사용자의 아이디어 요청
@@ -239,4 +243,3 @@ src
   2. 서버 로직(DB 쓰기, 사용자 권한 변경 등)이 필요할 경우, 클라이언트에서 직접 함수를 호출하는 대신 **서버 액션(Server Action)을 정의**하고 폼(form)을 통해 호출합니다.
   3. `src/lib/services.ts` 와 같은 공용 서비스 파일에는 서버 전용 코드가 포함되지 않도록 주의해야 합니다. 필요시 파일을 `services.client.ts`, `services.server.ts`로 분리하는 전략도 유효합니다.
 ```
-    

@@ -35,9 +35,10 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   const reviews = prompt.reviews ?? prompt.stats?.sales ?? 0;
 
   const isFree = prompt.price === 0;
-  const hasPurchased = false; 
+  const hasPurchased = false; // This will be dynamic based on user auth and purchase history
 
-  const canViewContent = prompt.visibility === 'public' || (prompt.visibility === 'partial' && hasPurchased);
+  const canViewFullContent = hasPurchased || isFree;
+  const canViewPartialContent = prompt.visibility === 'public' || prompt.visibility === 'partial';
 
   const handlePurchase = () => {
     // TODO: Implement actual purchase logic (e.g., redirect to checkout)
@@ -72,6 +73,104 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
         </Button>
       </div>
     );
+  }
+
+  const renderContent = () => {
+    if (!canViewPartialContent && !hasPurchased) {
+        return (
+            <Card className="flex flex-col items-center justify-center text-center p-8 border-dashed">
+                <Lock className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-xl font-bold font-headline">구매자 전용 콘텐츠입니다</h3>
+                <p className="text-muted-foreground mt-2">이 상품의 상세 정보는 구매한 사용자에게만 공개됩니다.</p>
+                 <Button className="mt-6" onClick={handlePurchase}>
+                    <Zap className="mr-2 h-4 w-4"/>
+                    구매하고 콘텐츠 보기
+                </Button>
+            </Card>
+        )
+    }
+
+    return (
+        <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
+            <AccordionItem value="item-1">
+                <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
+                <AccordionContent>
+                    <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
+                        <p>{prompt.description}</p>
+                        {!canViewFullContent && (
+                            <Alert className="mt-4 border-primary/30 bg-primary/5">
+                                <Eye className="h-4 w-4" />
+                                <AlertTitle>콘텐츠 미리보기</AlertTitle>
+                                <AlertDescription>
+                                    구매하시면 전체 콘텐츠를 확인하실 수 있습니다. 아래 내용은 일부만 공개됩니다.
+                                </AlertDescription>
+                            </Alert>
+                        )}
+                        <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
+                        
+                        {!canViewFullContent && (
+                             <div className="relative">
+                                <div className="blur-sm grayscale">
+                                    <p>주요 기능:</p>
+                                    <ul>
+                                        <li>Next.js 14 앱 라우터</li>
+                                        <li>ShadCN UI 및 Tailwind CSS</li>
+                                        <li>Firebase 인증 및 Firestore</li>
+                                        <li>Genkit AI 통합</li>
+                                    </ul>
+                                </div>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80">
+                                    <Lock className="h-8 w-8 text-muted-foreground mb-4" />
+                                    <h3 className="font-bold">전체 내용을 보려면 구매하세요</h3>
+                                    <Button size="sm" className="mt-4" onClick={handlePurchase}>
+                                        <Zap className="mr-2 h-4 w-4" />
+                                        구매하기
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {canViewFullContent && (
+                             <div>
+                                <p>주요 기능:</p>
+                                <ul>
+                                    <li>Next.js 14 앱 라우터</li>
+                                    <li>ShadCN UI 및 Tailwind CSS</li>
+                                    <li>Firebase 인증 및 Firestore</li>
+                                    <li>Genkit AI 통합</li>
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-2">
+                <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
+                <AccordionContent>
+                    {prompt.contentUrl ? 
+                        ( canViewFullContent ? 
+                            <Button asChild>
+                                <a href={prompt.contentUrl} target="_blank" rel="noopener noreferrer">
+                                    <Download className="mr-2 h-4 w-4" />
+                                    콘텐츠 다운로드
+                                </a>
+                            </Button> :
+                             <p className="flex items-center text-muted-foreground"><Lock className="mr-2 h-4 w-4"/>구매 후 콘텐츠 링크를 확인할 수 있습니다.</p>
+                        ) : (
+                            <p>ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)</p>
+                        )
+                    }
+                </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="item-3">
+                <AccordionTrigger className="text-lg font-semibold">자주 묻는 질문</AccordionTrigger>
+                <AccordionContent>
+                    <strong>Q: 상업적으로 이용할 수 있나요?</strong>
+                    <p>A: 네, 구매 후 상업적 프로젝트를 포함하여 자유롭게 사용하실 수 있습니다. 재판매는 금지됩니다.</p>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
+    )
   }
 
   return (
@@ -152,70 +251,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
         <div className="md:col-span-2 space-y-8">
             <div>
                 <h2 className="text-2xl font-bold font-headline mb-4">상품 상세 정보</h2>
-                 {canViewContent ? (
-                    <Accordion type="single" collapsible defaultValue="item-1" className="w-full">
-                        <AccordionItem value="item-1">
-                            <AccordionTrigger className="text-lg font-semibold">상품 설명</AccordionTrigger>
-                            <AccordionContent>
-                                <div className="prose prose-sm max-w-none text-foreground/90 leading-relaxed">
-                                    <p>{prompt.description}</p>
-                                    {prompt.visibility === 'partial' && !hasPurchased && (
-                                        <Alert className="mt-4">
-                                            <Eye className="h-4 w-4" />
-                                            <AlertTitle>콘텐츠 미리보기</AlertTitle>
-                                            <AlertDescription>
-                                                구매하시면 전체 콘텐츠를 확인하실 수 있습니다. 아래 내용은 일부만 공개됩니다.
-                                            </AlertDescription>
-                                        </Alert>
-                                    )}
-                                    <Image src="https://picsum.photos/600/400?random=41" alt="Code example" width={600} height={400} className="rounded-lg my-4" data-ai-hint="code screenshot" />
-                                    <p>주요 기능:</p>
-                                    <ul>
-                                        <li>Next.js 14 앱 라우터</li>
-                                        <li>ShadCN UI 및 Tailwind CSS</li>
-                                        <li>Firebase 인증 및 Firestore</li>
-                                        <li>Genkit AI 통합</li>
-                                    </ul>
-                                </div>
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="item-2">
-                            <AccordionTrigger className="text-lg font-semibold">포함된 파일</AccordionTrigger>
-                            <AccordionContent>
-                                {prompt.contentUrl ? 
-                                    ( hasPurchased || isFree ? 
-                                        <Button asChild>
-                                            <a href={prompt.contentUrl} target="_blank" rel="noopener noreferrer">
-                                                <Download className="mr-2 h-4 w-4" />
-                                                콘텐츠 다운로드
-                                            </a>
-                                        </Button> :
-                                        <p>구매 후 콘텐츠 링크를 확인할 수 있습니다.</p>
-                                    ) : (
-                                        <p>ZIP 파일에는 전체 Next.js 프로젝트 소스 코드가 포함되어 있습니다. (1.2MB)</p>
-                                    )
-                                }
-                            </AccordionContent>
-                        </AccordionItem>
-                        <AccordionItem value="item-3">
-                            <AccordionTrigger className="text-lg font-semibold">자주 묻는 질문</AccordionTrigger>
-                            <AccordionContent>
-                                <strong>Q: 상업적으로 이용할 수 있나요?</strong>
-                                <p>A: 네, 구매 후 상업적 프로젝트를 포함하여 자유롭게 사용하실 수 있습니다. 재판매는 금지됩니다.</p>
-                            </AccordionContent>
-                        </AccordionItem>
-                    </Accordion>
-                ) : (
-                    <Card className="flex flex-col items-center justify-center text-center p-8 border-dashed">
-                        <Lock className="h-12 w-12 text-muted-foreground mb-4" />
-                        <h3 className="text-xl font-bold font-headline">구매자 전용 콘텐츠입니다</h3>
-                        <p className="text-muted-foreground mt-2">이 상품의 상세 정보는 구매한 사용자에게만 공개됩니다.</p>
-                         <Button className="mt-6" onClick={handlePurchase}>
-                            <Zap className="mr-2 h-4 w-4"/>
-                            구매하고 콘텐츠 보기
-                        </Button>
-                    </Card>
-                )}
+                {renderContent()}
             </div>
 
             <Separator/>
