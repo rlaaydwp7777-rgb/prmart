@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
@@ -74,10 +75,6 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
         </Avatar>
         <form ref={formRef} action={formAction} className="flex-1 space-y-2">
             <input type="hidden" name="requestId" value={requestId} />
-            <input type="hidden" name="authorId" value={user.uid} />
-            <input type="hidden" name="authorName" value={user.displayName || user.email!} />
-            <input type="hidden" name="authorAvatar" value={user.photoURL || ""} />
-            
             <Textarea
                 name="content"
                 placeholder="여기에 제안 내용이나 댓글을 입력하세요... 자신의 상품을 링크할 수도 있습니다."
@@ -93,6 +90,9 @@ export function ProposalForm({ requestId }: ProposalFormProps) {
                     {state.issues.map((issue, i) => <p key={i}>{issue}</p>)}
                 </div>
             )}
+             {!state.success && state.message && !state.issues && (
+                <p className="text-sm text-center text-destructive">{state.message}</p>
+             )}
         </form>
       </div>
     </div>

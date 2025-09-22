@@ -1,10 +1,12 @@
+
 "use server";
 
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { getAuth } from 'firebase-admin/auth';
-import { adminAppInstance, adminDb } from '@/lib/firebaseAdmin';
-import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb } from "@/lib/firebase/services";
+import { cookies } from 'next/headers';
+import { adminAppInstance, adminAuth, adminDb } from '@/lib/firebaseAdmin';
+import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb, getCategories } from "@/lib/firebase/services";
 import type { Prompt, IdeaRequest, Category, Proposal } from "@/lib/types";
 
 // --- Form State ---
@@ -14,6 +16,18 @@ export type FormState = {
   issues?: string[];
   fields?: Record<string, string>;
 };
+
+// --- Helper Functions ---
+async function getUserRole(token: string | undefined): Promise<string | null> {
+    if (!token) return null;
+    if (!adminAuth) return null;
+    try {
+        const decodedToken = await adminAuth.verifyIdToken(token);
+        return decodedToken.role || 'user';
+    } catch (error) {
+        return null;
+    }
+}
 
 
 // --- Auth Actions ---
@@ -43,7 +57,6 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
   try {
     const auth = getAuth(adminAppInstance);
     
-    // Check if referrer code is valid
     let referredBy: string | null = null;
     if (referralCode) {
       const q = adminDb.collection("users").where("referralCode", "==", referralCode).limit(1);
@@ -65,7 +78,6 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         displayName,
     });
     
-    // Generate a unique referral code for the new user
     const newReferralCode = `${displayName.replace(/[^a-zA-Z0-9]/g, '')}_${Math.random().toString(36).substring(2, 8)}`;
 
     if (adminDb) {
@@ -116,7 +128,13 @@ const productSchema = z.object({
 });
 
 export async function saveProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
-  
+  const token = cookies().get('firebaseIdToken')?.value;
+  const userRole = await getUserRole(token);
+
+  if (!userRole || !['admin', 'seller'].includes(userRole)) {
+      return { success: false, message: "상품을 등록할 권한이 없습니다." };
+  }
+
   const rawData = Object.fromEntries(formData);
   const validatedFields = productSchema.safeParse(rawData);
 
@@ -131,7 +149,7 @@ export async function saveProductAction(prevState: FormState, formData: FormData
   const { title, description, image, contentUrl, category, price, tags, visibility, sellOnce, sellerId, author, sellerPhotoUrl } = validatedFields.data;
 
   try {
-    const categories: Category[] = await fetch('http://localhost:9002/api/categories').then(res => res.json());
+    const categories: Category[] = await getCategories();
     const categorySlug = categories.find(c => c.name === category)?.slug || '';
     
     const productData = {
@@ -169,10 +187,15 @@ const ideaRequestSchema = z.object({
   description: z.string().min(10, "설명은 10자 이상이어야 합니다."),
   category: z.string().min(1, "카테고리를 선택해주세요."),
   budget: z.coerce.number().min(0).optional(),
-  author: z.string(), // Assuming anonymous for now
+  author: z.string(),
 });
 
 export async function createIdeaRequestAction(prevState: FormState, formData: FormData): Promise<FormState> {
+  const token = cookies().get('firebaseIdToken')?.value;
+  if (!token) {
+    return { success: false, message: "로그인이 필요합니다." };
+  }
+
   const rawData = Object.fromEntries(formData);
   const validatedFields = ideaRequestSchema.safeParse(rawData);
 
@@ -184,10 +207,13 @@ export async function createIdeaRequestAction(prevState: FormState, formData: Fo
     };
   }
 
-  const { title, description, category, budget, author } = validatedFields.data;
+  const { title, description, category, budget } = validatedFields.data;
 
   try {
-    const categories: Category[] = await fetch('http://localhost:9002/api/categories').then(res => res.json());
+    const decodedToken = await adminAuth!.verifyIdToken(token);
+    const author = decodedToken.name || decodedToken.email!;
+
+    const categories: Category[] = await getCategories();
     const categorySlug = categories.find(c => c.name === category)?.slug || '';
 
     const requestData = {
@@ -196,11 +222,12 @@ export async function createIdeaRequestAction(prevState: FormState, formData: Fo
       category,
       categorySlug,
       budget: budget || 0,
-      author: author || "익명",
+      author: author,
+      authorId: decodedToken.uid,
       proposals: 0,
     };
     
-    await saveIdeaRequestToDb(requestData as Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'>);
+    await saveIdeaRequestToDb(requestData as Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>);
 
     revalidatePath('/requests');
 
@@ -223,6 +250,11 @@ const proposalSchema = z.object({
 });
 
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {
+    const token = cookies().get('firebaseIdToken')?.value;
+    if (!token) {
+      return { success: false, message: "로그인이 필요합니다." };
+    }
+
     const rawData = Object.fromEntries(formData);
     const validatedFields = proposalSchema.safeParse(rawData);
 
@@ -234,18 +266,19 @@ export async function createProposalAction(prevState: FormState, formData: FormD
         };
     }
 
-    const { content, requestId, authorId, authorName, authorAvatar } = validatedFields.data;
-    
-    // Quick regex to find a prmart product URL
-    const productUrlMatch = content.match(/https?:\/\/[^\s]*\/p\/([a-zA-Z0-9_-]+)/);
-    const productId = productUrlMatch ? productUrlMatch[1] : undefined;
+    const { content, requestId } = validatedFields.data;
 
     try {
+        const decodedToken = await adminAuth!.verifyIdToken(token);
+        
+        const productUrlMatch = content.match(/https?:\/\/[^\s]*\/p\/([a-zA-Z0-9_-]+)/);
+        const productId = productUrlMatch ? productUrlMatch[1] : undefined;
+
         const proposalData = {
             requestId,
-            authorId,
-            authorName,
-            authorAvatar: authorAvatar || '',
+            authorId: decodedToken.uid,
+            authorName: decodedToken.name || decodedToken.email!,
+            authorAvatar: decodedToken.picture || '',
             content,
             productId,
         };

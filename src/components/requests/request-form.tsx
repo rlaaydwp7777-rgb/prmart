@@ -12,7 +12,10 @@ import type { Category } from "@/lib/types";
 import { createIdeaRequestAction } from "@/app/actions";
 import type { FormState } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
+import { useAuth } from "../auth/AuthProvider";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import Link from "next/link";
 
 const initialState: FormState = {
   message: "",
@@ -30,6 +33,7 @@ function SubmitButton() {
 }
 
 export function RequestForm({ categories }: { categories: Category[] }) {
+  const { user } = useAuth();
   const [state, formAction] = useActionState(createIdeaRequestAction, initialState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
@@ -47,10 +51,20 @@ export function RequestForm({ categories }: { categories: Category[] }) {
     }
   }, [state, toast]);
 
+  if (!user) {
+    return (
+        <Alert className="max-w-2xl mx-auto">
+            <LogIn className="h-4 w-4" />
+            <AlertTitle>로그인이 필요합니다</AlertTitle>
+            <AlertDescription>
+                아이디어를 요청하려면 먼저 <Link href="/login" className="font-bold underline hover:text-primary">로그인</Link>해주세요.
+            </AlertDescription>
+        </Alert>
+    )
+  }
 
   return (
     <form ref={formRef} action={formAction} className="max-w-2xl mx-auto space-y-6 border p-6 sm:p-8 rounded-lg">
-      <input type="hidden" name="author" value="익명" />
       <div className="text-center">
         <h2 className="text-2xl font-bold font-headline tracking-tight">필요한 아이디어를 등록하세요</h2>
         <p className="text-muted-foreground mt-1">판매자들이 당신의 요청을 보고 상품을 제안할 거예요.</p>
@@ -88,7 +102,9 @@ export function RequestForm({ categories }: { categories: Category[] }) {
           {state.issues.map((issue, i) => <p key={i}>{issue}</p>)}
         </div>
       )}
+       {!state.success && state.message && !state.issues && (
+            <p className="text-sm text-center text-destructive">{state.message}</p>
+        )}
     </form>
   )
 }
-
