@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { adminAppInstance } from "./src/lib/firebaseAdmin";
+// import { adminAppInstance } from "./src/lib/firebaseAdmin";
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -18,7 +18,7 @@ export async function middleware(req: NextRequest) {
       console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}`);
       return NextResponse.redirect(loginUrl);
     }
-
+    /*
     try {
       if (!adminAppInstance) {
         console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
@@ -49,6 +49,7 @@ export async function middleware(req: NextRequest) {
       // If token is expired or invalid, redirect to login
       return NextResponse.redirect(loginUrl);
     }
+    */
   }
 
   return NextResponse.next();
