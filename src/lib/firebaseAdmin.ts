@@ -4,6 +4,11 @@ import admin from "firebase-admin";
 let adminApp: admin.app.App | null = null;
 
 function initAdmin() {
+  // Edge-runtime에서 실행되는 것을 방지합니다.
+  if (typeof window !== "undefined") {
+    return null;
+  }
+  
   if (admin.apps && admin.apps.length > 0) {
     adminApp = admin.apps[0];
     return adminApp;
