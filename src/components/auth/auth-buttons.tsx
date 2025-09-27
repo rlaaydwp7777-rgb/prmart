@@ -26,7 +26,6 @@ export function AuthButtons() {
 
     if (user) {
         const userRole = (user as any).customClaims?.role;
-        const isSeller = userRole === 'seller';
         const isAdmin = userRole === 'admin';
 
         return (
@@ -52,11 +51,9 @@ export function AuthButtons() {
                             <Link href="/admin">{SIDEBAR_STRINGS.DASHBOARD} (Admin)</Link>
                         </DropdownMenuItem>
                     )}
-                    {(isSeller || isAdmin) && (
-                         <DropdownMenuItem asChild>
-                            <Link href="/seller">{SIDEBAR_STRINGS.DASHBOARD} (Seller)</Link>
-                        </DropdownMenuItem>
-                    )}
+                    <DropdownMenuItem asChild>
+                        <Link href="/seller">{SIDEBAR_STRINGS.DASHBOARD} (Seller)</Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                         <Link href="/account">{SIDEBAR_STRINGS.ACCOUNT}</Link>
                     </DropdownMenuItem>
@@ -86,3 +83,5 @@ export function AuthButtons() {
         </div>
     );
 }
+
+    

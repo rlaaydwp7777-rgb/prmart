@@ -1,8 +1,16 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { adminAppInstance } from "./src/lib/firebaseAdmin";
 
-// import { adminAppInstance } from "./src/lib/firebaseAdmin";
+function maskEmail(email?: string) {
+  if (!email) return "unknown_email";
+  const [localPart, domain] = email.split("@");
+  if (localPart.length <= 3) {
+    return `${localPart}***@${domain}`;
+  }
+  return `${localPart.substring(0, 3)}***@${domain}`;
+}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -20,13 +28,7 @@ export async function middleware(req: NextRequest) {
       console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
       return NextResponse.redirect(loginUrl);
     }
-    
-    /*
-     * Firebase Admin SDK cannot be used in Edge runtime.
-     * Token verification and role checking must be moved to a server-side API route or a Server Action.
-     * For now, we are only checking for the presence of a token.
-    */
-    /*
+
     try {
       if (!adminAppInstance) {
         console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
@@ -39,8 +41,8 @@ export async function middleware(req: NextRequest) {
         return NextResponse.redirect(loginUrl);
       }
 
-      // /account is accessible to any logged-in user.
-      if (isAccountRoute) {
+      // /account and /seller are accessible to any logged-in user.
+      if (isAccountRoute || isSellerRoute) {
         return NextResponse.next();
       }
 
@@ -54,25 +56,16 @@ export async function middleware(req: NextRequest) {
         }
       }
 
-      // /seller is for 'admin' or 'seller' roles.
-      if (isSellerRoute) {
-        if (decoded?.role === "admin" || decoded?.role === "seller") {
-          return NextResponse.next();
-        } else {
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access seller route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
     } catch (err: any) {
       console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, code=${err.code || 'N/A'}, message=${err.message || 'Unknown error'}`);
       // If token is expired or invalid, redirect to login
       return NextResponse.redirect(loginUrl);
     }
-    */
   }
 
   return NextResponse.next();
 }
 
 export const config = { matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"] };
+
+    

@@ -68,7 +68,7 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
                 email,
                 displayName: googleDisplayName,
                 photoURL: photoURL,
-                role: 'user',
+                role: 'seller', // 모든 사용자는 판매자로 가입
                 createdAt: new Date().toISOString(),
              }, { merge: true });
         }
@@ -103,13 +103,16 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         displayName,
     });
     
+    // Set custom claim for seller role
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
+    
     const newReferralCode = `${displayName.replace(/[^a-zA-Z0-9]/g, '')}_${Math.random().toString(36).substring(2, 8)}`;
 
     if (adminDb) {
       const userData: { [key: string]: any } = {
         email,
         displayName,
-        role: 'user',
+        role: 'seller', // 모든 사용자는 판매자로 가입
         createdAt: new Date().toISOString(),
         referralCode: newReferralCode,
       };
@@ -155,10 +158,8 @@ const productSchema = z.object({
 
 export async function saveProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
   const token = cookies().get('firebaseIdToken')?.value;
-  const userRole = await getUserRole(token);
-
-  if (!userRole || !['admin', 'seller'].includes(userRole)) {
-      return { success: false, message: "상품을 등록할 권한이 없습니다." };
+  if (!token) {
+    return { success: false, message: "상품을 등록하려면 로그인이 필요합니다." };
   }
 
   const rawData = Object.fromEntries(formData);
@@ -320,3 +321,5 @@ export async function createProposalAction(prevState: FormState, formData: FormD
         return { success: false, message: error.message || "제안 제출 중 오류가 발생했습니다." };
     }
 }
+
+    
