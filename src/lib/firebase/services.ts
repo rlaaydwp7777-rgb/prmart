@@ -1,5 +1,5 @@
-import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc, Transaction, runTransaction, FieldValue } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc, Transaction, runTransaction, FieldValue, getFirestore } from "firebase/firestore";
+import { getFirebaseApp, getDb } from "./client";
 import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist, Proposal } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
@@ -261,6 +261,31 @@ const generateExamplePrompts = (): Prompt[] => {
 
 const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
+const EXAMPLE_PROPOSALS: Proposal[] = [
+    {
+        id: "prop-ex-1",
+        requestId: "req-1",
+        authorId: "seller-1",
+        authorName: "DevMaster",
+        authorAvatar: "https://picsum.photos/100/100?random=1",
+        content: "제가 만든 Next.js 보일러플레이트가 딱 맞을 것 같네요! 이걸로 시작하시면 기술 면접 준비 시간을 확 줄일 수 있습니다.",
+        productId: EXAMPLE_PROMPTS[0]?.id,
+        createdAt: new Date().toISOString(),
+        status: 'pending'
+    },
+    {
+        id: "prop-ex-2",
+        requestId: "req-2",
+        authorId: "seller-2",
+        authorName: "TechTutor",
+        authorAvatar: "https://picsum.photos/100/100?random=5",
+        content: "기술 면접 질문만 모아둔 건 아니지만, 제 실전 코딩 테스트 문제 풀이집도 도움이 될 겁니다. 한번 확인해보세요.",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+        status: 'accepted'
+    }
+];
+
+
 const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, index) => {
     const examples = [
         { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", authorId: "user-example-1", budget: 0, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
@@ -313,6 +338,7 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 }
 
 export async function getProducts(): Promise<Prompt[]> {
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Returning example products.");
       return EXAMPLE_PROMPTS;
@@ -321,11 +347,12 @@ export async function getProducts(): Promise<Prompt[]> {
         try {
             const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
             const dbProducts = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            if (dbProducts.length === 0) {
-                 console.warn("Firestore 'products' collection is empty, returning example data.");
-                 return EXAMPLE_PROMPTS;
-            }
-            return [...dbProducts, ...EXAMPLE_PROMPTS];
+            // In a real app, you might not want to mix example and real data like this.
+            // This is for demonstration purposes.
+            const combined = [...dbProducts, ...EXAMPLE_PROMPTS];
+            const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
+            return unique.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
         } catch (error) {
             console.error("Error fetching products, returning example data:", error);
             return EXAMPLE_PROMPTS;
@@ -334,6 +361,7 @@ export async function getProducts(): Promise<Prompt[]> {
 }
 
 export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Returning example products for seller.");
       return EXAMPLE_PROMPTS.filter(p => p.sellerId === sellerId);
@@ -359,6 +387,7 @@ export async function getProduct(id: string): Promise<Prompt | null> {
     if (id.startsWith('ex-')) {
       return EXAMPLE_PROMPTS.find(p => p.id === id) || null;
     }
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Cannot fetch product from DB.");
       return null;
@@ -390,6 +419,7 @@ export async function getProductsByCategorySlug(slug: string, count?: number, ex
 }
 
 export async function getCategories(): Promise<Category[]> {
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Returning example categories.");
       return EXAMPLE_CATEGORIES;
@@ -416,6 +446,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Returning example idea requests.");
       return ids ? EXAMPLE_IDEA_REQUESTS.filter(r => ids.includes(r.id)) : EXAMPLE_IDEA_REQUESTS;
@@ -452,8 +483,10 @@ export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
                 console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
                 return EXAMPLE_IDEA_REQUESTS.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
             }
+            
+            const unique = Array.from(new Map(combinedRequests.map(r => [r.id, r])).values());
+            return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-            return combinedRequests.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error("Error fetching idea requests, returning example data:", error);
             return EXAMPLE_IDEA_REQUESTS;
@@ -465,6 +498,7 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     if (id.startsWith('req-')) {
         return EXAMPLE_IDEA_REQUESTS.find(r => r.id === id) || null;
     }
+    const db = getDb();
     if (!db) {
       console.warn("Firebase not initialized. Cannot fetch idea request.");
       return null;
@@ -486,6 +520,7 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
 }
 
 export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
+    const db = getDb();
     if (!db) {
         throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
     }
@@ -507,7 +542,8 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
     }
 }
 
-export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'>) {
+export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'> & { authorId: string }) {
+    const db = getDb();
     if (!db) {
         throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
     }
@@ -528,6 +564,7 @@ export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'cre
 
 export async function getSellerDashboardData(sellerId: string) {
     const cacheKey = `seller_dashboard_${sellerId}`;
+    const db = getDb();
      if (!db) {
         console.warn("Firebase not initialized. Returning empty dashboard data.");
         return {
@@ -611,6 +648,7 @@ export async function getSellerDashboardData(sellerId: string) {
 }
 
 export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
+    const db = getDb();
     if (!db) {
         console.warn("Firebase not initialized. Cannot fetch seller profile.");
          const exampleUser = EXAMPLE_PROMPTS.find(p => p.sellerId === userId);
@@ -648,6 +686,7 @@ export async function getSellerProfile(userId: string): Promise<SellerProfile | 
 }
 
 export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
+    const db = getDb();
     if (!db) {
         throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
     }
@@ -656,6 +695,7 @@ export async function saveSellerProfile(userId: string, profile: Partial<SellerP
 }
 
 export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
+    const db = getDb();
     if (!db) {
         console.warn("Firebase not initialized. Cannot fetch orders.");
         return [];
@@ -675,6 +715,7 @@ export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
 }
 
 export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
+    const db = getDb();
     if (!db) {
         console.warn("Firebase not initialized. Cannot fetch reviews.");
         return [];
@@ -695,6 +736,7 @@ export async function getReviewsByAuthor(authorId: string): Promise<Review[]> {
 
 
 export async function getWishlistByUserId(userId: string): Promise<Wishlist | null> {
+     const db = getDb();
      if (!db) {
         console.warn("Firebase not initialized. Cannot fetch wishlist.");
         return { userId, productIds: [] };
@@ -717,6 +759,7 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
 
 
 export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
+    const db = getDb();
     if (!db) {
         throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
     }
@@ -751,6 +794,7 @@ export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdA
 
 
 export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]> {
+     const db = getDb();
      if (!db) {
         console.warn("Firebase not initialized. Cannot fetch proposals.");
         return [];
@@ -766,32 +810,36 @@ export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]
             console.error(`Error fetching proposals for author ${authorId}:`, error);
             // You might want to return mock proposals for example users
             if(authorId.includes("seller-")){
-                 const mockProposals = [
-                    {
-                        id: "prop-1",
-                        requestId: "req-1",
-                        authorId: authorId,
-                        authorName: "DevMaster",
-                        authorAvatar: "https://picsum.photos/100/100?random=1",
-                        content: "제가 만든 Next.js 보일러플레이트가 딱 맞을 것 같네요!",
-                        productId: EXAMPLE_PROMPTS[0]?.id,
-                        createdAt: new Date().toISOString(),
-                        status: 'pending' as 'pending' | 'accepted'
-                    },
-                    {
-                        id: "prop-2",
-                        requestId: "req-2",
-                        authorId: authorId,
-                        authorName: "DevMaster",
-                        authorAvatar: "https://picsum.photos/100/100?random=1",
-                        content: "제 실전 코딩 테스트 문제 풀이집도 도움이 될 겁니다.",
-                        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-                        status: 'accepted' as 'pending' | 'accepted'
-                    }
-                ];
-                return mockProposals;
+                 return EXAMPLE_PROPOSALS.filter(p => p.authorId === authorId);
             }
             return [];
+        }
+    }, 10000);
+}
+
+export async function getProposalsByRequestId(requestId: string): Promise<Proposal[]> {
+    const db = getDb();
+    if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch proposals.");
+        return EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
+    }
+    const cacheKey = `proposals_by_request_${requestId}`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const q = query(collection(db, "proposals"), where("requestId", "==", requestId), orderBy("createdAt", "desc"));
+            const snapshot = await getDocs(q);
+            const dbProposals = snapshot.docs.map(doc => serializeDoc(doc) as Proposal).filter(Boolean);
+            
+            // For demo, combine DB proposals with example proposals for the same request ID
+            const exampleProposals = EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
+            const combined = [...dbProposals, ...exampleProposals];
+            const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
+            
+            return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        } catch (error) {
+            console.error(`Error fetching proposals for request ${requestId}:`, error);
+            return EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
         }
     }, 10000);
 }
@@ -799,6 +847,7 @@ export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]
 
 // Admin services
 export async function getAdminDashboardData() {
+  const db = getDb();
   if (!db) {
     console.warn("Firebase not initialized. Returning empty admin dashboard data.");
     return {
@@ -829,5 +878,3 @@ export async function getAdminDashboardData() {
 
   return { kpi, pendingProducts, recentUsers };
 }
-
-    

@@ -1,7 +1,7 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, safeSignOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -14,41 +14,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
+    // getSafeAuth is safe to call on the client. It handles SSR checks internally.
     const auth = getSafeAuth();
+
     if (!auth) {
-      console.warn("[AUTH_PROVIDER] Auth not available (likely missing env or SSR).");
+      console.warn("[AUTH_PROVIDER] Firebase auth not available on client. Auth features disabled.");
       setLoading(false);
       return;
     }
-
+    
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       setLoading(false);
-
-      // 쿠키 설정 (미들웨어 검증용)
+      
       try {
         if (u) {
-          const token = await u.getIdToken(true);
-          const expires = new Date(Date.now() + 1000 * 60 * 60 * 24).toUTCString(); // 24h
-          const secure = process.env.NODE_ENV === "production" ? " Secure;" : "";
-          document.cookie = `firebaseIdToken=${token}; Path=/; Expires=${expires}; SameSite=Lax;${secure}`;
+          // Set cookie for middleware server checks
+          const token = await u.getIdToken(true); // Force refresh the token
+          const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString(); // 23 hours
+          const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
+          document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
         } else {
-          document.cookie = "firebaseIdToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax;";
+          // Clear cookie on logout
+          document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
         }
-      } catch (e) {
-        console.error("[AUTH_TOKEN_COOKIE_FAIL]", e);
+      } catch (error) {
+          console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
+          // Still proceed, but server-side protected routes might fail.
       }
     });
-
     return () => unsub();
   }, []);
 
   const signOut = async () => {
     try {
-      await safeSignOut();
+      await firebaseSignOut();
       router.push("/");
-    } catch (e) {
-      console.error("[SIGN_OUT_FAIL]", e);
+    } catch(error) {
+      console.error("[SIGN_OUT_FAIL] Sign out error:", error);
     }
   };
 

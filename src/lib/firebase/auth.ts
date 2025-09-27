@@ -1,31 +1,71 @@
 // src/lib/firebase/auth.ts
-import { getAuth, type Auth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, type User, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { 
+    getAuth, 
+    onAuthStateChanged,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut as firebaseSignOut,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    type Auth,
+    type User,
+    type UserCredential
+} from "firebase/auth";
 import { getFirebaseApp } from "./client";
 
-// 호출부에서 auth?.app 체크로 분기 가능하도록 null 반환 허용
+let authInstance: Auth | null = null;
+
+// This function is safe to call on the server or client.
 export function getSafeAuth(): Auth | null {
-  const app = getFirebaseApp();
-  if (!app) return null;
-  try {
-    return getAuth(app);
-  } catch (e) {
-    console.error("[AUTH_INIT_FAIL] Could not initialize Firebase Auth:", e);
-    return null;
+    if (authInstance) {
+        return authInstance;
+    }
+
+    const app = getFirebaseApp();
+    if (!app) {
+        if (typeof window !== 'undefined') {
+          // Only log error on the client
+          console.warn("[AUTH_INIT_FAIL] Firebase App not available. Auth features will be disabled.");
+        }
+        return null;
+    }
+    
+    try {
+        authInstance = getAuth(app);
+        return authInstance;
+    } catch (e: any) {
+        console.error("[AUTH_INIT_FAIL] Could not initialize Firebase Auth:", e.message);
+        return null;
+    }
+}
+
+const googleProvider = new GoogleAuthProvider();
+
+async function signInWithGoogle(): Promise<UserCredential> {
+  const auth = getSafeAuth();
+  if (!auth) {
+    throw new Error("Authentication service is not available. Please check your Firebase configuration.");
   }
+  return signInWithPopup(auth, googleProvider);
 }
 
-// 헬퍼들
-export async function signInWithGoogle() {
-  const auth = getSafeAuth();
-  if (!auth) throw new Error("Auth not available on client. [CLIENT_INIT_FAIL]");
-  const provider = new GoogleAuthProvider();
-  return signInWithPopup(auth, provider);
+async function signOut(): Promise<void> {
+    const auth = getSafeAuth();
+    if (!auth) {
+        console.warn("Firebase not initialized. Sign out operation skipped.");
+        return;
+    }
+    return firebaseSignOut(auth);
 }
 
-export async function safeSignOut() {
-  const auth = getSafeAuth();
-  if (!auth) return;
-  await signOut(auth);
-}
-
-export { onAuthStateChanged, type User, createUserWithEmailAndPassword, signInWithEmailAndPassword };
+// Re-export original functions for use
+export { 
+    onAuthStateChanged,
+    signInWithGoogle,
+    signOut,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    type User,
+    type UserCredential,
+    type Auth,
+};

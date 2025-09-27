@@ -1,8 +1,7 @@
 // src/app/(auth)/login/page.tsx
 "use client";
 import React, { useState } from "react";
-import { getSafeAuth, signInWithGoogle } from "@/lib/firebase/auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { getSafeAuth, signInWithGoogle, signInWithEmailAndPassword } from "@/lib/firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
