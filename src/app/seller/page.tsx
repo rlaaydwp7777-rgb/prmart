@@ -3,22 +3,18 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { ArrowUpRight, DollarSign, Package, ShoppingCart, Users, BarChart } from 'lucide-react';
+import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getSellerDashboardData } from '@/lib/firebase/services';
 import type { SellerStats, Order, Prompt } from '@/lib/types';
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
-import { BarChart as RechartsBarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { SELLER_STRINGS } from '@/lib/string-constants';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type DashboardData = {
     stats: SellerStats;
@@ -28,25 +24,53 @@ type DashboardData = {
 }
 
 export default function SellerDashboardPage() {
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        if(user?.uid) {
-            getSellerDashboardData(user.uid)
-                .then(setData)
-                .finally(() => setLoading(false));
-        } else if (!user) {
-            setLoading(false);
+        if (authLoading) {
+            return;
         }
-    }, [user]);
+        if (!user) {
+            router.replace("/login?continueUrl=/seller");
+            return;
+        }
+        
+        getSellerDashboardData(user.uid)
+            .then(setData)
+            .catch(err => {
+                console.error("Failed to load seller dashboard", err);
+                setData(null); // Ensure data is null on error
+            })
+            .finally(() => setLoading(false));
 
-    if(loading) {
-        return <div>로딩중...</div>
+    }, [user, authLoading, router]);
+
+    if (loading || authLoading) {
+        return (
+            <div className="flex flex-col gap-8">
+                 <header>
+                    <Skeleton className="h-9 w-48" />
+                    <Skeleton className="h-5 w-64 mt-2" />
+                </header>
+                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    <Skeleton className="h-28" />
+                    <Skeleton className="h-28" />
+                    <Skeleton className="h-28" />
+                    <Skeleton className="h-28" />
+                </div>
+                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                    <Skeleton className="lg:col-span-4 h-96" />
+                    <Skeleton className="lg:col-span-3 h-96" />
+                </div>
+            </div>
+        );
     }
 
     if (!user) {
+        // This part is for fallback, useEffect should handle redirection.
         return (
              <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                 <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
@@ -58,7 +82,17 @@ export default function SellerDashboardPage() {
         )
     }
 
-    if (!data || data.stats.productCount === 0) {
+    if (!data) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <h1 className="text-2xl font-bold mb-4">데이터 로딩 실패</h1>
+                <p className="text-muted-foreground mb-6">대시보드 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.</p>
+                <Button onClick={() => window.location.reload()}>새로고침</Button>
+            </div>
+        );
+    }
+    
+    if (data.stats.productCount === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-background rounded-lg p-8">
                 <h1 className="text-4xl font-headline font-bold mb-4">{SELLER_STRINGS.DASHBOARD_HEADLINE}</h1>

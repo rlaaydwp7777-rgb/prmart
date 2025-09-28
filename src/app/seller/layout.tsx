@@ -1,6 +1,8 @@
 // src/app/seller/layout.tsx
+"use client";
+
 import React from "react";
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from '@/components/ui/sidebar';
 import { Home, Package, MessageSquare, BarChart, Settings, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -44,7 +46,7 @@ const SellerNav = () => {
     );
 };
 
-const SellerFooter = () => {
+const SellerFooterContent = () => {
     const { user, signOut } = useAuth();
     if (!user) return null;
 
@@ -89,12 +91,12 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
                     <SellerNav />
                 </SidebarContent>
                 <SidebarFooter className="p-2">
-                    <SellerFooter />
+                    <SellerFooterContent />
                 </SidebarFooter>
             </Sidebar>
-            <div className="flex-1 p-4 md:p-6 lg:p-8 bg-muted/30 min-h-screen">
+            <main className="flex-1 p-4 md:p-6 lg:p-8 bg-muted/30 min-h-screen">
                 {children}
-            </div>
+            </main>
         </SidebarProvider>
     </div>
   );

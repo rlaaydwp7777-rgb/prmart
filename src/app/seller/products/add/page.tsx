@@ -18,6 +18,7 @@ import type { Category } from '@/lib/types';
 import { getCategories } from '@/lib/firebase/services';
 import { saveProductAction, type FormState } from '@/app/actions';
 import { useAuth } from '@/components/auth/AuthProvider';
+import Link from 'next/link';
 
 const initialState: FormState = {
   message: '',
@@ -64,6 +65,9 @@ export default function AddProductPage() {
         <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
             <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
             <p className="text-muted-foreground mb-6">상품을 등록하려면 먼저 로그인해주세요.</p>
+            <Button asChild>
+                <Link href="/login?continueUrl=/seller/products/add">로그인 페이지로 이동</Link>
+            </Button>
         </div>
     )
   }
@@ -138,9 +142,13 @@ export default function AddProductPage() {
                     <SelectValue placeholder={SELLER_STRINGS.CATEGORY_PLACEHOLDER} />
                   </SelectTrigger>
                   <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
-                    ))}
+                    {categories.length > 0 ? (
+                        categories.map((cat) => (
+                          <SelectItem key={cat.name} value={cat.name}>{cat.name}</SelectItem>
+                        ))
+                    ) : (
+                        <SelectItem value="loading" disabled>카테고리 로딩 중...</SelectItem>
+                    )}
                   </SelectContent>
                 </Select>
               </div>

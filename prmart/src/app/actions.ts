@@ -59,16 +59,19 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
   const { email, password, referralCode, uid, displayName: googleDisplayName, photoURL, isGoogleSignIn } = validatedFields.data;
 
   try {
+    const auth = getAuth(adminAppInstance);
+
     // Handle Google Sign-in user creation/update
     if (isGoogleSignIn === 'true' && uid && email) {
         const userRef = adminDb.collection("users").doc(uid);
         const userSnap = await userRef.get();
         if (!userSnap.exists()) {
+             await auth.setCustomUserClaims(uid, { role: 'seller' });
              await userRef.set({
                 email,
                 displayName: googleDisplayName,
                 photoURL: photoURL,
-                role: 'user',
+                role: 'seller', // 모든 사용자는 판매자로 가입
                 createdAt: new Date().toISOString(),
              }, { merge: true });
         }
@@ -79,8 +82,6 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     if (!password) {
         return { success: false, message: "비밀번호를 입력해주세요." };
     }
-
-    const auth = getAuth(adminAppInstance);
     
     let referredBy: string | null = null;
     if (referralCode) {
@@ -103,13 +104,16 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         displayName,
     });
     
+    // Set custom claim for seller role
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
+    
     const newReferralCode = `${displayName.replace(/[^a-zA-Z0-9]/g, '')}_${Math.random().toString(36).substring(2, 8)}`;
 
     if (adminDb) {
       const userData: { [key: string]: any } = {
         email,
         displayName,
-        role: 'user',
+        role: 'seller', // 모든 사용자는 판매자로 가입
         createdAt: new Date().toISOString(),
         referralCode: newReferralCode,
       };
@@ -155,10 +159,8 @@ const productSchema = z.object({
 
 export async function saveProductAction(prevState: FormState, formData: FormData): Promise<FormState> {
   const token = cookies().get('firebaseIdToken')?.value;
-  const userRole = await getUserRole(token);
-
-  if (!userRole || !['admin', 'seller'].includes(userRole)) {
-      return { success: false, message: "상품을 등록할 권한이 없습니다." };
+  if (!token) {
+    return { success: false, message: "상품을 등록하려면 로그인이 필요합니다." };
   }
 
   const rawData = Object.fromEntries(formData);
@@ -213,7 +215,6 @@ const ideaRequestSchema = z.object({
   description: z.string().min(10, "설명은 10자 이상이어야 합니다."),
   category: z.string().min(1, "카테고리를 선택해주세요."),
   budget: z.coerce.number().min(0).optional(),
-  author: z.string(),
 });
 
 export async function createIdeaRequestAction(prevState: FormState, formData: FormData): Promise<FormState> {
@@ -270,9 +271,6 @@ export async function createIdeaRequestAction(prevState: FormState, formData: Fo
 const proposalSchema = z.object({
   content: z.string().min(10, "제안 내용은 10자 이상이어야 합니다."),
   requestId: z.string().min(1),
-  authorId: z.string().min(1),
-  authorName: z.string().min(1),
-  authorAvatar: z.string().optional(),
 });
 
 export async function createProposalAction(prevState: FormState, formData: FormData): Promise<FormState> {

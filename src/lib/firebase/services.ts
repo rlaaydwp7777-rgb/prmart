@@ -347,15 +347,21 @@ export async function getProducts(): Promise<Prompt[]> {
         try {
             const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
             const dbProducts = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            // In a real app, you might not want to mix example and real data like this.
-            // This is for demonstration purposes.
-            const combined = [...dbProducts, ...EXAMPLE_PROMPTS];
-            const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
-            return unique.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            
+            // Mix with example data only in development
+            if (process.env.NODE_ENV === 'development') {
+                const combined = [...dbProducts, ...EXAMPLE_PROMPTS];
+                const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
+                return unique.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            }
+            return dbProducts;
 
         } catch (error) {
-            console.error("Error fetching products, returning example data:", error);
-            return EXAMPLE_PROMPTS;
+            console.error("Error fetching products:", error);
+            if (process.env.NODE_ENV === 'development') {
+                return EXAMPLE_PROMPTS;
+            }
+            return []; // Return empty array in production on error
         }
     });
 }
@@ -542,7 +548,7 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
     }
 }
 
-export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample' | 'authorId'> & { authorId: string }) {
+export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
     const db = getDb();
     if (!db) {
         throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
@@ -644,7 +650,7 @@ export async function getSellerDashboardData(sellerId: string) {
                 salesByMonth: Array.from({ length: 12 }, (_, i) => ({ name: `${i+1}월`, total: 0 }))
             };
         }
-    });
+    }, 10000); // Cache seller dashboard data for 10 seconds
 }
 
 export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
