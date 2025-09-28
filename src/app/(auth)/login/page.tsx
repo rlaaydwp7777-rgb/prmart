@@ -1,8 +1,7 @@
 // src/app/(auth)/login/page.tsx
 "use client";
-import React, { useState } from "react";
-import { getSafeAuth, signInWithGoogle } from "@/lib/firebase/auth";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
+import { getSafeAuth, signInWithGoogle, signInWithEmailAndPassword } from "@/lib/firebase/auth";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +9,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { signUpAction } from "@/app/actions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
+// Google 로그인 시 Firestore에 사용자 정보를 생성/업데이트하는 서버 액션 호출
 async function createOrUpdateUser(user: any) {
     const formData = new FormData();
     formData.append('uid', user.uid);
-    formData.append('email', user.email);
+    formData.append('email', user.email!);
     formData.append('displayName', user.displayName || '');
     formData.append('photoURL', user.photoURL || '');
     formData.append('isGoogleSignIn', 'true');
@@ -26,9 +28,22 @@ export default function LoginPage() {
   const params = useSearchParams();
   const { toast } = useToast();
   const continueUrl = params?.get("continueUrl") || "/";
+  const errorParam = params?.get("error");
+
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (errorParam === 'session-expired') {
+      toast({
+        title: "세션 만료",
+        description: "안전한 서비스 이용을 위해 세션이 만료되었습니다. 다시 로그인해주세요.",
+        variant: "destructive"
+      });
+    }
+  }, [errorParam, toast]);
+
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,11 +61,12 @@ export default function LoginPage() {
   const onGoogle = async () => {
     try {
       const result = await signInWithGoogle();
-      const user = result.user;
-      await createOrUpdateUser(user);
+      // Google 로그인 사용자를 DB에 등록/업데이트
+      await createOrUpdateUser(result.user);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
-    } catch (error: any) {
+    } catch (error: any)
+      {
       setErr(error?.message || "Google sign-in failed");
     }
   };
@@ -64,6 +80,15 @@ export default function LoginPage() {
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
+        {errorParam === 'session-expired' && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>세션 만료</AlertTitle>
+            <AlertDescription>
+              안전을 위해 다시 로그인해주세요.
+            </AlertDescription>
+          </Alert>
+        )}
         <Button variant="outline" className="w-full" onClick={onGoogle}>
           Google 계정으로 로그인
         </Button>

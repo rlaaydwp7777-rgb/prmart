@@ -1,12 +1,28 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, signOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
 type AuthContextType = { user: User | null; loading: boolean; signOut: () => Promise<void> };
 const AuthContext = createContext<AuthContextType>({ user: null, loading: true, signOut: async () => {} });
+
+// Helper to set cookie
+async function setAuthCookie(user: User | null) {
+    try {
+        if (user) {
+            const token = await user.getIdToken(true); // Force refresh
+            const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString();
+            const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
+            document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
+        } else {
+            document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+        }
+    } catch (error) {
+        console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
+    }
+}
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -14,41 +30,44 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   useEffect(() => {
-    // getSafeAuth is safe to call on the client. It handles SSR checks internally.
     const auth = getSafeAuth();
-
     if (!auth) {
       console.warn("[AUTH_PROVIDER] Firebase auth not available on client. Auth features disabled.");
       setLoading(false);
       return;
     }
     
+    // Listen for auth state changes
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
+      await setAuthCookie(u);
       setLoading(false);
-      
-      try {
-        if (u) {
-          // Set cookie for middleware server checks
-          const token = await u.getIdToken(true); // Force refresh the token
-          const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString(); // 23 hours
-          const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
-          document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
-        } else {
-          // Clear cookie on logout
-          document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
-        }
-      } catch (error) {
-          console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
-          // Still proceed, but server-side protected routes might fail.
-      }
     });
-    return () => unsub();
+
+    // Periodically refresh the token to get latest custom claims (e.g., role updates)
+    const interval = setInterval(async () => {
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            console.log("[AUTH_PROVIDER] Refreshing token to sync custom claims...");
+            await setAuthCookie(currentUser);
+        }
+    }, 10 * 60 * 1000); // 10 minutes
+
+    return () => {
+        unsub();
+        clearInterval(interval);
+    };
   }, []);
 
-  const handleSignOut = async () => {
+  const signOut = async () => {
     try {
-      await signOut();
+      const auth = getSafeAuth();
+      if (!auth) {
+        console.warn("Firebase not initialized. Sign out operation skipped.");
+        return;
+      }
+      await firebaseSignOut(auth);
+      // The onAuthStateChanged listener will clear the user and cookie.
       router.push("/");
     } catch(error) {
       console.error("[SIGN_OUT_FAIL] Sign out error:", error);
@@ -63,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <AuthContext.Provider value={{ user, loading, signOut: handleSignOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

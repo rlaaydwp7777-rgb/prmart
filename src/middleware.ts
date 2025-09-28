@@ -58,7 +58,8 @@ export async function middleware(req: NextRequest) {
 
     } catch (err: any) {
       console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, code=${err.code || 'N/A'}, message=${err.message || 'Unknown error'}`);
-      // If token is expired or invalid, redirect to login
+      // If token is expired or invalid, redirect to login with an error query param
+      loginUrl.searchParams.set("error", "session-expired");
       return NextResponse.redirect(loginUrl);
     }
   }
@@ -67,5 +68,3 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = { matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"] };
-
-    

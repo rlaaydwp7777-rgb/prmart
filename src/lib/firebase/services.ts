@@ -568,17 +568,12 @@ export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'cre
 }
 
 
-export async function getSellerDashboardData(sellerId: string) {
+export async function getSellerDashboardData(sellerId: string): Promise<{ stats: SellerStats; recentSales: Order[]; bestSellers: (Prompt & { sales: number; revenue: number; })[]; salesByMonth: { name: string; total: number; }[] } | null> {
     const cacheKey = `seller_dashboard_${sellerId}`;
     const db = getDb();
      if (!db) {
-        console.warn("Firebase not initialized. Returning empty dashboard data.");
-        return {
-            stats: { totalRevenue: 0, totalSales: 0, productCount: 0, averageRating: 0, reviewCount: 0 },
-            recentSales: [],
-            bestSellers: [],
-            salesByMonth: Array.from({ length: 12 }, (_, i) => ({ name: `${i+1}월`, total: 0 }))
-        };
+        console.warn("Firebase not initialized. Cannot fetch seller dashboard data.");
+        return null;
     }
     return fetchFromCache(cacheKey, async () => {
         try {
@@ -642,13 +637,7 @@ export async function getSellerDashboardData(sellerId: string) {
 
         } catch (error) {
             console.error("Error fetching seller dashboard data: ", error);
-            // Return empty/default data on error
-            return {
-                stats: { totalRevenue: 0, totalSales: 0, productCount: 0, averageRating: 0, reviewCount: 0 },
-                recentSales: [],
-                bestSellers: [],
-                salesByMonth: Array.from({ length: 12 }, (_, i) => ({ name: `${i+1}월`, total: 0 }))
-            };
+            return null;
         }
     }, 10000); // Cache seller dashboard data for 10 seconds
 }
