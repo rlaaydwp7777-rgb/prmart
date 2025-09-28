@@ -2,6 +2,17 @@
 
 이 문서는 prmart 프로젝트의 전체 아키텍처, 설정, 데이터 구조, 운영 노하우를 포함하는 기술 인수인계 문서입니다.
 
+## 0. 핵심 전제 및 원칙 (반드시 반영)
+
+*   **수익 배분**(공급가 기준): 플랫폼 15%(추천인 없을 때) 또는 플랫폼 10% + 추천인 5%(추천인 있을 때) / 판매자 나머지.
+*   **PG 수수료**: **항상 플랫폼 몫에서 차감** (플랫폼 실수익 = 플랫폼 수수료 − PG수수료).
+*   **VAT**: 표시가격은 **VAT 포함가**, 모든 내부 정산은 **공급가(= 표시가 / 1.1)** 기준.
+*   **정산 홀드**: 기본 **T+14**일을 원칙으로 하며, 판매자 신용도에 따라 단축 가능.
+*   **가입 정책**: 모든 가입자는 즉시 판매 및 구매 권한을 가지며, **리스크 기반 사전/사후 검수**로 안전을 보장합니다.
+*   **회계 원칙**: 모든 금융 거래는 **원장(Transactions Ledger)**에 기록하여 회계 무결성을 보장합니다.
+
+---
+
 ## 1. 환경변수 (`.env` 예시)
 
 프로젝트를 구동하기 위해 루트 디렉터리에 `.env` 파일을 생성하고 아래 내용을 채워야 합니다.
@@ -38,43 +49,46 @@ FIREBASE_ADMIN_SDK_JSON='{"type": "service_account", "project_id": "...", ...}'
 GEMINI_API_KEY="AIzaSy...YOUR_GEMINI_API_KEY..."
 ```
 
-## 2. Firebase 콘솔 설정 요약
+---
 
-### Authentication (인증)
-- **활성화된 제공자**:
-  - `이메일/비밀번호`
-  - `Google`
-- **승인된 도메인**:
-  - `localhost` (개발용)
-  - 배포된 도메인 (예: `prmart.ai`, `*.prmart.ai`, `prmart.web.app`)
-- **OAuth 리디렉션 URI**:
-  - Firebase 콘솔의 Google 제공자 설정에서 자동으로 생성된 URI를 복사하여 Google Cloud Console의 OAuth 2.0 클라이언트 ID 설정에 추가해야 합니다.
+## 2. 데이터 모델 (Firestore 컬렉션)
 
-### Firestore (데이터베이스)
-- **사용 중인 컬렉션**:
-  - `users`: 사용자 정보 (이메일, 역할, 프로필, 추천인 코드 등)
-  - `products`: 판매 상품 정보
-  - `categories`: 상품 카테고리
-  - `orders`: 주문 내역
-  - `transactions`: 모든 금융 거래 원장 (Cloud Functions 전용)
-  - `payouts`: 정산 요청 내역
-  - `referrals`: 추천인 코드 정보
-  - `risk_events`: 위험 이벤트 로그 (Cloud Functions 전용)
-- **필요한 색인(Index)**:
-  - 현재는 기본 색인만 사용 중입니다. 복합 쿼리(예: `where` + `orderBy`)가 추가될 경우, Firestore가 제공하는 색인 생성 링크를 통해 추가해야 합니다.
+> 설계 목적: **회계 불변식**(차·대변 합=0), **정산/환불/분쟁**을 코드로 재현 가능하게 하고, **추천 보상**의 확정/환수를 일관되게 처리합니다.
 
-### Storage (스토리지)
-- **사용 버킷**: `prmart-xxxx.appspot.com` (기본 버킷)
-- **주요 용도**: 사용자가 업로드하는 상품 이미지, 프로필 사진 등을 저장합니다.
-- **규칙**: 아래 '3. 보안 규칙' 항목 참조.
+### 2.1 컬렉션 구조
 
-### 기타
-- **Hosting**: 사용 안 함 (Firebase App Hosting 또는 다른 플랫폼 사용)
-- **Functions**: Cloud Functions를 사용하여 결제 처리, 정산, 원장 기록 등 핵심 백엔드 로직을 수행합니다.
+*   **`products/{productId}`**: 판매 상품 정보
+    *   `title, description, image, priceGross(표시가), category, sellerId, visibility, tags[], createdAt, updatedAt, stats{views,likes,sales}`
 
-## 3. 보안 규칙
+*   **`users/{uid}`**: 사용자 정보
+    *   `displayName, email, role('user'|'seller'|'admin'), referralCode, referredBy, balances{available,pending,reserve}, kyc{…}`
 
-### Firestore Rules (`firestore.rules`)
+*   **`orders/{orderId}`**: 주문 내역
+    *   `buyerId, sellerId, productId, priceGross, priceNet(공급가), vat, referralCode?, pgFee, platformFee, referralFee, sellerEarning`
+    *   `status`: `'created' | 'paid' | 'clearing_hold' | 'released' | 'refunded' | 'disputed' | 'chargeback'`
+    *   `holdUntil(ISO), disputeId?, refundReason?`
+
+*   **`transactions/{txId}`** (원장): 모든 금융 거래 기록
+    *   `orderId, creditTo, debitFrom, amountNet, amountVat, currency, createdAt`
+    *   `type`: `'platform_fee' | 'pg_fee' | 'seller_earn' | 'referral_earn' | 'vat' | 'gross_charge' | 'gross_refund' | 'reversal'`
+    *   **규칙**: 한 주문에 대해 최소 4줄(구매자→플랫폼, 플랫폼→판매자, 플랫폼수익, PG수수료) 이상 기록되며, 합계는 항상 0이어야 합니다.
+
+*   **`referrals/{code}`**: 추천인 코드 정보
+    *   `ownerId, createdAt, disabled, policy{selfUse:false, minNet:5000, rate:0.05}`
+
+*   **`payouts/{payoutId}`**: 정산 요청 내역
+    *   `ownerId, target('seller'|'referrer'), amount, fee, method, status('requested'|'processing'|'paid'|'failed'), requestedAt, processedAt`
+
+*   **`risk_events/{id}`**: 위험 이벤트 로그
+    *   `orderId?, userId?, level('low'|'mid'|'high'), signal('firstOrder'|'highAmount'|'rapidRefund'|…), action('hold+7'|'hideProduct'|'ban'), createdAt`
+
+---
+
+## 3. 보안 규칙 (Firestore & Storage)
+
+**목표:** 판매자는 자신의 상품만, 관리자는 모든 것을, 클라이언트는 민감한 데이터를 직접 수정할 수 없도록 제한합니다.
+
+### 3.1 Firestore Rules (`firestore.rules`)
 ```
 rules_version = '2';
 
@@ -95,43 +109,38 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn() && (request.resource.data.sellerId == request.auth.uid || isAdmin());
     }
-    
-    match /categories/{categoryId} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
 
     match /orders/{orderId} {
       allow read: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
-      allow create: if isSignedIn();
-      allow update: if false; // Cloud Functions 전용
+      allow create: if isSignedIn(); // 'draft' 상태로 생성만 허용
+      allow update: if false; // 결제/정산 관련 모든 수치 변경은 Cloud Functions에서만 가능
     }
 
     match /transactions/{txId} {
       allow read: if isAdmin();
       allow write: if false; // Cloud Functions 전용
     }
-    
+
     match /payouts/{payoutId} {
       allow read: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
       allow update: if isAdmin();
     }
-    
+
     match /referrals/{code} {
-        allow read: if true;
-        allow write: if isAdmin();
+      allow read: if true;
+      allow write: if isAdmin();
     }
-    
+
     match /risk_events/{id} {
-        allow read: if isAdmin();
-        allow write: if false; // Cloud Functions 전용
+      allow read: if isAdmin();
+      allow write: if false; // Cloud Functions 전용
     }
   }
 }
 ```
 
-### Storage Rules (`storage.rules`)
+### 3.2 Storage Rules (`storage.rules`)
 ```
 rules_version = '2';
 
@@ -142,14 +151,17 @@ service firebase.storage {
       allow read: if true;
       allow write: if request.auth.uid == userId;
     }
-    // 상품 이미지: 인증된 사용자(판매자)만 업로드 가능, 누구나 읽기 가능
-    match /products/{productId}/{allPaths=**} {
+    // 상품 이미지: 판매자 본인만 업로드 가능, 누구나 읽기 가능
+    // 경로에 sellerId를 포함하여 소유권 검증
+    match /products/{sellerId}/{productId}/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null; // TODO: 판매자 역할 확인 규칙 추가
+      allow write: if request.auth != null && request.auth.uid == sellerId;
     }
   }
 }
 ```
+
+---
 
 ## 4. 라우트 맵 & 폴더 트리
 
@@ -194,53 +206,54 @@ src
 └── middleware.ts          # Edge 미들웨어 (경로 보호 로직)
 ```
 
-## 5. 의존성 및 빌드/배포 파이프라인
+---
 
-- **주요 의존성 (`package.json`)**:
-  - `next`: 프레임워크
-  - `react`, `react-dom`: UI 라이브러리
-  - `firebase`, `firebase-admin`: Firebase 클라이언트/서버 SDK
-  - `genkit`, `@genkit-ai/googleai`: AI 기능
-  - `tailwindcss`, `shadcn-ui`: 스타일링 및 UI 컴포넌트
-  - `lucide-react`: 아이콘
-  - `zod`: 스키마 검증
-  - `recharts`: 차트 (대시보드용)
-- **빌드 명령어**: `npm run build`
-- **개발 서버 실행**:
-  1. `npm run dev` (웹 애플리케이션, `localhost:9002`)
-  2. `npm run genkit:dev` (AI 기능, `localhost:3100`, 별도 터미널)
-- **배포**: Firebase App Hosting을 사용하며, `apphosting.yaml` 파일에 따라 설정됩니다. GitHub 레포지토리와 연결하여 푸시 시 자동 빌드 및 배포가 이루어집니다.
+## 5. 판매/구매/요청 구성
 
-## 6. 초기 데이터 스키마
+### 5.1 판매하기 (`/seller`)
+*   **상품 등록**: Zod 스키마로 검증된 폼 데이터를 서버 액션(`saveProductAction`)으로 처리.
+*   **대시보드**: 가상 잔고(Available/Pending/Reserve), 정산 예정 캘린더, 총 매출/판매 건수, 베스트셀러, 환불/분쟁 내역 등 KPI 시각화.
 
-### `users`
-- **설명**: 사용자 정보 저장
-- **필드**:
-  - `email` (string): 이메일
-  - `displayName` (string): 닉네임
-  - `photoURL` (string, optional): 프로필 사진 URL
-  - `role` (string): 사용자 권한 (`user` | `seller` | `admin`)
-  - `referralCode` (string, optional): 사용자의 고유 추천인 코드
-  - `referredBy` (string, optional): 이 사용자를 추천한 사람의 UID
-  - `balances`: 잔고 정보 (map)
-    - `available` (number): 출금 가능 잔액
-    - `pending` (number): 정산 보류 중인 잔액
-    - `reserve` (number): 분쟁/환불 대비 예치금
-  - `createdAt` (string, ISO): 가입일
+### 5.2 아이디어 요청하기 (`/requests`)
+*   **요청 생성**: 사용자가 필요한 디지털 자산에 대한 아이디어를 등록 (`createIdeaRequestAction`).
+*   **제안 제출**: 다른 판매자들이 등록된 요청에 자신의 상품을 제안 (`createProposalAction`).
 
-### `products`
-- **설명**: 판매 상품 정보
-- **필드**: `src/lib/types.ts`의 `Prompt` 타입 참조.
+---
 
-### `orders`
-- **설명**: 사용자의 주문 정보
-- **필드**: `priceGross`, `priceNet`, `vat`, `status`('paid', 'refunded', 'disputed'), `holdUntil` 등 포함
+## 6. 추천인(Referral) 시스템 설계
+*   **코드 발급**: 가입 시 고유 코드 자동 생성. 대시보드에서 링크/QR 코드로 공유 가능.
+*   **보상 정책**:
+    *   Self-referral(자기추천) 방지 로직 필수.
+    *   보상은 거래의 정산 보류(T+14)가 해제된 후 `available` 잔고로 이동.
+    *   환불/차지백 발생 시 지급된 보상은 자동으로 환수(원장 역분개).
+    *   최소 출금액, 월 1회 정산 등 정책 적용.
 
-### `transactions` (원장)
-- **설명**: 모든 금융 거래 기록. Cloud Functions에서만 쓰기 가능.
-- **필드**: `type`, `amount`, `creditTo`, `debitFrom` 등 포함. 한 주문에 대해 여러 라인 생성.
+---
 
-## 7. 알려진 이슈/에러와 해결법
+## 7. 인증 및 세션 관리
+*   **`AuthProvider`**: `onAuthStateChanged` 이벤트 발생 시 `getIdToken(true)`로 토큰을 강제 갱신하고, `firebaseIdToken` 쿠키를 설정합니다. 쿠키는 `Path=/`, `SameSite=Lax`, `Secure` (프로덕션 환경) 속성을 가집니다.
+*   **`middleware.ts`**: `/admin`, `/seller`, `/account` 등 보호된 경로에 접근 시 쿠키 유효성을 검증. 실패 시 `login?continueUrl=…&error=session-expired`로 리디렉션하여 사용자에게 명확한 피드백을 제공합니다.
+*   **트러블슈팅**: "재로그인 이슈"는 대부분 쿠키의 `Domain` 또는 `Path` 속성, `HttpOnly` 설정, 프록시 환경에서의 헤더 전달 문제로 발생하므로, 배포 환경에서 이 부분을 집중적으로 점검해야 합니다.
+
+---
+
+## 8. Firestore 인덱스 가이드
+실서비스에서 원활한 쿼리를 위해 아래와 같은 복합 인덱스가 필요합니다. Firestore 콘솔에서 쿼리 실행 시 자동으로 생성 링크를 제공해줍니다.
+*   `products`: `(categorySlug, createdAt desc)`
+*   `orders`: `(sellerId, orderDate desc)`, `(buyerId, orderDate desc)`
+*   `proposals`: `(requestId, createdAt desc)`
+*   `ideaRequests`: `(createdAt desc)`
+
+---
+
+## 9. 테스트 및 모니터링
+*   **E2E 테스트**: Playwright/Cypress를 사용하여 비로그인/일반/판매자/관리자 역할별 핵심 동선(가입→로그인→상품등록→구매→정산확인)을 자동화합니다.
+*   **로깅**: 모든 로그 메시지에 `[MW]`, `[ACTION]`, `[FUNC]`, `[SERVICE]` 등 태그를 붙여 출처를 명확히 합니다.
+*   **알림**: 정산 실패, 분쟁 발생률 급증, 환불율 임계치 초과 등 이상 징후 발생 시 Slack/이메일로 즉시 알림을 받도록 구성합니다.
+
+---
+
+## 10. 알려진 이슈/에러와 해결법
 
 ### **Issue 1: `auth/api-key-not-valid` 또는 `[CLIENT_INIT_FAIL]`**
 - **증상**: 로그인 시 "Firebase: Error (auth/api-key-not-valid...)" 또는 "인증 서비스를 사용할 수 없습니다. [CLIENT_INIT_FAIL]" 오류 발생.
