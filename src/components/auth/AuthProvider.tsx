@@ -47,9 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // Periodically refresh the token to get latest custom claims (e.g., role updates)
     const interval = setInterval(async () => {
-        const currentUser = auth.currentUser;
-        if (currentUser) {
-            await setAuthCookie(currentUser);
+        if (auth.currentUser) {
+            await setAuthCookie(auth.currentUser);
         }
     }, 10 * 60 * 1000); // Every 10 minutes
 
