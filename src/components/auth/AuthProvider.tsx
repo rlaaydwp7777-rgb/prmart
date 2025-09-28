@@ -1,7 +1,7 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, signOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -46,9 +46,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => unsub();
   }, []);
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
-      await firebaseSignOut();
+      await signOut();
       router.push("/");
     } catch(error) {
       console.error("[SIGN_OUT_FAIL] Sign out error:", error);
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, signOut: handleSignOut }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
