@@ -25,10 +25,6 @@ export function AuthButtons() {
     }
 
     if (user) {
-        const userClaims = (user as any).reloadUserInfo?.customAttributes;
-        const role = userClaims ? JSON.parse(userClaims)?.role : 'user';
-        const isAdmin = role === 'admin';
-
         return (
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -47,14 +43,6 @@ export function AuthButtons() {
                         </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    {isAdmin && (
-                         <DropdownMenuItem asChild>
-                            <Link href="/admin">{SIDEBAR_STRINGS.DASHBOARD} (Admin)</Link>
-                        </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild>
-                        <Link href="/seller">{SIDEBAR_STRINGS.DASHBOARD} (Seller)</Link>
-                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                         <Link href="/account">{SIDEBAR_STRINGS.ACCOUNT}</Link>
                     </DropdownMenuItem>
