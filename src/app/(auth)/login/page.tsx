@@ -44,9 +44,23 @@ export default function LoginPage() {
     }
   }, [errorParam, toast]);
 
+  const handleAuthError = (error: any) => {
+    switch (error.code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            setErr("이메일 또는 비밀번호가 올바르지 않습니다.");
+            break;
+        default:
+            setErr("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            console.error("Login error:", error);
+            break;
+    }
+  }
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErr(null); // Clear previous errors
     const auth = getSafeAuth();
     if (!auth) return setErr("인증 서비스를 사용할 수 없습니다. 환경변수를 확인해주세요. [CLIENT_INIT_FAIL]");
     try {
@@ -54,7 +68,7 @@ export default function LoginPage() {
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
     } catch (error: any) {
-      setErr(error?.message || "Login failed");
+      handleAuthError(error);
     }
   };
 
@@ -65,9 +79,8 @@ export default function LoginPage() {
       await createOrUpdateUser(result.user);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });
       router.push(continueUrl);
-    } catch (error: any)
-      {
-      setErr(error?.message || "Google sign-in failed");
+    } catch (error: any) {
+      handleAuthError(error);
     }
   };
 
@@ -101,8 +114,8 @@ export default function LoginPage() {
         <form onSubmit={onSubmit} className="grid gap-2">
           <Input required value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="email@example.com" />
           <Input required value={pw} onChange={e => setPw(e.target.value)} type="password" placeholder="비밀번호" />
+           {err && <p className="text-sm text-center text-destructive">{err}</p>}
           <Button type="submit" className="w-full mt-2">로그인</Button>
-          {err && <p className="text-sm text-center text-red-500">{err}</p>}
         </form>
       </CardContent>
     </Card>

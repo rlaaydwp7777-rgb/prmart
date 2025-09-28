@@ -1,7 +1,7 @@
 // src/components/auth/AuthProvider.tsx
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { getSafeAuth, onAuthStateChanged, signOut as firebaseSignOut, type User } from "@/lib/firebase/auth";
+import { getSafeAuth, onAuthStateChanged, signOut, type User } from "@/lib/firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             console.log("[AUTH_PROVIDER] Refreshing token to sync custom claims...");
             await setAuthCookie(currentUser);
         }
-    }, 10 * 60 * 1000); // 10 minutes
+    }, 20 * 60 * 1000); // 20 minutes
 
     return () => {
         unsub();
@@ -59,14 +59,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  const signOut = async () => {
+  const handleSignOut = async () => {
     try {
-      const auth = getSafeAuth();
-      if (!auth) {
-        console.warn("Firebase not initialized. Sign out operation skipped.");
-        return;
-      }
-      await firebaseSignOut(auth);
+      await signOut();
       // The onAuthStateChanged listener will clear the user and cookie.
       router.push("/");
     } catch(error) {
@@ -82,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  return <AuthContext.Provider value={{ user, loading, signOut }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, loading, signOut: handleSignOut }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

@@ -21,13 +21,14 @@ type DashboardData = {
     recentSales: Order[];
     bestSellers: (Prompt & { sales: number; revenue: number; })[];
     salesByMonth: { name: string, total: number }[];
-}
+};
 
 export default function SellerDashboardPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
     const [data, setData] = useState<DashboardData | null>(null);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (authLoading) {
@@ -39,10 +40,16 @@ export default function SellerDashboardPage() {
         }
         
         getSellerDashboardData(user.uid)
-            .then(setData)
+            .then(result => {
+                if (result) {
+                    setData(result);
+                } else {
+                    setError("대시보드 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.");
+                }
+            })
             .catch(err => {
                 console.error("Failed to load seller dashboard", err);
-                setData(null); // Ensure data is null on error
+                setError("대시보드 데이터를 불러오는 중 예기치 않은 오류가 발생했습니다.");
             })
             .finally(() => setLoading(false));
 
@@ -71,27 +78,28 @@ export default function SellerDashboardPage() {
 
     if (!user) {
         // This part is for fallback, useEffect should handle redirection.
-        return (
-             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-                <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
-                <p className="text-muted-foreground mb-6">판매자 대시보드에 접근하려면 먼저 로그인해주세요.</p>
-                <Button asChild>
-                    <Link href="/login?continueUrl=/seller">로그인 페이지로 이동</Link>
-                </Button>
-            </div>
-        )
+        return null;
     }
-
-    if (!data) {
-        return (
+    
+    if (error) {
+         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
                 <h1 className="text-2xl font-bold mb-4">데이터 로딩 실패</h1>
-                <p className="text-muted-foreground mb-6">대시보드 데이터를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.</p>
+                <p className="text-muted-foreground mb-6">{error}</p>
                 <Button onClick={() => window.location.reload()}>새로고침</Button>
             </div>
         );
     }
-    
+
+    if (!data) {
+        return (
+             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <h1 className="text-2xl font-bold mb-4">데이터 로딩 중...</h1>
+                <p className="text-muted-foreground mb-6">잠시만 기다려주세요.</p>
+            </div>
+        );
+    }
+
     if (data.stats.productCount === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-background rounded-lg p-8">
