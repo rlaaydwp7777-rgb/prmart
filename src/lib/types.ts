@@ -7,7 +7,7 @@ export interface User {
     email: string;
     displayName: string;
     photoURL?: string;
-    role: 'user' | 'seller';
+    role: 'user';
     createdAt: string;
 }
 

@@ -369,29 +369,6 @@ export async function getProducts(): Promise<Prompt[]> {
     });
 }
 
-export async function getProductsBySeller(sellerId: string): Promise<Prompt[]> {
-    const db = getDb();
-    if (!db) {
-      console.warn("Firebase not initialized. Returning example products for seller.");
-      return EXAMPLE_PROMPTS.filter(p => p.sellerId === sellerId);
-    }
-    return fetchFromCache(`products_by_seller_${sellerId}`, async () => {
-         try {
-            const q = query(collection(db, "products"), where("sellerId", "==", sellerId));
-            const snapshot = await getDocs(q);
-            const products = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            // Sort by createdAt client-side to avoid composite index
-            return products.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        } catch (error) {
-            console.error(`Error fetching products for seller ${sellerId}:`, error);
-            // Fallback to example data for example sellers
-            const exampleProducts = EXAMPLE_PROMPTS.filter(p => p.sellerId === sellerId);
-            return exampleProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        }
-    });
-}
-
-
 export async function getProduct(id: string): Promise<Prompt | null> {
     if (id.startsWith('ex-')) {
       return EXAMPLE_PROMPTS.find(p => p.id === id) || null;
@@ -528,29 +505,6 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
     });
 }
 
-export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
-    const db = getDb();
-    if (!db) {
-        throw new Error("상품을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
-    }
-    try {
-        const now = Timestamp.now();
-        const docRef = await addDoc(collection(db, "products"), {
-            ...productData,
-            createdAt: now,
-            updatedAt: now,
-            stats: { views: 0, likes: 0, sales: 0 },
-            rating: 0,
-            reviews: 0,
-            sellOnce: productData.sellOnce || false,
-        });
-        return docRef.id;
-    } catch (error) {
-        console.error("Error saving product: ", error);
-        throw new Error("상품을 데이터베이스에 저장하는 데 실패했습니다.");
-    }
-}
-
 export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
     const db = getDb();
     if (!db) {
@@ -568,128 +522,6 @@ export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'cre
         console.error("Error saving idea request: ", error);
         throw new Error("아이디어 요청을 데이터베이스에 저장하는 데 실패했습니다.");
     }
-}
-
-
-export async function getSellerDashboardData(sellerId: string): Promise<{ stats: SellerStats; recentSales: Order[]; bestSellers: (Prompt & { sales: number; revenue: number; })[]; salesByMonth: { name: string; total: number; }[] } | null> {
-    const cacheKey = `seller_dashboard_${sellerId}`;
-    const db = getDb();
-     if (!db) {
-        console.error("Firebase not initialized. Cannot fetch seller dashboard data.");
-        return null;
-    }
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            // 1. Fetch orders by sellerId directly for better performance
-            const ordersQuery = query(collection(db, "orders"), where("sellerId", "==", sellerId));
-            const ordersSnapshot = await getDocs(ordersQuery);
-            const orders: Order[] = ordersSnapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
-            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
-
-            // 2. Fetch products by seller
-            const sellerProducts = await getProductsBySeller(sellerId);
-
-            // 3. Calculate stats safely
-            const ratedProducts = sellerProducts.filter(p => p.rating && p.rating > 0);
-            const averageRating = ratedProducts.length > 0 
-                ? ratedProducts.reduce((sum, p) => sum + (p.rating || 0), 0) / ratedProducts.length
-                : 0;
-
-            const stats: SellerStats = {
-                totalRevenue: orders.reduce((sum, order) => sum + order.amount, 0),
-                totalSales: orders.length,
-                productCount: sellerProducts.length,
-                averageRating: averageRating,
-                reviewCount: sellerProducts.reduce((sum, p) => sum + (p.reviews || 0), 0),
-            };
-
-            // 4. Get recent sales (last 5)
-            const recentSales = orders.slice(0, 5);
-
-            // 5. Get best sellers
-            const salesByProduct: { [key: string]: { sales: number, revenue: number } } = {};
-            orders.forEach(order => {
-                if (!salesByProduct[order.productId]) {
-                    salesByProduct[order.productId] = { sales: 0, revenue: 0 };
-                }
-                salesByProduct[order.productId].sales++;
-                salesByProduct[order.productId].revenue += order.amount;
-            });
-            const bestSellers = Object.keys(salesByProduct)
-                .map(productId => {
-                    const product = sellerProducts.find(p => p.id === productId);
-                    return { ...product, ...salesByProduct[productId] };
-                })
-                .filter(p => p.id) // Filter out cases where product was not found
-                .sort((a, b) => b.sales - a.sales)
-                .slice(0, 3) as (Prompt & { sales: number; revenue: number; })[];
-            
-            // 6. Aggregate sales by month for the graph
-            const salesByMonth: { name: string, total: number }[] = Array.from({ length: 12 }, (_, i) => {
-                const month = new Date(0, i).toLocaleString('ko-KR', { month: 'short' });
-                return { name: month, total: 0 };
-            });
-
-            orders.forEach(order => {
-                const monthIndex = new Date(order.orderDate).getMonth();
-                salesByMonth[monthIndex].total += order.amount;
-            });
-
-
-            return { stats, recentSales, bestSellers, salesByMonth };
-
-        } catch (error) {
-            console.error("Error fetching seller dashboard data: ", error);
-            return null;
-        }
-    }, 10000); // Cache seller dashboard data for 10 seconds
-}
-
-export async function getSellerProfile(userId: string): Promise<SellerProfile | null> {
-    const db = getDb();
-    if (!db) {
-        console.warn("Firebase not initialized. Cannot fetch seller profile.");
-         const exampleUser = EXAMPLE_PROMPTS.find(p => p.sellerId === userId);
-         if (exampleUser) {
-            return {
-                sellerName: exampleUser.author,
-                sellerBio: `${exampleUser.author}의 프로필입니다.`,
-                photoUrl: exampleUser.sellerPhotoUrl
-            }
-         }
-         return null;
-    }
-    const cacheKey = `seller_profile_${userId}`;
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            const docRef = doc(db, 'sellers', userId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                return serializeDoc(docSnap) as SellerProfile;
-            }
-             // If no profile in DB, check auth user data
-            const exampleUser = EXAMPLE_PROMPTS.find(p => p.sellerId === userId);
-            if (exampleUser) {
-                return {
-                    sellerName: exampleUser.author,
-                    sellerBio: `${exampleUser.author}의 프로필입니다.`,
-                    photoUrl: exampleUser.sellerPhotoUrl
-                }
-            }
-        } catch (error) {
-            console.error(`Error fetching seller profile for ${userId}:`, error);
-        }
-        return null;
-    });
-}
-
-export async function saveSellerProfile(userId: string, profile: Partial<SellerProfile>) {
-    const db = getDb();
-    if (!db) {
-        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
-    }
-    const docRef = doc(db, 'sellers', userId);
-    await setDoc(docRef, profile, { merge: true });
 }
 
 export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
