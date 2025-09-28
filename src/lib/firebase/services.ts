@@ -1,6 +1,6 @@
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc, Transaction, runTransaction, FieldValue, getFirestore } from "firebase/firestore";
 import { getFirebaseApp, getDb } from "./client";
-import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist, Proposal } from "@/lib/types";
+import type { Prompt, Category, SubCategory, Order, SellerStats, SellerProfile, Review, Wishlist } from "@/lib/types";
 
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, { ts: number, data: any }>();
@@ -261,52 +261,6 @@ const generateExamplePrompts = (): Prompt[] => {
 
 const EXAMPLE_PROMPTS: Prompt[] = generateExamplePrompts();
 
-const EXAMPLE_PROPOSALS: Proposal[] = [
-    {
-        id: "prop-ex-1",
-        requestId: "req-1",
-        authorId: "seller-1",
-        authorName: "DevMaster",
-        authorAvatar: "https://picsum.photos/100/100?random=1",
-        content: "제가 만든 Next.js 보일러플레이트가 딱 맞을 것 같네요! 이걸로 시작하시면 기술 면접 준비 시간을 확 줄일 수 있습니다.",
-        productId: EXAMPLE_PROMPTS[0]?.id,
-        createdAt: new Date().toISOString(),
-        status: 'pending'
-    },
-    {
-        id: "prop-ex-2",
-        requestId: "req-2",
-        authorId: "seller-2",
-        authorName: "TechTutor",
-        authorAvatar: "https://picsum.photos/100/100?random=5",
-        content: "기술 면접 질문만 모아둔 건 아니지만, 제 실전 코딩 테스트 문제 풀이집도 도움이 될 겁니다. 한번 확인해보세요.",
-        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-        status: 'accepted'
-    }
-];
-
-
-const EXAMPLE_IDEA_REQUESTS: IdeaRequest[] = EXAMPLE_CATEGORIES.map((category, index) => {
-    const examples = [
-        { title: "유튜브 채널아트 & 썸네일 자동 생성기", author: "크리에이터준", authorId: "user-example-1", budget: 0, description: "채널 컨셉과 영상 제목만 입력하면 알아서 세련된 채널아트와 썸네일을 여러 개 만들어주는 AI 프롬프트를 원해요." },
-        { title: "부동산 월세 수익률 계산기 (엑셀 템플릿)", author: "재테크왕", authorId: "user-example-2", budget: 0, description: "매매가, 보증금, 월세 등 기본 정보만 입력하면 연간/월간 수익률을 자동으로 계산해주는 엑셀 대시보드가 필요합니다." },
-    ];
-    const example = examples[index % examples.length];
-    return {
-        id: `req-${index + 1}`,
-        title: example.title,
-        author: example.author,
-        authorId: example.authorId,
-        category: category.name,
-        categorySlug: category.slug,
-        budget: example.budget,
-        proposals: Math.floor(Math.random() * 15),
-        description: example.description,
-        isExample: true, // 모든 예제 요청에 플래그 설정
-        createdAt: new Date(Date.now() - (index * 1000 * 3600 * 24)).toISOString(),
-    }
-});
-
 
 function serializeDoc(doc: any): any {
     if (!doc.exists()) {
@@ -431,99 +385,6 @@ export async function getCategories(): Promise<Category[]> {
     });
 }
 
-export async function getIdeaRequests(ids?: string[]): Promise<IdeaRequest[]> {
-    const db = getDb();
-    if (!db) {
-      console.warn("Firebase not initialized. Returning example idea requests.");
-      return ids ? EXAMPLE_IDEA_REQUESTS.filter(r => ids.includes(r.id)) : EXAMPLE_IDEA_REQUESTS;
-    }
-    const cacheKey = ids ? `ideaRequests_${ids.join('_')}` : 'ideaRequests_all';
-    
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            let dbRequests: IdeaRequest[] = [];
-            if (ids && ids.length > 0) {
-                 // Firestore 'in' query supports up to 30 elements.
-                const idChunks = chunkArray(ids, 30);
-                const queryPromises = idChunks.map(chunk => 
-                    getDocs(query(collection(db, "ideaRequests"), where("__name__", "in", chunk)))
-                );
-                const snapshotChunks = await Promise.all(queryPromises);
-                snapshotChunks.forEach(snapshot => {
-                    const chunkRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
-                    dbRequests.push(...chunkRequests);
-                });
-            } else {
-                 const snapshot = await getDocs(query(collection(db, "ideaRequests"), orderBy("createdAt", "desc")));
-                 dbRequests = snapshot.docs.map(doc => serializeDoc(doc) as IdeaRequest).filter(Boolean);
-            }
-
-            const combinedRequests = [...dbRequests, ...EXAMPLE_IDEA_REQUESTS];
-            // If specific IDs were requested, filter the combined list.
-            if(ids && ids.length > 0){
-                const idSet = new Set(ids);
-                return combinedRequests.filter(req => idSet.has(req.id));
-            }
-
-            if (dbRequests.length === 0 && !ids) {
-                console.warn("Firestore 'ideaRequests' collection is empty, returning example data.");
-                return EXAMPLE_IDEA_REQUESTS.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            }
-            
-            const unique = Array.from(new Map(combinedRequests.map(r => [r.id, r])).values());
-            return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        } catch (error) {
-            console.error("Error fetching idea requests, returning example data:", error);
-            return EXAMPLE_IDEA_REQUESTS;
-        }
-    });
-}
-
-export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
-    if (id.startsWith('req-')) {
-        return EXAMPLE_IDEA_REQUESTS.find(r => r.id === id) || null;
-    }
-    const db = getDb();
-    if (!db) {
-      console.warn("Firebase not initialized. Cannot fetch idea request.");
-      return null;
-    }
-    const cacheKey = `ideaRequest_${id}`;
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            const docRef = doc(db, "ideaRequests", id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                return serializeDoc(docSnap) as IdeaRequest;
-            }
-        } catch (error) {
-            console.error(`Error fetching idea request ${id}:`, error);
-        }
-
-        return null;
-    });
-}
-
-export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
-    const db = getDb();
-    if (!db) {
-        throw new Error("아이디어 요청을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
-    }
-    try {
-        const now = Timestamp.now();
-        const docRef = await addDoc(collection(db, "ideaRequests"), {
-            ...requestData,
-            isExample: false,
-            createdAt: now,
-        });
-        return docRef.id;
-    } catch (error) {
-        console.error("Error saving idea request: ", error);
-        throw new Error("아이디어 요청을 데이터베이스에 저장하는 데 실패했습니다.");
-    }
-}
-
 export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
     const db = getDb();
     if (!db) {
@@ -583,93 +444,6 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
         } catch (error) {
             console.error(`Error fetching wishlist for user ${userId}:`, error);
             return null;
-        }
-    }, 10000);
-}
-
-
-export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
-    const db = getDb();
-    if (!db) {
-        throw new Error("제안을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
-    }
-    try {
-        const docRef = await runTransaction(db, async (transaction: Transaction) => {
-            const now = Timestamp.now();
-            const newProposalRef = doc(collection(db, "proposals"));
-            
-            transaction.set(newProposalRef, {
-                ...proposalData,
-                createdAt: now,
-                status: 'pending',
-            });
-
-            const requestRef = doc(db, "ideaRequests", proposalData.requestId);
-            const requestDoc = await transaction.get(requestRef);
-            if (!requestDoc.exists()) {
-                throw "Document does not exist!";
-            }
-            const newProposalsCount = (requestDoc.data().proposals || 0) + 1;
-            transaction.update(requestRef, { proposals: newProposalsCount });
-            
-            return newProposalRef;
-        });
-        
-        return docRef.id;
-    } catch (error) {
-        console.error("Error saving proposal: ", error);
-        throw new Error("제안을 데이터베이스에 저장하는 데 실패했습니다.");
-    }
-}
-
-
-export async function getProposalsByAuthor(authorId: string): Promise<Proposal[]> {
-     const db = getDb();
-     if (!db) {
-        console.warn("Firebase not initialized. Cannot fetch proposals.");
-        return [];
-    }
-    const cacheKey = `proposals_by_author_${authorId}`;
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            const q = query(collection(db, "proposals"), where("authorId", "==", authorId));
-            const snapshot = await getDocs(q);
-            const proposals = snapshot.docs.map(doc => serializeDoc(doc) as Proposal).filter(Boolean);
-            return proposals.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        } catch (error) {
-            console.error(`Error fetching proposals for author ${authorId}:`, error);
-            // You might want to return mock proposals for example users
-            if(authorId.includes("seller-")){
-                 return EXAMPLE_PROPOSALS.filter(p => p.authorId === authorId);
-            }
-            return [];
-        }
-    }, 10000);
-}
-
-export async function getProposalsByRequestId(requestId: string): Promise<Proposal[]> {
-    const db = getDb();
-    if (!db) {
-        console.warn("Firebase not initialized. Cannot fetch proposals.");
-        return EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
-    }
-    const cacheKey = `proposals_by_request_${requestId}`;
-    return fetchFromCache(cacheKey, async () => {
-        try {
-            const q = query(collection(db, "proposals"), where("requestId", "==", requestId), orderBy("createdAt", "desc"));
-            const snapshot = await getDocs(q);
-            const dbProposals = snapshot.docs.map(doc => serializeDoc(doc) as Proposal).filter(Boolean);
-            
-            // For demo, combine DB proposals with example proposals for the same request ID
-            const exampleProposals = EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
-            const combined = [...dbProposals, ...exampleProposals];
-            const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
-            
-            return unique.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        } catch (error) {
-            console.error(`Error fetching proposals for request ${requestId}:`, error);
-            return EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
         }
     }, 10000);
 }

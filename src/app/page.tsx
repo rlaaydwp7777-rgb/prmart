@@ -160,13 +160,7 @@ export default async function Home() {
 
             <div className="flex justify-center flex-col gap-2 mt-6 min-[400px]:flex-row">
               <Button asChild size="lg">
-                <Link href="/requests">{BUTTONS.START_SELLING}</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline">
-                <Link href="/requests">
-                  {HEADER_LINKS.REQUEST_IDEA}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                <Link href="/browse">{BUTTONS.START_EXPLORING}</Link>
               </Button>
             </div>
           </div>
@@ -318,12 +312,12 @@ export default async function Home() {
                 당신의 지식을 자산으로 만들 시간
               </h2>
               <p className="mx-auto max-w-[600px] text-primary-foreground/80 md:text-lg lg:text-xl">
-                지금 바로 판매자로 등록하고 전 세계 사용자들과 당신의 전문성을 공유하세요.
+                prmart에서 당신의 전문성을 공유하고 새로운 수익을 창출하세요.
               </p>
             </div>
             <div className="mx-auto w-full flex justify-center">
-              <Button asChild size="lg" variant="secondary" className="text-lg">
-                <Link href="/requests">{BUTTONS.START_SELLING}</Link>
+               <Button asChild size="lg" variant="secondary" className="text-lg">
+                <Link href="/browse">{BUTTONS.START_EXPLORING}</Link>
               </Button>
             </div>
           </div>

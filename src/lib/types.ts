@@ -41,20 +41,6 @@ export interface Prompt {
   reviews: number;
 }
 
-export interface IdeaRequest {
-    id: string;
-    title: string;
-    description: string;
-    author: string;
-    authorId: string;
-    category: string;
-    categorySlug: string;
-    budget: number;
-    proposals: number;
-    isExample?: boolean;
-    createdAt: string;
-}
-
 export interface SubCategory {
   id: string;
   name: string;
@@ -125,16 +111,4 @@ export interface Review {
 export interface Wishlist {
     userId: string;
     productIds: string[];
-}
-
-export interface Proposal {
-    id: string;
-    requestId: string;
-    authorId: string;
-    authorName: string;
-    authorAvatar: string;
-    content: string;
-    productId?: string;
-    createdAt: string;
-    status: 'pending' | 'accepted';
 }

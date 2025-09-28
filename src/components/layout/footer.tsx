@@ -23,8 +23,6 @@ export function Footer() {
             <ul className="space-y-1 text-muted-foreground">
               <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.PRODUCTS}</Link></li>
               <li><Link href="/browse" className="hover:text-primary">{FOOTER_STRINGS.BROWSE}</Link></li>
-              <li><Link href="/requests" className="hover:text-primary">{FOOTER_STRINGS.REQUEST_IDEA}</Link></li>
-              <li><Link href="/seller/products/add" className="hover:text-primary">{FOOTER_STRINGS.BECOME_SELLER}</Link></li>
             </ul>
           </div>
 
