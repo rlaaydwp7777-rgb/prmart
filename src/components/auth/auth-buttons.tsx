@@ -13,9 +13,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "./AuthProvider";
-import { AUTH_STRINGS, SIDEBAR_STRINGS } from "@/lib/string-constants";
+import { AUTH_STRINGS, HEADER_LINKS } from "@/lib/string-constants";
 import { Skeleton } from "../ui/skeleton";
-import { Gift } from "lucide-react";
+import { Gift, Package, Users } from "lucide-react";
 
 export function AuthButtons() {
     const { user, loading, signOut } = useAuth();
@@ -44,7 +44,10 @@ export function AuthButtons() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                        <Link href="/account">{SIDEBAR_STRINGS.ACCOUNT}</Link>
+                        <Link href="/account">계정 정보</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/seller">판매자 센터</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={signOut}>

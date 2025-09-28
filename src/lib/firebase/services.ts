@@ -340,8 +340,11 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 export async function getProducts(): Promise<Prompt[]> {
     const db = getDb();
     if (!db) {
-      console.warn("Firebase not initialized. Returning example products.");
-      return EXAMPLE_PROMPTS;
+      if (process.env.NODE_ENV === 'development') {
+        console.warn("Firebase not initialized. Returning example products.");
+        return EXAMPLE_PROMPTS;
+      }
+      return [];
     }
     return fetchFromCache('products', async () => {
         try {
@@ -528,7 +531,7 @@ export async function getIdeaRequest(id: string): Promise<IdeaRequest | null> {
 export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>) {
     const db = getDb();
     if (!db) {
-        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+        throw new Error("상품을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
     }
     try {
         const now = Timestamp.now();
@@ -551,7 +554,7 @@ export async function saveProduct(productData: Omit<Prompt, 'id' | 'createdAt' |
 export async function saveIdeaRequest(requestData: Omit<IdeaRequest, 'id' | 'createdAt' | 'isExample'>) {
     const db = getDb();
     if (!db) {
-        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+        throw new Error("아이디어 요청을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
     }
     try {
         const now = Timestamp.now();
@@ -572,7 +575,7 @@ export async function getSellerDashboardData(sellerId: string): Promise<{ stats:
     const cacheKey = `seller_dashboard_${sellerId}`;
     const db = getDb();
      if (!db) {
-        console.warn("Firebase not initialized. Cannot fetch seller dashboard data.");
+        console.error("Firebase not initialized. Cannot fetch seller dashboard data.");
         return null;
     }
     return fetchFromCache(cacheKey, async () => {
@@ -756,7 +759,7 @@ export async function getWishlistByUserId(userId: string): Promise<Wishlist | nu
 export async function saveProposal(proposalData: Omit<Proposal, 'id' | 'createdAt' | 'status'>): Promise<string> {
     const db = getDb();
     if (!db) {
-        throw new Error("❌ Firebase 초기화 실패: db가 없습니다. 환경변수를 확인하세요.");
+        throw new Error("제안을 저장하지 못했습니다: 데이터베이스에 연결할 수 없습니다.");
     }
     try {
         const docRef = await runTransaction(db, async (transaction: Transaction) => {
@@ -837,39 +840,4 @@ export async function getProposalsByRequestId(requestId: string): Promise<Propos
             return EXAMPLE_PROPOSALS.filter(p => p.requestId === requestId);
         }
     }, 10000);
-}
-
-
-// Admin services
-export async function getAdminDashboardData() {
-  const db = getDb();
-  if (!db) {
-    console.warn("Firebase not initialized. Returning empty admin dashboard data.");
-    return {
-      kpi: { totalRevenue: { value: 0, change: 0 }, totalSales: { value: 0, change: 0 }, totalProducts: { value: 0, change: 0 }, avgRating: { value: 0, totalReviews: 0 } },
-      pendingProducts: [],
-      recentUsers: [],
-    };
-  }
-  // In a real app, you'd fetch real data.
-  // For now, we'll return some mock data.
-  const kpi = {
-    totalRevenue: { value: 5231890, change: 0.201 },
-    totalSales: { value: 2350, change: 1.801 },
-    totalProducts: { value: 12234, change: 0.19 },
-    avgRating: { value: 4.8, totalReviews: 231 },
-  };
-
-  const pendingProducts = EXAMPLE_PROMPTS.slice(0, 5).map(p => ({
-      ...p,
-      status: 'pending'
-  }));
-
-  const recentUsers = [
-      { name: 'Olivia Martin', email: 'olivia.martin@email.com', avatar: 'https://i.pravatar.cc/150?img=1', amount: '+₩1,999.00' },
-      { name: 'Jackson Lee', email: 'jackson.lee@email.com', avatar: 'https://i.pravatar.cc/150?img=2', amount: '+₩39.00' },
-      { name: 'Isabella Nguyen', email: 'isabella.nguyen@email.com', avatar: 'https://i.pravatar.cc/150?img=3', amount: '+₩299.00' },
-  ]
-
-  return { kpi, pendingProducts, recentUsers };
 }
