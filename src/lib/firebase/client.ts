@@ -2,7 +2,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp, FirebaseError } from "firebase/app";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
-
 const clientConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -17,15 +16,15 @@ let app: FirebaseApp | null = null;
 let db: Firestore | null = null;
 
 // This function is safe to call on the server or client.
-// It ensures Firebase is only initialized once and on the client-side.
+// It ensures Firebase is only initialized once.
 function initializeClientApp(): FirebaseApp | null {
-  if (typeof window === "undefined") {
-    // On the server, don't initialize.
-    return null;
-  }
-
   if (app) {
     return app;
+  }
+
+  // On the server, don't initialize.
+  if (typeof window === "undefined") {
+    return null;
   }
 
   const areAllKeysPresent = 
@@ -60,7 +59,6 @@ function initializeClientApp(): FirebaseApp | null {
 
 // Initialize the app on module load for client-side usage.
 initializeClientApp();
-
 
 // Public getter functions
 export function getFirebaseApp(): FirebaseApp | null {

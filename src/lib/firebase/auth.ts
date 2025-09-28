@@ -21,10 +21,12 @@ export function getSafeAuth(): Auth | null {
         return authInstance;
     }
 
+    // Rely on getFirebaseApp to handle initialization logic.
+    // It will return null if on server or if config is missing.
     const app = getFirebaseApp();
     if (!app) {
         if (typeof window !== 'undefined') {
-          // Only log error on the client
+          // Only log error on the client to avoid server-side noise
           console.warn("[AUTH_INIT_FAIL] Firebase App not available. Auth features will be disabled.");
         }
         return null;

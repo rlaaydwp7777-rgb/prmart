@@ -36,17 +36,15 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (errorParam === 'session-expired') {
-      toast({
-        title: "세션 만료",
-        description: "안전한 서비스 이용을 위해 세션이 만료되었습니다. 다시 로그인해주세요.",
-        variant: "destructive"
-      });
+        setErr("세션이 만료되었습니다. 안전한 서비스 이용을 위해 다시 로그인해주세요.");
     }
-  }, [errorParam, toast]);
+  }, [errorParam]);
 
   const handleAuthError = (error: any) => {
     switch (error.code) {
         case 'auth/user-not-found':
+             setErr("등록되지 않은 이메일입니다.");
+             break;
         case 'auth/wrong-password':
         case 'auth/invalid-credential':
              setErr("이메일 또는 비밀번호가 올바르지 않습니다.");

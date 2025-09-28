@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      setLoading(false);
       await setAuthCookie(u);
+      setLoading(false);
     });
 
     // Periodically refresh the token to get latest custom claims (e.g., role updates)
