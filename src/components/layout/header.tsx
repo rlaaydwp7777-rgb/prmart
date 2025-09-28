@@ -1,3 +1,4 @@
+// src/components/layout/header.tsx
 
 "use client";
 
@@ -17,6 +18,7 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "../ui/sheet";
 import { useState } from "react";
 import { AuthButtons } from "../auth/auth-buttons";
+import { useAuth } from "../auth/AuthProvider";
 
 interface HeaderProps {
   categories: Category[];
@@ -24,6 +26,7 @@ interface HeaderProps {
 
 export function Header({ categories }: HeaderProps) {
   const [isSheetOpen, setSheetOpen] = useState(false);
+  const { user } = useAuth();
   
   const navLinks = (
     <>
@@ -61,7 +64,17 @@ export function Header({ categories }: HeaderProps) {
                 <Link href="/browse" className="font-semibold">전체 상품 둘러보기</Link>
             </DropdownMenuItem>
         </DropdownMenuContent>
-        </DropdownMenu>
+      </DropdownMenu>
+
+      <Link href="/requests" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+        {HEADER_LINKS.REQUEST_IDEA}
+      </Link>
+
+      {!user && (
+         <Link href="/seller" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+            {HEADER_LINKS.START_SELLING}
+        </Link>
+      )}
     </>
   );
 
