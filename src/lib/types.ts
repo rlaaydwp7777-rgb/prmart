@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 export type PromptVisibility = 'public' | 'private' | 'partial';
+export type OrderStatus = 'created' | 'paid' | 'clearing_hold' | 'released' | 'refunded' | 'disputed' | 'chargeback';
 
 export interface User {
     uid: string;
@@ -11,6 +12,15 @@ export interface User {
     referralCode?: string;
     referredBy?: string;
     createdAt: string;
+    balances?: {
+        available: number;
+        pending: number;
+        reserve: number;
+    };
+    kyc?: {
+        status: 'verified' | 'pending' | 'rejected';
+        [key: string]: any;
+    };
 }
 
 export interface Prompt {
@@ -104,8 +114,20 @@ export interface Order {
     buyerId: string;
     buyerName: string;
     buyerEmail: string;
-    amount: number;
-    status: 'paid' | 'refunded';
+    amount: number; // This is priceGross
+    priceGross: number;
+    priceNet: number;
+    vat: number;
+    referralCode?: string;
+    pgFee: number;
+    platformFee: number;
+    referralFee: number;
+    sellerEarning: number;
+    status: OrderStatus;
+    holdUntil?: string;
+    disputeId?: string;
+    refundReason?: string;
+    createdAt: string;
 }
 
 export interface SellerStats {
