@@ -9,9 +9,6 @@ export interface User {
     photoURL?: string;
     role: 'user' | 'admin' | 'seller';
     createdAt: string;
-    // Referral System Fields
-    referralCode?: string; // This user's unique referral code
-    referredBy?: string;   // The referral code of the user who referred this user
 }
 
 export interface Prompt {
