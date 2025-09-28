@@ -116,6 +116,7 @@ export interface SellerProfile {
 export interface Review {
     id: string;
     author: string;
+    authorAvatar?: string;
     authorId: string;
     productId: string;
     productTitle: string;

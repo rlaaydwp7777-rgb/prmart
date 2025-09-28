@@ -46,11 +46,16 @@ export default function LoginPage() {
 
   const handleAuthError = (error: any) => {
     switch (error.code) {
-        case 'auth/invalid-credential':
         case 'auth/user-not-found':
-        case 'auth/wrong-password':
-            setErr("이메일 또는 비밀번호가 올바르지 않습니다.");
+            setErr("등록되지 않은 이메일입니다.");
             break;
+        case 'auth/wrong-password':
+        case 'auth/invalid-credential':
+             setErr("비밀번호가 올바르지 않습니다.");
+             break;
+        case 'auth/too-many-requests':
+             setErr("너무 많은 로그인 시도를 했습니다. 잠시 후 다시 시도해주세요.");
+             break;
         default:
             setErr("로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
             console.error("Login error:", error);
