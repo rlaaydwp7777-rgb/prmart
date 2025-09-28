@@ -35,7 +35,6 @@ const signupSchema = z.object({
   uid: z.string().optional(), // For Google Sign in
   email: z.string().email("유효한 이메일 주소를 입력해주세요."),
   password: z.string().min(6, "비밀번호는 6자 이상이어야 합니다.").optional(),
-  referralCode: z.string().optional(),
   displayName: z.string().optional(), // For Google Sign in
   photoURL: z.string().optional(), // For Google Sign in
   isGoogleSignIn: z.string().optional(), // Flag for Google Sign in
@@ -56,7 +55,7 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     };
   }
 
-  const { email, password, referralCode, uid, displayName: googleDisplayName, photoURL, isGoogleSignIn } = validatedFields.data;
+  const { email, password, uid, displayName: googleDisplayName, photoURL, isGoogleSignIn } = validatedFields.data;
 
   try {
     const auth = getAuth(adminAppInstance);
@@ -83,19 +82,6 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         return { success: false, message: "비밀번호를 입력해주세요." };
     }
     
-    let referredBy: string | null = null;
-    if (referralCode) {
-      const q = adminDb.collection("users").where("referralCode", "==", referralCode).limit(1);
-      const snapshot = await q.get();
-      if (snapshot.empty) {
-        return {
-            success: false,
-            message: "유효하지 않은 추천인 코드입니다.",
-        }
-      }
-      referredBy = snapshot.docs[0].id;
-    }
-    
     const displayName = email.split('@')[0];
 
     const userRecord = await auth.createUser({
@@ -107,21 +93,14 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     // Set custom claim for seller role
     await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
     
-    const newReferralCode = `${displayName.replace(/[^a-zA-Z0-9]/g, '')}_${Math.random().toString(36).substring(2, 8)}`;
-
     if (adminDb) {
       const userData: { [key: string]: any } = {
         email,
         displayName,
         role: 'seller', // 모든 사용자는 판매자로 가입
         createdAt: new Date().toISOString(),
-        referralCode: newReferralCode,
       };
 
-      if (referredBy) {
-        userData.referredBy = referredBy;
-      }
-      
       await adminDb.collection("users").doc(userRecord.uid).set(userData);
     }
 
@@ -199,8 +178,8 @@ export async function saveProductAction(prevState: FormState, formData: FormData
     
     await saveProductToDb(productData as Omit<Prompt, 'id' | 'createdAt' | 'updatedAt' | 'stats' | 'rating' | 'reviews'>);
     
-    revalidatePath("/seller/products");
     revalidatePath("/");
+    revalidatePath("/seller/products");
 
     return { success: true, message: "상품이 성공적으로 등록되었습니다!" };
   } catch (error: any) {

@@ -143,12 +143,7 @@ src
 │   ├── (auth)/            # - 인증 페이지 그룹 (로그인, 회원가입)
 │   │   ├── login/page.tsx
 │   │   └── signup/page.tsx
-│   ├── admin/             # - 관리자 전용 페이지 그룹
-│   │   ├── layout.tsx
-│   │   ├── users/page.tsx
-│   │   └── page.tsx
-│   ├── api/               # - API 라우트
-│   │   └── admin/         #   - 관리자용 API
+│   ├── account/           # - 사용자 계정 관리 페이지
 │   ├── browse/            # - 전체 상품 탐색 페이지
 │   ├── c/[...slug]/       # - 카테고리별 상품 페이지
 │   ├── p/[id]/            # - 상품 상세 페이지
@@ -201,8 +196,6 @@ src
   - `photoURL` (string, optional): 프로필 사진 URL
   - `role` (string): 사용자 권한 (`user` | `admin` | `seller`)
   - `createdAt` (string, ISO): 가입일
-  - `referralCode` (string, optional): 이 사용자의 고유 추천인 코드
-  - `referredBy` (string, optional): 이 사용자를 추천한 사람의 추천인 코드
 
 ### `products`
 - **설명**: 판매 상품 정보
