@@ -1,6 +1,6 @@
 // src/app/requests/page.tsx
 import { getIdeaRequests, getCategories } from "@/lib/firebase/services";
-import { Button }s "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { RequestList } from "@/components/requests/request-list";
