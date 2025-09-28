@@ -3,7 +3,6 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react';
@@ -25,7 +24,6 @@ type DashboardData = {
 
 export default function SellerDashboardPage() {
     const { user, loading: authLoading } = useAuth();
-    const router = useRouter();
     const [data, setData] = useState<DashboardData>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
