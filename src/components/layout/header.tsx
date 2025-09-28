@@ -71,7 +71,7 @@ export function Header({ categories }: HeaderProps) {
       </Link>
 
       {!user && (
-         <Link href="/seller" className="font-medium text-muted-foreground transition-colors hover:text-primary">
+         <Link href="/seller/products/add" className="font-medium text-muted-foreground transition-colors hover:text-primary">
             {HEADER_LINKS.START_SELLING}
         </Link>
       )}
