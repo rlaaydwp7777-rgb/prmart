@@ -26,6 +26,7 @@ export async function middleware(req: NextRequest) {
 
     if (!token) {
       console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
+      loginUrl.searchParams.set("error", "no-token");
       return NextResponse.redirect(loginUrl);
     }
 
@@ -38,6 +39,7 @@ export async function middleware(req: NextRequest) {
       
       if (!decoded) {
         console.warn(`[MW_ACCESS_DENIED] Unauthenticated attempt to access ${pathname}`);
+        loginUrl.searchParams.set("error", "session-expired");
         return NextResponse.redirect(loginUrl);
       }
 

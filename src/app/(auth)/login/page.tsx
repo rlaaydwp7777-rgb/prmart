@@ -47,11 +47,9 @@ export default function LoginPage() {
   const handleAuthError = (error: any) => {
     switch (error.code) {
         case 'auth/user-not-found':
-            setErr("등록되지 않은 이메일입니다.");
-            break;
         case 'auth/wrong-password':
         case 'auth/invalid-credential':
-             setErr("비밀번호가 올바르지 않습니다.");
+             setErr("이메일 또는 비밀번호가 올바르지 않습니다.");
              break;
         case 'auth/too-many-requests':
              setErr("너무 많은 로그인 시도를 했습니다. 잠시 후 다시 시도해주세요.");
@@ -67,7 +65,10 @@ export default function LoginPage() {
     e.preventDefault();
     setErr(null); // Clear previous errors
     const auth = getSafeAuth();
-    if (!auth) return setErr("인증 서비스를 사용할 수 없습니다. 환경변수를 확인해주세요. [CLIENT_INIT_FAIL]");
+    if (!auth) {
+        setErr("인증 서비스를 사용할 수 없습니다. 환경변수를 확인해주세요. [CLIENT_INIT_FAIL]");
+        return;
+    }
     try {
       await signInWithEmailAndPassword(auth, email, pw);
       toast({ title: "로그인 성공", description: "prmart에 오신 것을 환영합니다." });

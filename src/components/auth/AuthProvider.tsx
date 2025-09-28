@@ -12,12 +12,13 @@ const AuthContext = createContext<AuthContextType>({ user: null, loading: true, 
 async function setAuthCookie(user: User | null) {
     try {
         if (user) {
-            const token = await user.getIdToken(true); // Force refresh
+            const token = await user.getIdToken(true); // Force refresh to get the latest token
             const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString();
             const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
             document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
         } else {
-            document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+            // Clear cookie on logout
+            document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax;`;
         }
     } catch (error) {
         console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
@@ -40,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Listen for auth state changes
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      await setAuthCookie(u);
+      await setAuthCookie(u); // Set or clear cookie on every auth state change
       setLoading(false);
     });
 
@@ -48,7 +49,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const interval = setInterval(async () => {
         const currentUser = auth.currentUser;
         if (currentUser) {
-            console.log("[AUTH_PROVIDER] Refreshing token to sync custom claims...");
             await setAuthCookie(currentUser);
         }
     }, 20 * 60 * 1000); // 20 minutes
