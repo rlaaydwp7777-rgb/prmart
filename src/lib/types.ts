@@ -7,7 +7,9 @@ export interface User {
     email: string;
     displayName: string;
     photoURL?: string;
-    role: 'user';
+    role: 'user' | 'seller' | 'admin';
+    referralCode?: string;
+    referredBy?: string;
     createdAt: string;
 }
 
@@ -40,6 +42,33 @@ export interface Prompt {
   rating: number;
   reviews: number;
 }
+
+export interface IdeaRequest {
+    id: string;
+    title: string;
+    description: string;
+    author: string;
+    authorId: string;
+    category: string;
+    categorySlug: string;
+    budget: number;
+    proposals: number;
+    isExample?: boolean;
+    createdAt: string;
+}
+
+export interface Proposal {
+    id: string;
+    requestId: string;
+    authorId: string;
+    authorName: string;
+    authorAvatar: string;
+    content: string;
+    productId?: string;
+    createdAt: string;
+    status: 'pending' | 'accepted';
+}
+
 
 export interface SubCategory {
   id: string;

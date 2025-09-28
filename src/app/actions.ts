@@ -52,12 +52,12 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         const userRef = adminDb.collection("users").doc(uid);
         const userSnap = await userRef.get();
         if (!userSnap.exists()) {
-             await auth.setCustomUserClaims(uid, { role: 'user' });
+             await auth.setCustomUserClaims(uid, { role: 'seller' });
              await userRef.set({
                 email,
                 displayName: googleDisplayName,
                 photoURL: photoURL,
-                role: 'user',
+                role: 'seller', // 모든 사용자는 판매자로 가입
                 createdAt: new Date().toISOString(),
              }, { merge: true });
         }
@@ -77,14 +77,14 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
         displayName,
     });
     
-    // Set custom claim for user role
-    await auth.setCustomUserClaims(userRecord.uid, { role: 'user' });
+    // Set custom claim for seller role
+    await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
     
     if (adminDb) {
       const userData: { [key: string]: any } = {
         email,
         displayName,
-        role: 'user',
+        role: 'seller', // 모든 사용자는 판매자로 가입
         createdAt: new Date().toISOString(),
       };
 

@@ -52,24 +52,25 @@ GEMINI_API_KEY="AIzaSy...YOUR_GEMINI_API_KEY..."
 
 ### Firestore (데이터베이스)
 - **사용 중인 컬렉션**:
-  - `users`: 사용자 정보 (이메일, 역할, 프로필 등)
+  - `users`: 사용자 정보 (이메일, 역할, 프로필, 추천인 코드 등)
   - `products`: 판매 상품 정보
   - `categories`: 상품 카테고리
-  - `ideaRequests`: 아이디어 요청
-  - `proposals`: 아이디어 제안
-  - `orders`: 주문 내역 (향후 구현)
-  - `reviews`: 리뷰 (향후 구현)
+  - `orders`: 주문 내역
+  - `transactions`: 모든 금융 거래 원장 (Cloud Functions 전용)
+  - `payouts`: 정산 요청 내역
+  - `referrals`: 추천인 코드 정보
+  - `risk_events`: 위험 이벤트 로그 (Cloud Functions 전용)
 - **필요한 색인(Index)**:
   - 현재는 기본 색인만 사용 중입니다. 복합 쿼리(예: `where` + `orderBy`)가 추가될 경우, Firestore가 제공하는 색인 생성 링크를 통해 추가해야 합니다.
 
 ### Storage (스토리지)
 - **사용 버킷**: `prmart-xxxx.appspot.com` (기본 버킷)
-- **주요 용도**: 사용자가 업로드하는 상품 이미지, 프로필 사진 등을 저장합니다. (현재는 이미지 URL을 직접 사용)
+- **주요 용도**: 사용자가 업로드하는 상품 이미지, 프로필 사진 등을 저장합니다.
 - **규칙**: 아래 '3. 보안 규칙' 항목 참조.
 
 ### 기타
 - **Hosting**: 사용 안 함 (Firebase App Hosting 또는 다른 플랫폼 사용)
-- **Functions**: 사용 안 함 (Genkit Flow 또는 API Route로 대체)
+- **Functions**: Cloud Functions를 사용하여 결제 처리, 정산, 원장 기록 등 핵심 백엔드 로직을 수행합니다.
 
 ## 3. 보안 규칙
 
@@ -80,32 +81,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 사용자 정보: 본인만 쓰기 가능, 로그인한 사용자는 읽기 가능
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth.uid == userId;
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'; }
+    function isSelf(uid) { return isSignedIn() && request.auth.uid == uid; }
+
+    match /users/{uid} {
+      allow read: if isSelf(uid) || isAdmin();
+      allow write: if isSelf(uid) || isAdmin();
     }
 
-    // 상품: 누구나 읽기 가능, 쓰기는 소유자 또는 관리자만 가능
     match /products/{productId} {
       allow read: if true;
-      allow write: if request.auth != null && (request.auth.uid == resource.data.sellerId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow create: if isSignedIn();
+      allow update, delete: if isSignedIn() && (request.resource.data.sellerId == request.auth.uid || isAdmin());
     }
     
-    // 카테고리: 누구나 읽기 가능, 쓰기는 관리자만 가능
     match /categories/{categoryId} {
       allow read: if true;
-      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow write: if isAdmin();
     }
 
-    // 아이디어 요청 및 제안: 누구나 읽기 가능, 쓰기는 로그인 사용자만 가능
-    match /ideaRequests/{requestId} {
-        allow read: if true;
-        allow write: if request.auth != null;
+    match /orders/{orderId} {
+      allow read: if isSignedIn() && (resource.data.buyerId == request.auth.uid || resource.data.sellerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn();
+      allow update: if false; // Cloud Functions 전용
     }
-    match /proposals/{proposalId} {
+
+    match /transactions/{txId} {
+      allow read: if isAdmin();
+      allow write: if false; // Cloud Functions 전용
+    }
+    
+    match /payouts/{payoutId} {
+      allow read: if isSignedIn() && (resource.data.ownerId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isAdmin();
+    }
+    
+    match /referrals/{code} {
         allow read: if true;
-        allow write: if request.auth != null;
+        allow write: if isAdmin();
+    }
+    
+    match /risk_events/{id} {
+        allow read: if isAdmin();
+        allow write: if false; // Cloud Functions 전용
     }
   }
 }
@@ -141,21 +161,26 @@ src
 │
 ├── app/                   # Next.js App Router
 │   ├── (auth)/            # - 인증 페이지 그룹 (로그인, 회원가입)
-│   │   ├── login/page.tsx
-│   │   └── signup/page.tsx
 │   ├── account/           # - 사용자 계정 관리 페이지
+│   ├── admin/             # - 관리자 대시보드
 │   ├── browse/            # - 전체 상품 탐색 페이지
 │   ├── c/[...slug]/       # - 카테고리별 상품 페이지
 │   ├── p/[id]/            # - 상품 상세 페이지
-│   ├── requests/          # - 아이디어 요청 관련 페이지
+│   ├── seller/            # - 판매자 센터
 │   └── layout.tsx         # - 루트 레이아웃 (AuthProvider 포함)
 │
 ├── components/            # 재사용 가능한 React 컴포넌트
-│   ├── auth/              # - 인증 관련 컴포넌트 (로그인/가입 폼, 버튼)
+│   ├── auth/              # - 인증 관련 컴포넌트
 │   ├── layout/            # - 헤더, 푸터, 캐러셀 등
 │   ├── prompts/           # - 상품 카드, 상세 정보 등
-│   ├── requests/          # - 아이디어 요청 폼, 카드 등
 │   └── ui/                # - ShadCN/UI 컴포넌트
+│
+├── functions/ (예시)      # Firebase Cloud Functions (별도 배포)
+│   ├── src/
+│   │   ├── onPaymentCaptured.ts # - 결제 완료 핸들러
+│   │   ├── scheduleReleaseHolds.ts # - 정산 보류 해제 스케줄러
+│   │   └── lib/settlement.ts # - 수익 분배 로직
+│   └── package.json
 │
 ├── lib/                   # 라이브러리, 헬퍼, 타입 정의
 │   ├── firebase/          # - Firebase 관련 설정
@@ -194,20 +219,26 @@ src
   - `email` (string): 이메일
   - `displayName` (string): 닉네임
   - `photoURL` (string, optional): 프로필 사진 URL
-  - `role` (string): 사용자 권한 (`user` | `admin` | `seller`)
+  - `role` (string): 사용자 권한 (`user` | `seller` | `admin`)
+  - `referralCode` (string, optional): 사용자의 고유 추천인 코드
+  - `referredBy` (string, optional): 이 사용자를 추천한 사람의 UID
+  - `balances`: 잔고 정보 (map)
+    - `available` (number): 출금 가능 잔액
+    - `pending` (number): 정산 보류 중인 잔액
+    - `reserve` (number): 분쟁/환불 대비 예치금
   - `createdAt` (string, ISO): 가입일
 
 ### `products`
 - **설명**: 판매 상품 정보
 - **필드**: `src/lib/types.ts`의 `Prompt` 타입 참조.
 
-### `ideaRequests`
-- **설명**: 사용자의 아이디어 요청
-- **필드**: `src/lib/types.ts`의 `IdeaRequest` 타입 참조.
+### `orders`
+- **설명**: 사용자의 주문 정보
+- **필드**: `priceGross`, `priceNet`, `vat`, `status`('paid', 'refunded', 'disputed'), `holdUntil` 등 포함
 
-### `proposals`
-- **설명**: 아이디어 요청에 대한 판매자의 제안
-- **필드**: `src/lib/types.ts`의 `Proposal` 타입 참조.
+### `transactions` (원장)
+- **설명**: 모든 금융 거래 기록. Cloud Functions에서만 쓰기 가능.
+- **필드**: `type`, `amount`, `creditTo`, `debitFrom` 등 포함. 한 주문에 대해 여러 라인 생성.
 
 ## 7. 알려진 이슈/에러와 해결법
 
