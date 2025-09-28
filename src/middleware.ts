@@ -1,72 +1,35 @@
-// middleware.ts
+// src/middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { adminAppInstance } from "./src/lib/firebaseAdmin";
-
-function maskEmail(email?: string) {
-  if (!email) return "unknown_email";
-  const [localPart, domain] = email.split("@");
-  if (localPart.length <= 3) {
-    return `${localPart}***@${domain}`;
-  }
-  return `${localPart.substring(0, 3)}***@${domain}`;
-}
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+  const isProtected =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/seller") ||
+    pathname.startsWith("/account");
 
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isSellerRoute = pathname.startsWith("/seller");
-  const isAccountRoute = pathname.startsWith("/account");
-
-  if (isAdminRoute || isSellerRoute || isAccountRoute) {
-    const token = req.cookies.get("firebaseIdToken")?.value;
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("continueUrl", pathname);
-
-    if (!token) {
-      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
-      loginUrl.searchParams.set("error", "no-token");
-      return NextResponse.redirect(loginUrl);
-    }
-
-    try {
-      if (!adminAppInstance) {
-        console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      const decoded = await adminAppInstance.auth().verifyIdToken(token);
-      
-      if (!decoded) {
-        console.warn(`[MW_ACCESS_DENIED] Unauthenticated attempt to access ${pathname}`);
-        loginUrl.searchParams.set("error", "session-expired");
-        return NextResponse.redirect(loginUrl);
-      }
-
-      // /account and /seller are accessible to any logged-in user.
-      if (isAccountRoute || isSellerRoute) {
-        return NextResponse.next();
-      }
-
-      // /admin is only for 'admin' role.
-      if (isAdminRoute) {
-        if (decoded?.role === "admin") {
-          return NextResponse.next();
-        } else {
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access admin route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-    } catch (err: any) {
-      console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, code=${err.code || 'N/A'}, message=${err.message || 'Unknown error'}`);
-      // If token is expired or invalid, redirect to login with an error query param
-      loginUrl.searchParams.set("error", "session-expired");
-      return NextResponse.redirect(loginUrl);
-    }
+  if (!isProtected) {
+    return NextResponse.next();
   }
 
+  const token = req.cookies.get("firebaseIdToken")?.value;
+  const loginUrl = new URL("/login", req.url);
+  loginUrl.searchParams.set("continueUrl", pathname);
+
+  if (!token) {
+    loginUrl.searchParams.set("error", "no-token");
+    console.warn(
+      `[MW_TOKEN_MISSING] No token for protected route ${pathname}. Redirecting to login.`
+    );
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Edge-friendly: Only check for token existence.
+  // Deeper validation will be handled by server components or API routes.
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"] };
+export const config = {
+  matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"],
+};

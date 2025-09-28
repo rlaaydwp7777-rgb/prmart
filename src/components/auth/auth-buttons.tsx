@@ -25,8 +25,9 @@ export function AuthButtons() {
     }
 
     if (user) {
-        const userRole = (user as any).customClaims?.role;
-        const isAdmin = userRole === 'admin';
+        const userClaims = (user as any).reloadUserInfo?.customAttributes;
+        const role = userClaims ? JSON.parse(userClaims)?.role : 'user';
+        const isAdmin = role === 'admin';
 
         return (
             <DropdownMenu>
@@ -83,5 +84,3 @@ export function AuthButtons() {
         </div>
     );
 }
-
-    

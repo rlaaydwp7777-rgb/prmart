@@ -21,21 +21,21 @@ type DashboardData = {
     recentSales: Order[];
     bestSellers: (Prompt & { sales: number; revenue: number; })[];
     salesByMonth: { name: string, total: number }[];
-};
+} | null;
 
 export default function SellerDashboardPage() {
     const { user, loading: authLoading } = useAuth();
     const router = useRouter();
-    const [data, setData] = useState<DashboardData | null>(null);
+    const [data, setData] = useState<DashboardData>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (authLoading) {
-            return;
+            return; // Wait until authentication state is determined
         }
         if (!user) {
-            router.replace("/login?continueUrl=/seller");
+            setLoading(false); // Not logged in, stop loading
             return;
         }
         
@@ -53,9 +53,9 @@ export default function SellerDashboardPage() {
             })
             .finally(() => setLoading(false));
 
-    }, [user, authLoading, router]);
+    }, [user, authLoading]);
 
-    if (loading || authLoading) {
+    if (authLoading || loading) {
         return (
             <div className="flex flex-col gap-8">
                  <header>
@@ -77,8 +77,15 @@ export default function SellerDashboardPage() {
     }
 
     if (!user) {
-        // This part is for fallback, useEffect should handle redirection.
-        return null;
+        return (
+             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <h1 className="text-2xl font-bold mb-4">로그인이 필요합니다.</h1>
+                <p className="text-muted-foreground mb-6">판매자 대시보드에 접근하려면 먼저 로그인해주세요.</p>
+                <Button asChild>
+                    <Link href="/login?continueUrl=/seller">로그인 페이지로 이동</Link>
+                </Button>
+            </div>
+        )
     }
     
     if (error) {
@@ -91,16 +98,7 @@ export default function SellerDashboardPage() {
         );
     }
 
-    if (!data) {
-        return (
-             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-                <h1 className="text-2xl font-bold mb-4">데이터 로딩 중...</h1>
-                <p className="text-muted-foreground mb-6">잠시만 기다려주세요.</p>
-            </div>
-        );
-    }
-
-    if (data.stats.productCount === 0) {
+    if (!data || data.stats.productCount === 0) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center bg-background rounded-lg p-8">
                 <h1 className="text-4xl font-headline font-bold mb-4">{SELLER_STRINGS.DASHBOARD_HEADLINE}</h1>

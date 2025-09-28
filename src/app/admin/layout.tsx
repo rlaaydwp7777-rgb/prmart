@@ -1,9 +1,33 @@
 // src/app/admin/layout.tsx
-import React from "react";
+import React from 'react';
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { adminAuth } from "@/lib/firebaseAdmin";
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from '@/components/ui/sidebar';
-import { Home, Users, Package, BarChart, Settings, LogOut } from "lucide-react";
+import { Home, Users, Package, BarChart, Settings } from "lucide-react";
 import Link from "next/link";
-import { useAuth } from "@/components/auth/AuthProvider";
+
+async function verifyAdminRole() {
+  const token = cookies().get("firebaseIdToken")?.value;
+  if (!token) {
+    redirect("/login?continueUrl=/admin");
+  }
+
+  try {
+    if (!adminAuth) {
+      throw new Error("Admin Auth not initialized");
+    }
+    const decoded = await adminAuth.verifyIdToken(token);
+    if (decoded.role !== "admin") {
+      redirect("/");
+    }
+    return true;
+  } catch (error) {
+    console.error("[ADMIN_GUARD_FAIL] Admin verification failed:", error);
+    redirect("/login?continueUrl=/admin&error=session-expired");
+  }
+}
+
 
 const AdminNav = () => {
     return (
@@ -37,7 +61,9 @@ const AdminNav = () => {
     );
 };
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
+export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  await verifyAdminRole();
+  
   return (
     <SidebarProvider>
         <Sidebar>

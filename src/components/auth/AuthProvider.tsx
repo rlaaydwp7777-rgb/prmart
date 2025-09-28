@@ -13,12 +13,13 @@ async function setAuthCookie(user: User | null) {
     try {
         if (user) {
             const token = await user.getIdToken(true); // Force refresh to get the latest token
-            const expires = new Date(Date.now() + 23 * 60 * 60 * 1000).toUTCString();
-            const secure = process.env.NODE_ENV === "production" ? "Secure;" : "";
-            document.cookie = `firebaseIdToken=${token}; path=/; expires=${expires}; SameSite=Lax; ${secure}`;
+            const maxAge = 55 * 60; // 55 minutes, as ID tokens last 1 hour.
+            const baseCookie = `firebaseIdToken=${token}; Path=/; Max-Age=${maxAge}; SameSite=Lax;`;
+            const secureCookie = process.env.NODE_ENV === "production" ? " Secure;" : "";
+            document.cookie = baseCookie + secureCookie;
         } else {
             // Clear cookie on logout
-            document.cookie = `firebaseIdToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax;`;
+            document.cookie = `firebaseIdToken=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax;`;
         }
     } catch (error) {
         console.error("[AUTH_COOKIE_SET_FAIL] Failed to set auth cookie:", error);
@@ -38,11 +39,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
     
-    // Listen for auth state changes
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
-      await setAuthCookie(u); // Set or clear cookie on every auth state change
       setLoading(false);
+      await setAuthCookie(u);
     });
 
     // Periodically refresh the token to get latest custom claims (e.g., role updates)
@@ -51,7 +51,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (currentUser) {
             await setAuthCookie(currentUser);
         }
-    }, 20 * 60 * 1000); // 20 minutes
+    }, 10 * 60 * 1000); // Every 10 minutes
 
     return () => {
         unsub();
@@ -62,7 +62,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const handleSignOut = async () => {
     try {
       await signOut();
-      // The onAuthStateChanged listener will clear the user and cookie.
       router.push("/");
     } catch(error) {
       console.error("[SIGN_OUT_FAIL] Sign out error:", error);
