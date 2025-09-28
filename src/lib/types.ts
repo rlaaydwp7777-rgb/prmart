@@ -79,6 +79,17 @@ export interface Proposal {
     status: 'pending' | 'accepted';
 }
 
+export interface Review {
+    id: string;
+    author: string;
+    authorAvatar?: string;
+    authorId: string;
+    productId: string;
+    productTitle: string;
+    rating: number;
+    content: string;
+    createdAt: string;
+}
 
 export interface SubCategory {
   id: string;
@@ -147,17 +158,6 @@ export interface SellerProfile {
     accountHolder?: string;
 }
 
-export interface Review {
-    id: string;
-    author: string;
-    authorAvatar?: string;
-    authorId: string;
-    productId: string;
-    productTitle: string;
-    rating: number;
-    content: string;
-    createdAt: string;
-}
 
 export interface Wishlist {
     userId: string;

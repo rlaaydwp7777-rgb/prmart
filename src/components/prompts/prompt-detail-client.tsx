@@ -18,7 +18,8 @@ import { format } from 'date-fns';
 
 // This is still mock data, but will be replaced by a fetch from Firestore.
 const mockReviews: Review[] = [
-    // { id: 'rev1', author: "김지훈", authorId: 'user1', productId: 'prod1', productTitle: 'test', avatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요.", createdAt: new Date().toISOString() },
+    { id: 'rev1', author: "김지훈", authorId: 'user1', productId: 'prod1', productTitle: 'test', authorAvatar: "https://picsum.photos/100/100?random=10", rating: 5, content: "이 보일러플레이트 덕분에 개발 시간이 절반으로 줄었어요! 퀄리티는 말할 것도 없고요.", createdAt: new Date().toISOString() },
+    { id: 'rev2', author: "박서연", authorId: 'user2', productId: 'prod1', productTitle: 'test', authorAvatar: "https://picsum.photos/100/100?random=11", rating: 4, content: "정말 유용합니다. 몇 가지 부분만 제 입맛에 맞게 수정하니 바로 실무에 적용할 수 있었어요.", createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString() },
 ];
 
 interface PromptDetailClientProps {
@@ -31,7 +32,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   const router = useRouter();
 
   const rating = prompt.rating ?? prompt.stats?.likes ?? 0;
-  const reviewsCount = prompt.reviews ?? prompt.stats?.sales ?? 0;
+  const reviewsCount = mockReviews.length;
 
   const isFree = prompt.price === 0;
   const hasPurchased = false; // This will be dynamic based on user auth and purchase history
@@ -173,7 +174,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
   }
 
   return (
-    <div className="container px-4 md:px-6">
+    <div className="container px-4 md:px-6 py-8 md:py-12">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         {/* Left Column: Image Gallery */}
         <div className="grid gap-4">
@@ -256,7 +257,7 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
             <Separator/>
 
             <div>
-                 <h2 className="text-2xl font-bold font-headline mb-4">구매자 후기 ({mockReviews.length})</h2>
+                 <h2 className="text-2xl font-bold font-headline mb-4">구매자 후기 ({reviewsCount})</h2>
                  <div className="space-y-6">
                     {mockReviews.length > 0 ? mockReviews.map((review) => (
                        <div key={review.id} className="flex gap-4">
@@ -269,11 +270,12 @@ export function PromptDetailClient({ prompt, relatedPrompts, categoryData }: Pro
                                     <p className="font-semibold">{review.author}</p>
                                     <div className="flex items-center gap-1">
                                          {Array.from({ length: 5 }).map((_, i) => (
-                                            <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground'}`} />
+                                            <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-amber-400 fill-amber-400' : 'text-muted-foreground/50'}`} />
                                         ))}
                                     </div>
                                 </div>
                                 <p className="text-sm text-foreground/90 mt-1">{review.content}</p>
+                                 <p className="text-xs text-muted-foreground mt-2">{format(new Date(review.createdAt), "yyyy년 MM월 dd일")}</p>
                             </div>
                        </div>
                     )) : (
