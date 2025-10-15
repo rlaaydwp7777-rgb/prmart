@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 import { adminAppInstance, adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb, getCategories } from "@/lib/firebase/services";
 import type { Prompt, IdeaRequest, Category, Proposal, User, Order } from "@/lib/types";
-import { collection, getDocs, orderBy, limit, query as firestoreQuery, Timestamp } from "firebase/firestore";
+import { collection, getDocs, orderBy, limit, query as firestoreQuery, Timestamp, where } from "firebase/firestore";
 
 // --- Form State ---
 export type FormState = {
@@ -168,7 +168,7 @@ export async function saveProductAction(prevState: FormState, formData: FormData
       contentUrl,
       category,
       categorySlug,
-      price,
+      price: Number(price),
       tags: tags ? tags.split(',').map(t => t.trim()) : [],
       visibility,
       sellOnce: sellOnce === 'on',
@@ -325,7 +325,7 @@ export async function updateProductStatusAction(productId: string, status: 'appr
 }
 
 
-export async function listAllUsers(): Promise<{ users: User[], error?: string }> {
+export async function listAllUsersAction(): Promise<{ users: User[], error?: string }> {
     const token = cookies().get('firebaseIdToken')?.value;
     const isAdmin = await verifyAdmin(token);
     if (!isAdmin) {
@@ -344,18 +344,18 @@ export async function listAllUsers(): Promise<{ users: User[], error?: string }>
                 createdAt: user.metadata.creationTime,
             };
         });
-        return { users };
+        return { users: users as User[] };
     } catch (error) {
         console.error('Error listing users:', error);
         return { users: [], error: "사용자 목록을 불러오는 중 오류가 발생했습니다." };
     }
 }
 
-export async function listAllOrders(): Promise<{ orders?: Order[], error?: string }> {
+export async function listAllOrdersAction(): Promise<{ orders: Order[], error?: string }> {
     const token = cookies().get('firebaseIdToken')?.value;
     const isAdmin = await verifyAdmin(token);
     if (!isAdmin) {
-        return { error: "권한이 없습니다." };
+        return { orders: [], error: "권한이 없습니다." };
     }
     
     try {
@@ -377,7 +377,7 @@ export async function listAllOrders(): Promise<{ orders?: Order[], error?: strin
         return { orders };
     } catch (error: any) {
         console.error(`Error fetching all orders:`, error);
-        return { error: "주문 내역을 불러오는 중 오류가 발생했습니다." };
+        return { orders: [], error: "주문 내역을 불러오는 중 오류가 발생했습니다." };
     }
 }
 
@@ -397,4 +397,33 @@ export async function setUserRoleAction(uid: string, role: 'admin' | 'seller' | 
         console.error('Error setting user role:', error);
         return { success: false, message: "역할 변경 중 오류가 발생했습니다." };
     }
+}
+
+export async function getAdminDashboardStatsAction(): Promise<{
+  productCount: number;
+  pendingCount: number;
+  orderCount: number;
+  totalRevenue: number;
+  error?: string;
+}> {
+  const token = cookies().get('firebaseIdToken')?.value;
+  const isAdmin = await verifyAdmin(token);
+  if (!isAdmin) {
+    return { productCount: 0, pendingCount: 0, orderCount: 0, totalRevenue: 0, error: "권한이 없습니다." };
+  }
+
+  try {
+    const productsSnap = await getDocs(collection(adminDb, 'products'));
+    const ordersSnap = await getDocs(collection(adminDb, 'orders'));
+
+    const productCount = productsSnap.size;
+    const pendingCount = productsSnap.docs.filter(doc => doc.data().status === 'pending').length;
+    const orderCount = ordersSnap.size;
+    const totalRevenue = ordersSnap.docs.reduce((sum, doc) => sum + (doc.data().priceGross || 0), 0);
+
+    return { productCount, pendingCount, orderCount, totalRevenue };
+  } catch (error: any) {
+    console.error("Error fetching admin dashboard stats:", error);
+    return { productCount: 0, pendingCount: 0, orderCount: 0, totalRevenue: 0, error: "통계 데이터를 불러오는 중 오류가 발생했습니다." };
+  }
 }

@@ -1,8 +1,7 @@
-// src/app/admin/users/page.tsx
 'use client';
 
 import React, { useState, useEffect, useTransition } from 'react';
-import { listAllUsers, setUserRoleAction } from '@/app/actions';
+import { listAllUsersAction, setUserRoleAction } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -75,7 +74,7 @@ export default function AdminUsersPage() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { users: fetchedUsers, error: fetchError } = await listAllUsers();
+      const { users: fetchedUsers, error: fetchError } = await listAllUsersAction();
       if (fetchError) {
         setError(fetchError);
       } else {
@@ -112,7 +111,7 @@ export default function AdminUsersPage() {
   }
 
   if (error) {
-      return <p className="text-destructive">오류: {error}</p>
+      return <p className="text-destructive text-center py-8">{error}</p>
   }
 
   return (

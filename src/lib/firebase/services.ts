@@ -858,35 +858,7 @@ export async function getProposalsByRequestId(requestId: string): Promise<Propos
 }
 
 
-// Admin services
-export async function getAdminDashboardData() {
-  const db = getDb();
-  if (!db) {
-    console.warn("Firebase not initialized. Returning empty admin dashboard data.");
-    return {
-      kpi: { totalRevenue: { value: 0, change: 0 }, totalSales: { value: 0, change: 0 }, totalProducts: { value: 0, change: 0 }, avgRating: { value: 0, totalReviews: 0 } },
-      pendingProducts: [],
-      recentUsers: [],
-    };
-  }
-  // In a real app, you'd fetch real data.
-  // For now, we'll return some mock data.
-  const kpi = {
-    totalRevenue: { value: 5231890, change: 0.201 },
-    totalSales: { value: 2350, change: 1.801 },
-    totalProducts: { value: 12234, change: 0.19 },
-    avgRating: { value: 4.8, totalReviews: 231 },
-  };
-
-  const allProducts = await getProducts();
-  const pendingProducts = allProducts.filter(p => p.status === 'pending').slice(0,5);
-  
-
-  const recentUsers = [
-      { name: 'Olivia Martin', email: 'olivia.martin@email.com', avatar: 'https://i.pravatar.cc/150?img=1', amount: '+₩1,999.00' },
-      { name: 'Jackson Lee', email: 'jackson.lee@email.com', avatar: 'https://i.pravatar.cc/150?img=2', amount: '+₩39.00' },
-      { name: 'Isabella Nguyen', email: 'isabella.nguyen@email.com', avatar: 'https://i.pravatar.cc/150?img=3', amount: '+₩299.00' },
-  ]
-
-  return { kpi, pendingProducts, recentUsers };
-}
+// Admin services - This is now handled by a server action in `actions.ts`
+// export async function getAdminDashboardData() {
+// ...
+// }

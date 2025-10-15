@@ -28,7 +28,6 @@ export async function POST(request: NextRequest) {
     // 2. Firestore에도 동기화 (update 대신 set(..., { merge: true }) 사용)
     await adminDb.collection("users").doc(uid).set({
       role: "admin",
-      updatedAt: new Date().toISOString(),
     }, { merge: true });
 
     return NextResponse.json({

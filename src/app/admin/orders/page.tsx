@@ -1,4 +1,3 @@
-// src/app/admin/orders/page.tsx
 'use client';
 
 import * as React from "react";
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { listAllOrders } from "@/app/actions";
+import { listAllOrdersAction } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Order } from "@/lib/types";
 import Link from "next/link";
@@ -21,16 +20,20 @@ import { getStatusBadgeVariant, getStatusText } from "@/lib/order-helpers";
 export default function AdminOrdersPage() {
     const [orders, setOrders] = React.useState<Order[]>([]);
     const [loading, setLoading] = React.useState(true);
+    const [error, setError] = React.useState<string | null>(null);
 
     React.useEffect(() => {
         async function fetchOrders() {
             try {
-                const { orders: allOrders } = await listAllOrders();
-                if (allOrders) {
+                const { orders: allOrders, error } = await listAllOrdersAction();
+                if (error) {
+                    setError(error);
+                } else if (allOrders) {
                    setOrders(allOrders);
                 }
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Failed to fetch orders:", error);
+                setError(error.message || "주문 내역을 불러오는데 실패했습니다.");
             } finally {
                 setLoading(false);
             }
@@ -51,6 +54,8 @@ export default function AdminOrdersPage() {
                         <Skeleton className="h-12 w-full" />
                         <Skeleton className="h-12 w-full" />
                     </div>
+                ) : error ? (
+                    <p className="text-destructive text-center py-8">{error}</p>
                 ) : orders.length > 0 ? (
                     <Table>
                         <TableHeader>

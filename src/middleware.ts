@@ -51,9 +51,11 @@ export async function middleware(req: NextRequest) {
 
       // /admin is only for 'admin' role.
       if (isAdminRoute) {
+        // @ts-ignore
         if (decoded?.role === "admin") {
           return NextResponse.next();
         } else {
+           // @ts-ignore
            console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access admin route ${pathname}. Denied.`);
            return NextResponse.redirect(new URL("/", req.url));
         }
@@ -61,9 +63,11 @@ export async function middleware(req: NextRequest) {
 
       // /seller is for 'admin' or 'seller' roles.
       if (isSellerRoute) {
+        // @ts-ignore
         if (decoded?.role === "admin" || decoded?.role === "seller") {
           return NextResponse.next();
         } else {
+           // @ts-ignore
            console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access seller route ${pathname}. Denied.`);
            return NextResponse.redirect(new URL("/", req.url));
         }

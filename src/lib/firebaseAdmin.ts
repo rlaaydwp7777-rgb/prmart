@@ -21,6 +21,7 @@ function initAdmin() {
             }),
         });
         adminApp = admin.app();
+        console.log("[ADMIN_INIT_SUCCESS] Firebase Admin SDK initialized successfully via individual variables.");
         return adminApp;
     } catch (e: any) {
        console.error("[ADMIN_INIT_ERROR] Firebase Admin SDK initialization failed:", e.message);
@@ -39,6 +40,7 @@ function initAdmin() {
         const parsed = JSON.parse(formattedJson);
         admin.initializeApp({ credential: admin.credential.cert(parsed) });
         adminApp = admin.app();
+        console.log("[ADMIN_INIT_SUCCESS] Firebase Admin SDK initialized successfully via legacy JSON.");
         return adminApp;
      } catch (e: any) {
         console.error("[ADMIN_INIT_ERROR] Failed to parse FIREBASE_ADMIN_SDK_JSON. Please use individual FIREBASE_ADMIN_* variables. Details:", e.message);
