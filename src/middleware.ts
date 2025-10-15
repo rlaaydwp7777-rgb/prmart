@@ -1,87 +1,39 @@
-// src/middleware.ts
-export const runtime = 'nodejs';
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { adminAppInstance } from "@/lib/firebaseAdmin";
+import { NextRequest, NextResponse } from "next/server";
 
-function maskEmail(email?: string) {
-  if (!email) return "unknown_email";
-  const [localPart, domain] = email.split("@");
-  if (localPart.length <= 3) {
-    return `${localPart}***@${domain}`;
-  }
-  return `${localPart.substring(0, 3)}***@${domain}`;
-}
-
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isSellerRoute = pathname.startsWith("/seller");
-  const isAccountRoute = pathname.startsWith("/account");
-
-  if (isAdminRoute || isSellerRoute || isAccountRoute) {
-    const token = req.cookies.get("firebaseIdToken")?.value;
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("continueUrl", pathname);
+export async function middleware(request: NextRequest) {
+  // /admin 경로 보호
+  if (request.nextUrl.pathname.startsWith("/admin")) {
+    const token = request.cookies.get("firebaseIdToken")?.value;
 
     if (!token) {
-      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
-      loginUrl.searchParams.set("error", "session-expired");
-      return NextResponse.redirect(loginUrl);
+      console.log("No token found, redirecting to home");
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     try {
-      if (!adminAppInstance) {
-        console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      const decoded = await adminAppInstance.auth().verifyIdToken(token);
+      // Admin SDK 동적 import (서버 전용)
+      const { adminAuth } = await import("@/lib/firebaseAdmin");
       
-      if (!decoded) {
-        console.warn(`[MW_ACCESS_DENIED] Unauthenticated attempt to access ${pathname}`);
-        loginUrl.searchParams.set("error", "session-expired");
-        return NextResponse.redirect(loginUrl);
+      const decodedToken = await adminAuth.verifyIdToken(token);
+      
+      // role 확인
+      // @ts-ignore
+      if (decodedToken.role !== "admin") {
+        console.log("User is not admin, redirecting");
+        return NextResponse.redirect(new URL("/", request.url));
       }
 
-      // /account is accessible to any logged-in user.
-      if (isAccountRoute) {
-        return NextResponse.next();
-      }
-
-      // /admin is only for 'admin' role.
-      if (isAdminRoute) {
-        // @ts-ignore
-        if (decoded?.role === "admin") {
-          return NextResponse.next();
-        } else {
-           // @ts-ignore
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access admin route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-      // /seller is for 'admin' or 'seller' roles.
-      if (isSellerRoute) {
-        // @ts-ignore
-        if (decoded?.role === "admin" || decoded?.role === "seller") {
-          return NextResponse.next();
-        } else {
-           // @ts-ignore
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access seller route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-    } catch (err: any) {
-      console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, code=${err.code || 'N/A'}, message=${err.message || 'Unknown error'}`);
-      // If token is expired or invalid, redirect to login
-      loginUrl.searchParams.set("error", "session-expired");
-      return NextResponse.redirect(loginUrl);
+      // 관리자 확인됨, 계속 진행
+      return NextResponse.next();
+    } catch (error) {
+      console.error("Token verification failed:", error);
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"] };
+export const config = {
+  matcher: "/admin/:path*",
+};
