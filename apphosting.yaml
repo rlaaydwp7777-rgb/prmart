@@ -15,8 +15,7 @@ runConfig:
 
 # The "buildConfig" field specifies the build process for the backend.
 buildConfig:
-  # The "fetch" field is required to specify the source code to build.
-  # This section was missing, causing the deployment to fail.
+  # The "fetch" field is required to specify the source code to build from a repository.
   fetch:
     repo: https://github.com/rlaaydwp7777/prmart-ai-assistant
     branch: main
