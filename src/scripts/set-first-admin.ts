@@ -33,4 +33,4 @@ async function setFirstAdmin(email: string) {
 
 // ❗ 중요: 아래 이메일 주소를 실제 관리자로 지정할 사용자의 이메일로 변경한 후,
 // 터미널에서 `npx tsx src/scripts/set-first-admin.ts` 명령을 실행하세요.
-setFirstAdmin("your-email@example.com");
+setFirstAdmin("prmart7777@gmail.com");
