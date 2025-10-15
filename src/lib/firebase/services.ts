@@ -856,6 +856,26 @@ export async function getProposalsByRequestId(requestId: string): Promise<Propos
 
 
 // Admin services
+export async function getOrders(): Promise<Order[]> {
+    const db = getDb();
+    if (!db) {
+        console.warn("Firebase not initialized. Cannot fetch orders.");
+        return [];
+    }
+    const cacheKey = `orders_all`;
+    return fetchFromCache(cacheKey, async () => {
+        try {
+            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(50));
+            const snapshot = await getDocs(q);
+            const orders = snapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
+            return orders;
+        } catch (error) {
+            console.error(`Error fetching all orders:`, error);
+            return [];
+        }
+    }, 10000);
+}
+
 export async function getAdminDashboardData() {
   const db = getDb();
   if (!db) {

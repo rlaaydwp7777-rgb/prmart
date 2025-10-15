@@ -7,7 +7,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { adminAppInstance, adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb, getCategories } from "@/lib/firebase/services";
-import type { Prompt, IdeaRequest, Category, Proposal } from "@/lib/types";
+import type { Prompt, IdeaRequest, Category, Proposal, User } from "@/lib/types";
 
 // --- Form State ---
 export type FormState = {
@@ -18,14 +18,14 @@ export type FormState = {
 };
 
 // --- Helper Functions ---
-async function getUserRole(token: string | undefined): Promise<string | null> {
-    if (!token) return null;
-    if (!adminAuth) return null;
+async function verifyAdmin(token?: string): Promise<boolean> {
+    if (!token) return false;
+    if (!adminAuth) return false;
     try {
         const decodedToken = await adminAuth.verifyIdToken(token);
-        return decodedToken.role || 'user';
+        return decodedToken.role === 'admin';
     } catch (error) {
-        return null;
+        return false;
     }
 }
 
@@ -94,7 +94,7 @@ export async function signUpAction(prevState: FormState, formData: FormData): Pr
     await auth.setCustomUserClaims(userRecord.uid, { role: 'seller' });
     
     if (adminDb) {
-      const userData: { [key: string]: any } = {
+      const userData: Partial<User> = {
         email,
         displayName,
         role: 'seller', // 모든 사용자는 판매자로 가입
@@ -296,5 +296,74 @@ export async function createProposalAction(prevState: FormState, formData: FormD
     } catch(error: any) {
         console.error("[ACTION_CREATE_PROPOSAL_FAIL]", error);
         return { success: false, message: error.message || "제안 제출 중 오류가 발생했습니다." };
+    }
+}
+
+
+// --- Admin Actions ---
+export async function updateProductStatusAction(productId: string, status: 'approved' | 'rejected'): Promise<FormState> {
+    const token = cookies().get('firebaseIdToken')?.value;
+    const isAdmin = await verifyAdmin(token);
+    if (!isAdmin) {
+        return { success: false, message: "권한이 없습니다." };
+    }
+
+    if (!['approved', 'rejected'].includes(status)) {
+        return { success: false, message: "잘못된 상태 값입니다." };
+    }
+
+    try {
+        const productRef = adminDb.collection("products").doc(productId);
+        await productRef.update({ status: status });
+        revalidatePath('/admin/products');
+        return { success: true, message: `상품 상태가 ${status}로 변경되었습니다.` };
+    } catch (error) {
+        console.error("Error updating product status:", error);
+        return { success: false, message: "상품 상태 변경 중 오류가 발생했습니다." };
+    }
+}
+
+
+export async function listAllUsers(): Promise<{ users: User[], error?: string }> {
+    const token = cookies().get('firebaseIdToken')?.value;
+    const isAdmin = await verifyAdmin(token);
+    if (!isAdmin) {
+        return { users: [], error: "권한이 없습니다." };
+    }
+
+    try {
+        const userRecords = await adminAuth.listUsers(100); // Get up to 100 users
+        const users = userRecords.users.map((user) => {
+            const customClaims = (user.customClaims || {}) as { role?: string };
+            return {
+                uid: user.uid,
+                email: user.email || "N/A",
+                displayName: user.displayName || "N/A",
+                role: customClaims.role || 'user',
+                createdAt: user.metadata.creationTime,
+            };
+        });
+        return { users };
+    } catch (error) {
+        console.error('Error listing users:', error);
+        return { users: [], error: "사용자 목록을 불러오는 중 오류가 발생했습니다." };
+    }
+}
+
+export async function setUserRoleAction(uid: string, role: 'admin' | 'seller' | 'user'): Promise<FormState> {
+     const token = cookies().get('firebaseIdToken')?.value;
+    const isAdmin = await verifyAdmin(token);
+    if (!isAdmin) {
+        return { success: false, message: "권한이 없습니다." };
+    }
+
+    try {
+        await adminAuth.setCustomUserClaims(uid, { role });
+        await adminDb.collection("users").doc(uid).set({ role }, { merge: true });
+        revalidatePath('/admin/users');
+        return { success: true, message: "사용자 역할이 변경되었습니다." };
+    } catch (error) {
+        console.error('Error setting user role:', error);
+        return { success: false, message: "역할 변경 중 오류가 발생했습니다." };
     }
 }

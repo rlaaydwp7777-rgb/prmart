@@ -1,4 +1,5 @@
 // src/app/admin/products/page.tsx
+'use client';
 import {
   Card,
   CardContent,
@@ -17,13 +18,90 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { getProducts } from "@/lib/firebase/services"
 import { Button } from "@/components/ui/button"
-import { CheckCircle2, XCircle, MoreHorizontal } from "lucide-react"
-import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu"
+import { CheckCircle2, XCircle, MoreHorizontal, Loader2 } from "lucide-react"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
+import React, { useState, useEffect, useTransition } from "react"
+import { Prompt } from "@/lib/types"
+import { updateProductStatusAction } from "@/app/actions"
+import { useToast } from "@/hooks/use-toast"
 
 
-export default async function AdminProductsPage() {
-  const products = await getProducts(); // Fetches all products including pending ones
+function ProductActions({ product }: { product: Prompt }) {
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    const handleAction = (status: 'approved' | 'rejected') => {
+        startTransition(async () => {
+            const result = await updateProductStatusAction(product.id, status);
+            if (result.success) {
+                toast({ title: '성공', description: result.message });
+            } else {
+                toast({ title: '오류', description: result.message, variant: 'destructive' });
+            }
+        });
+    };
+    
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-8 w-8 p-0" disabled={isPending}>
+                <span className="sr-only">메뉴 열기</span>
+                {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreHorizontal className="h-4 w-4" />}
+            </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+            <DropdownMenuLabel>작업</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {product.status === 'pending' && (
+                <>
+                    <DropdownMenuItem onClick={() => handleAction('approved')}>
+                        <CheckCircle2 className="mr-2 h-4 w-4 text-green-500" />
+                        승인
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleAction('rejected')} className="text-destructive">
+                        <XCircle className="mr-2 h-4 w-4" />
+                        거부
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                </>
+            )}
+                <DropdownMenuItem asChild>
+                    <Link href={`/p/${product.id}`} target="_blank">상품 보기</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>판매자 정보 보기</DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
+
+
+export default function AdminProductsPage() {
+  const [products, setProducts] = useState<Prompt[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+        try {
+            const allProducts = await getProducts();
+            setProducts(allProducts);
+        } catch(error) {
+            console.error("Failed to fetch products for admin", error);
+        } finally {
+            setLoading(false);
+        }
+    }
+    fetchData();
+  }, []);
+
+
+  if (loading) {
+      return (
+          <div className="flex justify-center items-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin" />
+          </div>
+      )
+  }
 
   return (
     <Card>
@@ -67,31 +145,7 @@ export default async function AdminProductsPage() {
                 </TableCell>
                 <TableCell>{new Date(product.createdAt).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                   <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">메뉴 열기</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>작업</DropdownMenuLabel>
-                        {product.status === 'pending' && (
-                            <>
-                                <DropdownMenuItem>
-                                    <CheckCircle2 className="mr-2 h-4 w-4" />
-                                    승인
-                                </DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">
-                                    <XCircle className="mr-2 h-4 w-4" />
-                                    거부
-                                </DropdownMenuItem>
-                            </>
-                        )}
-                         <DropdownMenuItem>상품 보기</DropdownMenuItem>
-                         <DropdownMenuItem>판매자 정보 보기</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                   <ProductActions product={product} />
                 </TableCell>
               </TableRow>
             ))}
