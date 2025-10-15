@@ -167,11 +167,11 @@ export async function saveProductAction(prevState: FormState, formData: FormData
       contentUrl,
       category,
       categorySlug,
-      priceGross: price,
       price,
       tags: tags ? tags.split(',').map(t => t.trim()) : [],
       visibility,
       sellOnce: sellOnce === 'on',
+      status: 'pending', // Add status field
       sellerId,
       author,
       sellerPhotoUrl,
@@ -182,7 +182,7 @@ export async function saveProductAction(prevState: FormState, formData: FormData
     revalidatePath("/");
     revalidatePath("/seller/products");
 
-    return { success: true, message: "상품이 성공적으로 등록되었습니다!" };
+    return { success: true, message: "상품이 성공적으로 등록되었습니다! 관리자 승인 후 판매가 시작됩니다." };
   } catch (error: any) {
     console.error("[ACTION_SAVE_PRODUCT_FAIL]", error);
     return { success: false, message: error.message || "상품 등록 중 오류가 발생했습니다." };

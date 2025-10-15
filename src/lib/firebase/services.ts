@@ -235,6 +235,7 @@ const generateExamplePrompts = (): Prompt[] => {
                     isExample: true, // 모든 예제 상품에 플래그 설정
                     visibility: 'public',
                     sellOnce: false,
+                    status: (promptIdCounter % 5 === 0) ? 'pending' : 'approved',
                     contentUrl: "https://prmart.ai/example-content",
                     createdAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
                     updatedAt: new Date(Date.now() - (promptIdCounter * 1000 * 3600 * 24)).toISOString(),
@@ -337,27 +338,34 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
   return chunks;
 }
 
-export async function getProducts(): Promise<Prompt[]> {
+export async function getProducts(options: { approvedOnly?: boolean } = {}): Promise<Prompt[]> {
+    const { approvedOnly = false } = options;
     const db = getDb();
     if (!db) {
       if (process.env.NODE_ENV === 'development') {
         console.warn("Firebase not initialized. Returning example products.");
       }
-      return EXAMPLE_PROMPTS;
+      return approvedOnly ? EXAMPLE_PROMPTS.filter(p => p.status === 'approved') : EXAMPLE_PROMPTS;
     }
-    return fetchFromCache('products', async () => {
+    const cacheKey = `products_${approvedOnly}`;
+    return fetchFromCache(cacheKey, async () => {
         try {
-            const snapshot = await getDocs(query(collection(db, "products"), orderBy("createdAt", "desc")));
+            let q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+            if (approvedOnly) {
+                q = query(q, where("status", "==", "approved"));
+            }
+            const snapshot = await getDocs(q);
             const dbProducts = snapshot.docs.map(doc => serializeDoc(doc) as Prompt).filter(Boolean);
-            // In a real app, you might not want to mix example and real data like this.
-            // This is for demonstration purposes.
-            const combined = [...dbProducts, ...EXAMPLE_PROMPTS];
+            
+            const exampleProducts = approvedOnly ? EXAMPLE_PROMPTS.filter(p => p.status === 'approved') : EXAMPLE_PROMPTS;
+
+            const combined = [...dbProducts, ...exampleProducts];
             const unique = Array.from(new Map(combined.map(p => [p.id, p])).values());
             return unique.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         } catch (error) {
             console.error("Error fetching products, returning example data:", error);
-            return EXAMPLE_PROMPTS;
+            return approvedOnly ? EXAMPLE_PROMPTS.filter(p => p.status === 'approved') : EXAMPLE_PROMPTS;
         }
     });
 }
@@ -413,7 +421,7 @@ export async function getProduct(id: string): Promise<Prompt | null> {
 export async function getProductsByCategorySlug(slug: string, count?: number, excludeId?: string): Promise<Prompt[]> {
     const cacheKey = `products_by_category_${slug}_${count}_${excludeId}`;
     return fetchFromCache(cacheKey, async () => {
-        const allProducts = await getProducts();
+        const allProducts = await getProducts({ approvedOnly: true });
         const productsInCategory = allProducts.filter(p => p.categorySlug === slug);
         let filteredProducts = excludeId ? productsInCategory.filter(p => p.id !== excludeId) : productsInCategory;
         return count ? filteredProducts.slice(0, count) : filteredProducts;
@@ -867,10 +875,9 @@ export async function getAdminDashboardData() {
     avgRating: { value: 4.8, totalReviews: 231 },
   };
 
-  const pendingProducts = EXAMPLE_PROMPTS.slice(0, 5).map(p => ({
-      ...p,
-      status: 'pending'
-  }));
+  const allProducts = await getProducts();
+  const pendingProducts = allProducts.filter(p => p.status === 'pending').slice(0,5);
+  
 
   const recentUsers = [
       { name: 'Olivia Martin', email: 'olivia.martin@email.com', avatar: 'https://i.pravatar.cc/150?img=1', amount: '+₩1,999.00' },

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 
 export type PromptVisibility = 'public' | 'private' | 'partial';
 export type OrderStatus = 'created' | 'paid' | 'clearing_hold' | 'released' | 'refunded' | 'disputed' | 'chargeback';
+export type ProductStatus = 'pending' | 'approved' | 'rejected';
 
 export interface User {
     uid: string;
@@ -42,6 +43,7 @@ export interface Prompt {
   isExample?: boolean;
   visibility: PromptVisibility;
   sellOnce?: boolean;
+  status: ProductStatus;
   createdAt: string; 
   updatedAt?: string;
   stats: {
