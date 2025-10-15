@@ -8,8 +8,8 @@ version: 1
 runConfig:
   # The following settings are optional.
   concurrency: 100
-  cpu: 1
-  memoryMiB: 512
+  cpu: 2
+  memoryMiB: 1024
   minInstances: 0
   maxInstances: 10
 
