@@ -4,16 +4,29 @@
 # The "version" field is required.
 version: 1
 
-# Specifies the build process for the backend.
+# The "runConfig" field specifies runtime settings.
+runConfig:
+  # The following settings are optional.
+  # concurrency: 100
+  # cpu: 1
+  # memoryMiB: 512
+  # minInstances: 0
+  maxInstances: 10
+
+# The "buildConfig" field specifies the build process for the backend.
 buildConfig:
-  # The "buildCommand" field is required to build the Next.js app.
-  buildCommand: npm run build
-  # The "fetch" field is required to specify the source directory.
+  # The "fetch" field is required to specify the source code to build.
+  # In this case, we are fetching from the root of the repository.
   fetch:
     source: /
-
-# The "runConfig" field is optional and specifies runtime settings.
-runConfig:
-  # Increase this value if you'd like to automatically spin up
-  # more instances in response to increased traffic.
-  maxInstances: 10
+  
+  # The "buildCommand" field is required to build the Next.js app.
+  buildCommand: npm install && npm run build
+  
+  # The "outputDirectory" field specifies the directory containing the built app.
+  # For Next.js, this is typically the .next directory.
+  # This field is currently not supported but is a placeholder for future use.
+  # outputDirectory: .next
+  
+  # The "nodeVersion" field specifies the Node.js version to use.
+  # nodeVersion: 20
