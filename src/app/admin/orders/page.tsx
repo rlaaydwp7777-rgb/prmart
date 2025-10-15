@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { getOrders } from "@/lib/firebase/services";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Order } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getStatusBadgeVariant, getStatusText } from "@/lib/order-helpers";
 
