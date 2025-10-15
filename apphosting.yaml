@@ -1,16 +1,10 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
-version: 1
 runConfig:
   concurrency: 100
   cpu: 2
   memoryMiB: 1024
-  minInstances: 0
-  maxInstances: 10
 buildConfig:
   buildCommand: npm install && npm run build
   outputDirectory: .next
   nodeVersion: 20
-  fetch:
-    repo: https://github.com/rlaaydwp7777/prmart-ai-assistant
-    branch: main
