@@ -1,3 +1,4 @@
+
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "firebase-admin/auth";
 import { adminAppInstance, adminDb } from "@/lib/firebaseAdmin";
@@ -25,9 +26,10 @@ export async function POST(request: NextRequest) {
     // 1. Custom Claims 설정
     await auth.setCustomUserClaims(uid, { role: "admin" });
 
-    // 2. Firestore에도 동기화 (update 대신 set(..., { merge: true }) 사용)
+    // 2. Firestore에도 동기화 (merge로 안전하게)
     await adminDb.collection("users").doc(uid).set({
       role: "admin",
+      updatedAt: new Date().toISOString(),
     }, { merge: true });
 
     return NextResponse.json({
