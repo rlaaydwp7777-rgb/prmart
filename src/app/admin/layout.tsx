@@ -12,8 +12,8 @@ const navItems = [
   { href: "/admin/products", label: "상품 관리", icon: Package },
   { href: "/admin/users", label: "사용자 관리", icon: Users },
   { href: "/admin/orders", label: "주문 내역", icon: BadgeDollarSign },
-  { href: "/admin/payouts", label: "정산 관리", icon: "Settings" }, // Placeholder
-  { href: "/admin/risks", label: "리스크 관리", icon: Shield },
+  // { href: "/admin/payouts", label: "정산 관리", icon: "Settings" }, // Placeholder
+  // { href: "/admin/risks", label: "리스크 관리", icon: Shield },
 ];
 
 export default function AdminLayout({

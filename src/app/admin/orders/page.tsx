@@ -14,38 +14,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { getOrders } from "@/lib/firebase/services";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { Order, OrderStatus } from "@/lib/types";
+import type { Order } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-
-function getStatusBadgeVariant(status: OrderStatus): "default" | "secondary" | "destructive" | "outline" {
-    switch (status) {
-        case 'paid':
-        case 'released':
-            return 'default';
-        case 'clearing_hold':
-            return 'outline';
-        case 'refunded':
-        case 'chargeback':
-            return 'destructive';
-        default:
-            return 'secondary';
-    }
-}
-
-function getStatusText(status: OrderStatus): string {
-    switch (status) {
-        case 'created': return '주문 생성됨';
-        case 'paid': return '결제 완료';
-        case 'clearing_hold': return '정산 보류';
-        case 'released': return '정산 완료';
-        case 'refunded': return '환불됨';
-        case 'disputed': return '분쟁 중';
-        case 'chargeback': return '차지백';
-        default: return status;
-    }
-}
+import { getStatusBadgeVariant, getStatusText } from "@/lib/order-helpers";
 
 export default function AdminOrdersPage() {
     const [orders, setOrders] = React.useState<Order[]>([]);
@@ -97,7 +69,7 @@ export default function AdminOrdersPage() {
                                     <TableCell className="font-medium truncate" style={{maxWidth: '100px'}}>{order.id}</TableCell>
                                     <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell>
-                                        <Link href={`/p/${order.productId}`} className="hover:underline">
+                                        <Link href={`/p/${order.productId}`} className="hover:underline" target="_blank" rel="noopener noreferrer">
                                             {order.productTitle}
                                         </Link>
                                     </TableCell>

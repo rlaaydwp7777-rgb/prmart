@@ -105,7 +105,7 @@ export default function AdminUsersPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-full">
+      <div className="flex justify-center items-center h-96">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );

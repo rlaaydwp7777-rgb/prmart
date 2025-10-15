@@ -5,7 +5,10 @@ import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, Se
 // A temporary cache to avoid fetching the same data multiple times in a single request.
 const requestCache = new Map<string, { ts: number, data: any }>();
 
-async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>, ttl = 60000): Promise<T> {
+async function fetchFromCache<T>(key: string, fetcher: () => Promise<T>, ttl = 10000): Promise<T> {
+  if (typeof window === 'undefined') {
+    return fetcher();
+  }
   const item = requestCache.get(key);
   if (item && Date.now() - item.ts < ttl) {
     return item.data;

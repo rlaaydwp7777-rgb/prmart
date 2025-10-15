@@ -58,7 +58,7 @@ export default function AccountDashboardPage() {
                                 <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg">
                                     <div>
                                         <p className="font-medium">{order.productTitle}</p>
-                                        <p className="text-sm text-muted-foreground">{new Date(order.orderDate).toLocaleDateString()}</p>
+                                        <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</p>
                                     </div>
                                     <p className="font-semibold">₩{order.priceGross.toLocaleString()}</p>
                                 </div>

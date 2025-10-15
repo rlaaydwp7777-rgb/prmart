@@ -66,7 +66,7 @@ export default function DownloadsPage() {
                             {orders.map((order) => (
                                 <TableRow key={order.id}>
                                     <TableCell className="font-medium">{order.productTitle}</TableCell>
-                                    <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
                                         <Button variant="outline" size="sm">
                                             <Download className="mr-2 h-4 w-4" />
