@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getOrders } from "@/lib/firebase/services";
+import { listAllOrders } from "@/app/actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Order } from "@/lib/types";
 import Link from "next/link";
@@ -25,8 +25,10 @@ export default function AdminOrdersPage() {
     React.useEffect(() => {
         async function fetchOrders() {
             try {
-                const allOrders = await getOrders();
-                setOrders(allOrders);
+                const { orders: allOrders } = await listAllOrders();
+                if (allOrders) {
+                   setOrders(allOrders);
+                }
             } catch (error) {
                 console.error("Failed to fetch orders:", error);
             } finally {

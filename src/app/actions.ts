@@ -7,7 +7,8 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { adminAppInstance, adminAuth, adminDb } from '@/lib/firebaseAdmin';
 import { saveProduct as saveProductToDb, saveIdeaRequest as saveIdeaRequestToDb, saveProposal as saveProposalToDb, getCategories } from "@/lib/firebase/services";
-import type { Prompt, IdeaRequest, Category, Proposal, User } from "@/lib/types";
+import type { Prompt, IdeaRequest, Category, Proposal, User, Order } from "@/lib/types";
+import { collection, getDocs, orderBy, limit, query as firestoreQuery, Timestamp } from "firebase/firestore";
 
 // --- Form State ---
 export type FormState = {
@@ -347,6 +348,36 @@ export async function listAllUsers(): Promise<{ users: User[], error?: string }>
     } catch (error) {
         console.error('Error listing users:', error);
         return { users: [], error: "사용자 목록을 불러오는 중 오류가 발생했습니다." };
+    }
+}
+
+export async function listAllOrders(): Promise<{ orders?: Order[], error?: string }> {
+    const token = cookies().get('firebaseIdToken')?.value;
+    const isAdmin = await verifyAdmin(token);
+    if (!isAdmin) {
+        return { error: "권한이 없습니다." };
+    }
+    
+    try {
+        const q = firestoreQuery(collection(adminDb, "orders"), orderBy("createdAt", "desc"), limit(50));
+        const snapshot = await getDocs(q);
+        const orders = snapshot.docs.map(doc => {
+            const data = doc.data();
+            const serializedData: { [key: string]: any } = { id: doc.id };
+             for (const key in data) {
+                const value = data[key];
+                if (value instanceof Timestamp) {
+                    serializedData[key] = value.toDate().toISOString();
+                } else {
+                    serializedData[key] = value;
+                }
+            }
+            return serializedData as Order;
+        }).filter(Boolean);
+        return { orders };
+    } catch (error: any) {
+        console.error(`Error fetching all orders:`, error);
+        return { error: "주문 내역을 불러오는 중 오류가 발생했습니다." };
     }
 }
 
