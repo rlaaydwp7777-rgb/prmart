@@ -1,89 +1,70 @@
-// src/components/auth/auth-buttons.tsx
-"use client";
-
+import { notFound } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
+import { User, MessageSquare } from "lucide-react";
 import Link from "next/link";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/components/auth/AuthProvider";
-import { AUTH_STRINGS } from "@/lib/string-constants";
-import { Skeleton } from "../ui/skeleton";
-import { Gift, Package, Users } from "lucide-react";
+import { getProducts, getIdeaRequest, getProposalsByRequestId } from "@/lib/firebase/services";
+import { Separator } from "@/components/ui/separator";
+import { ProposalForm } from "@/components/requests/proposal-form";
+import { ProposalList } from "@/components/requests/proposal-list";
 
-export function AuthButtons() {
-    const { user, loading, signOut } = useAuth();
 
-    if (loading) {
-        return <Skeleton className="h-10 w-24" />;
-    }
+export default async function RequestDetailPage({ params }: { params: { id: string } }) {
+  const request = await getIdeaRequest(params.id);
+  
+  if (!request) {
+    notFound();
+  }
 
-    if (user) {
-        // @ts-ignore - customAttributes are not part of the default user type but are present on our user objects
-        const isSeller = user.reloadUserInfo?.customAttributes?.role === 'seller';
-        // @ts-ignore
-        const isAdmin = user.reloadUserInfo?.customAttributes?.role === 'admin';
+  // Fetch real proposals for the request
+  const [products, proposals] = await Promise.all([
+    getProducts(),
+    getProposalsByRequestId(params.id)
+  ]);
 
-        return (
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.photoURL || `https://avatar.vercel.sh/${user.uid}.png`} alt={user.displayName || "user"} />
-                            <AvatarFallback>{(user.displayName || user.email || "U").charAt(0)}</AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                        <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">{user.displayName || AUTH_STRINGS.USER_MENU_GREETING}</p>
-                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-                        </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                        <Link href="/account">계정 정보</Link>
-                    </DropdownMenuItem>
-                     {(isSeller || isAdmin) && (
-                         <DropdownMenuItem asChild>
-                           <Link href="/seller">판매자 센터</Link>
-                        </DropdownMenuItem>
-                    )}
-                    {isAdmin && (
-                        <DropdownMenuItem asChild>
-                            <Link href="/admin">관리자 페이지</Link>
-                        </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild>
-                        <Link href="/account/referrals" className="flex items-center">
-                            <Gift className="mr-2 h-4 w-4" />
-                            친구 초대 & 리워드
-                        </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut}>
-                        {AUTH_STRINGS.LOGOUT_LINK}
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        );
-    }
+  return (
+      <div className="container px-4 md:px-6">
+        <div className="max-w-3xl mx-auto">
+          {/* Request Details */}
+          <div className="space-y-4">
+            <div className="flex gap-2">
+               {request.category && (
+                  <Link href={`/c/${request.categorySlug}`}>
+                    <Badge variant="secondary">{request.category}</Badge>
+                  </Link>
+               )}
+              {request.isExample && <Badge variant="outline">예제</Badge>}
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold font-headline tracking-tighter">{request.title}</h1>
+            
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground">
+              <div className="flex items-center gap-2">
+                  <User className="w-4 h-4"/>
+                  <span>{request.author}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4"/>
+                  <span>{proposals.length}개 제안</span>
+              </div>
+            </div>
 
-    return (
-        <div className="flex items-center gap-2">
-            <Button variant="ghost" asChild>
-                <Link href="/login">{AUTH_STRINGS.LOGIN}</Link>
-            </Button>
-            <Button asChild>
-                <Link href="/signup">{AUTH_STRINGS.SIGNUP}</Link>
-            </Button>
+            <div className="text-3xl font-bold text-primary">
+              희망 예산: {request.budget > 0 ? `₩${request.budget.toLocaleString()}` : "협의 가능"}
+            </div>
+
+            <p className="text-foreground/80 leading-relaxed whitespace-pre-wrap">
+              {request.description}
+            </p>
+          </div>
+
+          <Separator className="my-8 md:my-12" />
+
+          <ProposalForm requestId={params.id} />
+
+          <Separator className="my-8 md:my-12" />
+          
+          <ProposalList initialProposals={proposals} allProducts={products} />
+
         </div>
-    );
+      </div>
+  );
 }

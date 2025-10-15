@@ -1,79 +1,170 @@
-// middleware.ts
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
-import { adminAppInstance } from "./src/lib/firebaseAdmin";
+import type { LucideIcon } from "lucide-react";
 
-function maskEmail(email?: string) {
-  if (!email) return "unknown_email";
-  const [localPart, domain] = email.split("@");
-  if (localPart.length <= 3) {
-    return `${localPart}***@${domain}`;
-  }
-  return `${localPart.substring(0, 3)}***@${domain}`;
+export type PromptVisibility = 'public' | 'private' | 'partial';
+export type OrderStatus = 'created' | 'paid' | 'clearing_hold' | 'released' | 'refunded' | 'disputed' | 'chargeback';
+export type ProductStatus = 'pending' | 'approved' | 'rejected';
+
+export interface User {
+    uid: string;
+    email: string;
+    displayName: string;
+    photoURL?: string;
+    role: 'user' | 'seller' | 'admin';
+    referralCode?: string;
+    referredBy?: string;
+    createdAt: string;
+    balances?: {
+        available: number;
+        pending: number;
+        reserve: number;
+    };
+    kyc?: {
+        status: 'verified' | 'pending' | 'rejected';
+        [key: string]: any;
+    };
 }
 
-export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
-  const isAdminRoute = pathname.startsWith("/admin");
-  const isSellerRoute = pathname.startsWith("/seller");
-  const isAccountRoute = pathname.startsWith("/account");
-
-  if (isAdminRoute || isSellerRoute || isAccountRoute) {
-    const token = req.cookies.get("firebaseIdToken")?.value;
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("continueUrl", pathname);
-
-    if (!token) {
-      console.warn(`[MW_TOKEN_MISSING] No token found for protected route: ${pathname}. Redirecting to login.`);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    try {
-      if (!adminAppInstance) {
-        console.error("[MW_ADMIN_SDK_MISSING] Admin SDK not available in middleware. Access denied.");
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      const decoded = await adminAppInstance.auth().verifyIdToken(token);
-      
-      if (!decoded) {
-        console.warn(`[MW_ACCESS_DENIED] Unauthenticated attempt to access ${pathname}`);
-        return NextResponse.redirect(loginUrl);
-      }
-
-      // /account is accessible to any logged-in user.
-      if (isAccountRoute) {
-        return NextResponse.next();
-      }
-
-      // /admin is only for 'admin' role.
-      if (isAdminRoute) {
-        if (decoded?.role === "admin") {
-          return NextResponse.next();
-        } else {
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access admin route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-      // /seller is for 'admin' or 'seller' roles.
-      if (isSellerRoute) {
-        if (decoded?.role === "admin" || decoded?.role === "seller") {
-          return NextResponse.next();
-        } else {
-           console.warn(`[MW_ACCESS_DENIED] User ${maskEmail(decoded.email)} with role '${decoded?.role || 'user'}' attempted to access seller route ${pathname}. Denied.`);
-           return NextResponse.redirect(new URL("/", req.url));
-        }
-      }
-
-    } catch (err: any) {
-      console.error(`[MW_TOKEN_VERIFY_FAIL] path=${pathname}, code=${err.code || 'N/A'}, message=${err.message || 'Unknown error'}`);
-      // If token is expired or invalid, redirect to login
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  return NextResponse.next();
+export interface Prompt {
+  id: string;
+  title: string;
+  description?: string;
+  author: string; 
+  sellerId: string;
+  sellerPhotoUrl?: string;
+  category: string;
+  categorySlug: string;
+  subCategorySlug?: string;
+  price: number;
+  image: string;
+  contentUrl?: string; // To store external link for product content
+  aiHint: string;
+  tags?: string[];
+  rank?: number;
+  isExample?: boolean;
+  visibility: PromptVisibility;
+  sellOnce?: boolean;
+  status: ProductStatus;
+  createdAt: string; 
+  updatedAt?: string;
+  stats: {
+    views: number;
+    likes: number;
+    sales: number;
+  };
+  rating: number;
+  reviews: number;
 }
 
-export const config = { matcher: ["/admin/:path*", "/seller/:path*", "/account/:path*"] };
+export interface IdeaRequest {
+    id: string;
+    title: string;
+    description: string;
+    author: string;
+    authorId: string;
+    category: string;
+    categorySlug: string;
+    budget: number;
+    proposals: number;
+    isExample?: boolean;
+    createdAt: string;
+}
+
+export interface Proposal {
+    id: string;
+    requestId: string;
+    authorId: string;
+    authorName: string;
+    authorAvatar: string;
+    content: string;
+    productId?: string;
+    createdAt: string;
+    status: 'pending' | 'accepted';
+}
+
+export interface Review {
+    id: string;
+    author: string;
+    authorAvatar?: string;
+    authorId: string;
+    productId: string;
+    productTitle: string;
+    rating: number;
+    content: string;
+    createdAt: string;
+}
+
+export interface SubCategory {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+export interface Category {
+  id: string;
+  name:string;
+  slug: string;
+  icon: string;
+  subCategories: SubCategory[];
+}
+
+export interface HomePageContent {
+  headline: string;
+  subheadline: string | null;
+  categoriesHeadline: string;
+  categoriesSubheadline: string;
+  featuredPromptsHeadline: string;
+  featuredPromptsSubheadline: string;
+  ctaHeadline: string;
+  ctaSubheadline: string;
+}
+
+export interface Order {
+    id: string;
+    buyerId: string;
+    sellerId: string;
+    productId: string;
+    productTitle: string;
+    
+    priceGross: number; // 최종 결제 금액 (VAT 포함)
+    priceNet: number;   // 공급가 (priceGross / 1.1)
+    vat: number;        // 부가세
+    
+    referralCode?: string; // 사용된 추천인 코드
+    
+    pgFee: number;           // PG사 수수료
+    platformFee: number;     // 플랫폼 수수료 (총액)
+    referralFee: number;     // 추천인에게 지급될 보상
+    sellerEarning: number;   // 판매자 최종 수익
+    
+    status: OrderStatus;
+    
+    holdUntil?: string;      // 정산 보류 만료 시점 (ISO String)
+    disputeId?: string;      // 분쟁 ID
+    refundReason?: string;   // 환불 사유
+
+    orderDate: string; // 호환성을 위해 유지 (createdAt과 동일할 수 있음)
+    createdAt: string;
+}
+
+export interface SellerStats {
+    totalRevenue: number;
+    totalSales: number;
+    productCount: number;
+    averageRating: number;
+    reviewCount: number;
+}
+
+export interface SellerProfile {
+    sellerName: string;
+    sellerBio?: string;
+    photoUrl?: string;
+    bankName?: string;
+    accountNumber?: string;
+    accountHolder?: string;
+}
+
+
+export interface Wishlist {
+    userId: string;
+    productIds: string[];
+}

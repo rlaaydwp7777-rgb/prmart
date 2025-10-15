@@ -1,5 +1,4 @@
 
-
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { User, MessageSquare } from "lucide-react";
