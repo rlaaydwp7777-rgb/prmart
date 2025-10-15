@@ -5,6 +5,5 @@ runConfig:
   cpu: 2
   memoryMiB: 1024
 buildConfig:
-  buildCommand: npm install && npm run build
   outputDirectory: .next
   nodeVersion: 20
