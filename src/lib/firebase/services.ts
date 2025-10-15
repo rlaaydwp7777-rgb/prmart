@@ -1,3 +1,4 @@
+
 import { collection, getDocs, getDoc, doc, query, where, limit, Timestamp, orderBy, addDoc, setDoc, Transaction, runTransaction, FieldValue, getFirestore } from "firebase/firestore";
 import { getDb } from "./client";
 import type { Prompt, Category, SubCategory, IdeaRequest, Order, SellerStats, SellerProfile, Review, Wishlist, Proposal } from "@/lib/types";
@@ -336,7 +337,7 @@ function serializeDoc(doc: any): any {
 function chunkArray<T>(arr: T[], size: number): T[][] {
   const chunks: T[][] = [];
   for (let i = 0; i < arr.length; i += size) {
-    chunks.push(arr.slice(i, i + size);
+    chunks.push(arr.slice(i, i + size));
   }
   return chunks;
 }
@@ -862,3 +863,5 @@ export async function getProposalsByRequestId(requestId: string): Promise<Propos
 // export async function getAdminDashboardData() {
 // ...
 // }
+
+    
