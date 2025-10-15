@@ -1,8 +1,6 @@
-Dockerfile
-.dockerignore
 node_modules
-.next
+.next/cache
 .git
-.env*
+.gitignore
+Dockerfile
 README.md
-*.log
