@@ -587,10 +587,10 @@ export async function getSellerDashboardData(sellerId: string) {
     return fetchFromCache(cacheKey, async () => {
         try {
             // 1. Fetch orders by sellerId directly for better performance
-            const ordersQuery = query(collection(db, "orders"), where("sellerId", "==", sellerId));
+            const ordersQuery = query(collection(db, "orders"), where("sellerId", "==", sellerId), where("status", "in", ["released", "paid", "clearing_hold"]));
             const ordersSnapshot = await getDocs(ordersQuery);
             const orders: Order[] = ordersSnapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
-            orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
             // 2. Fetch products by seller
             const sellerProducts = await getProductsBySeller(sellerId);
@@ -602,7 +602,7 @@ export async function getSellerDashboardData(sellerId: string) {
                 : 0;
 
             const stats: SellerStats = {
-                totalRevenue: orders.reduce((sum, order) => sum + order.amount, 0),
+                totalRevenue: orders.reduce((sum, order) => sum + order.sellerEarning, 0),
                 totalSales: orders.length,
                 productCount: sellerProducts.length,
                 averageRating: averageRating,
@@ -619,7 +619,7 @@ export async function getSellerDashboardData(sellerId: string) {
                     salesByProduct[order.productId] = { sales: 0, revenue: 0 };
                 }
                 salesByProduct[order.productId].sales++;
-                salesByProduct[order.productId].revenue += order.amount;
+                salesByProduct[order.productId].revenue += order.sellerEarning;
             });
             const bestSellers = Object.keys(salesByProduct)
                 .map(productId => {
@@ -637,8 +637,8 @@ export async function getSellerDashboardData(sellerId: string) {
             });
 
             orders.forEach(order => {
-                const monthIndex = new Date(order.orderDate).getMonth();
-                salesByMonth[monthIndex].total += order.amount;
+                const monthIndex = new Date(order.createdAt).getMonth();
+                salesByMonth[monthIndex].total += order.sellerEarning;
             });
 
 
@@ -716,7 +716,7 @@ export async function getOrdersByBuyer(buyerId: string): Promise<Order[]> {
             const q = query(collection(db, "orders"), where("buyerId", "==", buyerId));
             const snapshot = await getDocs(q);
             const orders = snapshot.docs.map(doc => serializeDoc(doc) as Order).filter(Boolean);
-            return orders.sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime());
+            return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         } catch (error) {
             console.error(`Error fetching orders for buyer ${buyerId}:`, error);
             return [];

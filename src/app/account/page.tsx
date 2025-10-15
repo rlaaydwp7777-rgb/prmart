@@ -60,7 +60,7 @@ export default function AccountDashboardPage() {
                                         <p className="font-medium">{order.productTitle}</p>
                                         <p className="text-sm text-muted-foreground">{new Date(order.orderDate).toLocaleDateString()}</p>
                                     </div>
-                                    <p className="font-semibold">₩{order.amount.toLocaleString()}</p>
+                                    <p className="font-semibold">₩{order.priceGross.toLocaleString()}</p>
                                 </div>
                             ))}
                         </div>

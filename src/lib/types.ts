@@ -120,26 +120,29 @@ export interface HomePageContent {
 
 export interface Order {
     id: string;
-    orderDate: string;
+    buyerId: string;
+    sellerId: string;
     productId: string;
     productTitle: string;
-    sellerId: string;
-    buyerId: string;
-    buyerName: string;
-    buyerEmail: string;
-    amount: number; // This is priceGross
-    priceGross: number;
-    priceNet: number;
-    vat: number;
-    referralCode?: string;
-    pgFee: number;
-    platformFee: number;
-    referralFee: number;
-    sellerEarning: number;
+    
+    priceGross: number; // 최종 결제 금액 (VAT 포함)
+    priceNet: number;   // 공급가 (priceGross / 1.1)
+    vat: number;        // 부가세
+    
+    referralCode?: string; // 사용된 추천인 코드
+    
+    pgFee: number;           // PG사 수수료
+    platformFee: number;     // 플랫폼 수수료 (총액)
+    referralFee: number;     // 추천인에게 지급될 보상
+    sellerEarning: number;   // 판매자 최종 수익
+    
     status: OrderStatus;
-    holdUntil?: string;
-    disputeId?: string;
-    refundReason?: string;
+    
+    holdUntil?: string;      // 정산 보류 만료 시점 (ISO String)
+    disputeId?: string;      // 분쟁 ID
+    refundReason?: string;   // 환불 사유
+
+    orderDate: string; // 호환성을 위해 유지 (createdAt과 동일할 수 있음)
     createdAt: string;
 }
 

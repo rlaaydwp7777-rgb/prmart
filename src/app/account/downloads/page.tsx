@@ -28,9 +28,9 @@ export default function DownloadsPage() {
         async function fetchOrders() {
             if (!user) return;
             try {
-                // For downloads, we only care about paid orders.
+                // For downloads, we only care about paid/released orders.
                 const userOrders = await getOrdersByBuyer(user.uid);
-                setOrders(userOrders.filter(o => o.status === 'paid'));
+                setOrders(userOrders.filter(o => o.status === 'paid' || o.status === 'released'));
             } catch (error) {
                 console.error("Failed to fetch orders for downloads:", error);
             } finally {
