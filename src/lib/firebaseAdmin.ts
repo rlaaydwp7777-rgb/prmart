@@ -4,12 +4,9 @@ import admin from "firebase-admin";
 let adminApp: admin.app.App | null = null;
 
 function initAdmin() {
-  if (typeof window !== "undefined") {
-    return null;
-  }
-  
-  if (admin.apps.length) {
-    return admin.app();
+  if (admin.apps.length > 0) {
+    adminApp = admin.app();
+    return adminApp;
   }
 
   const hasServiceAccount = process.env.FIREBASE_ADMIN_PRIVATE_KEY && process.env.FIREBASE_ADMIN_CLIENT_EMAIL && process.env.FIREBASE_ADMIN_PROJECT_ID;
@@ -49,12 +46,18 @@ function initAdmin() {
      }
   }
 
-  const errorMessage = "[ADMIN_CONFIG_MISSING] Firebase Admin SDK not configured. Set FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_PRIVATE_KEY, and FIREBASE_ADMIN_CLIENT_EMAIL.";
-  if (process.env.NODE_ENV === "production") {
+  const errorMessage = "[ADMIN_CONFIG_MISSING] Firebase Admin SDK not configured. Set FIREBASE_ADMIN_PROJECT_ID, FIREBASE_ADMIN_PRIVATE_KEY, and FIREBASE_ADMIN_CLIENT_EMAIL in your environment variables.";
+  
+  // In a production environment, this should be a fatal error.
+  if (process.env.NODE_ENV === "production" && !admin.apps.length) {
     throw new Error(errorMessage);
   }
 
-  console.warn(errorMessage + " Admin-only APIs will be disabled in development.");
+  // In development, we can warn but allow the app to run.
+  if (typeof window === "undefined") {
+      console.warn(errorMessage + " Admin-only features will be disabled.");
+  }
+  
   return null;
 }
 

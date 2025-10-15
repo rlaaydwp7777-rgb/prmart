@@ -40,6 +40,7 @@ export async function middleware(req: NextRequest) {
       
       if (!decoded) {
         console.warn(`[MW_ACCESS_DENIED] Unauthenticated attempt to access ${pathname}`);
+        loginUrl.searchParams.set("error", "session-expired");
         return NextResponse.redirect(loginUrl);
       }
 

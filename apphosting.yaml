@@ -1,31 +1,16 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
-
-# The "version" field is required.
 version: 1
-
-# The "runConfig" field specifies runtime settings.
 runConfig:
-  # The following settings are optional.
   concurrency: 100
   cpu: 2
   memoryMiB: 1024
   minInstances: 0
   maxInstances: 10
-
-# The "buildConfig" field specifies the build process for the backend.
 buildConfig:
-  # The "fetch" field is required to specify the source code to build from a repository.
+  buildCommand: npm install && npm run build
+  outputDirectory: .next
+  nodeVersion: 20
   fetch:
     repo: https://github.com/rlaaydwp7777/prmart-ai-assistant
     branch: main
-  
-  # The "buildCommand" field is required to build the Next.js app.
-  buildCommand: npm install && npm run build
-  
-  # The "outputDirectory" field specifies the directory containing the built app.
-  # For Next.js, this is typically the .next directory.
-  outputDirectory: .next
-  
-  # The "nodeVersion" field specifies the Node.js version to use.
-  nodeVersion: 20
