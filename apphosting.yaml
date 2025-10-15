@@ -6,14 +6,13 @@ version: 1
 
 # Specifies the build process for the backend.
 buildConfig:
-  # The "buildCommand" field is required.
+  # The "buildCommand" field is required to build the Next.js app.
   buildCommand: npm run build
-  # The "fetch" field is required.
+  # The "fetch" field is required to specify the source directory.
   fetch:
-    # The "source" field specifies the directory to fetch.
     source: /
 
-# The "runConfig" field is optional.
+# The "runConfig" field is optional and specifies runtime settings.
 runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
