@@ -1,4 +1,7 @@
+
 import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = 'nodejs';
 
 export async function middleware(request: NextRequest) {
   // /admin 경로 보호
@@ -6,7 +9,7 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get("firebaseIdToken")?.value;
 
     if (!token) {
-      console.log("No token found, redirecting to home");
+      console.log("[MW] No token found, redirecting to home");
       return NextResponse.redirect(new URL("/", request.url));
     }
 
@@ -19,15 +22,19 @@ export async function middleware(request: NextRequest) {
       // role 확인
       // @ts-ignore
       if (decodedToken.role !== "admin") {
-        console.log("User is not admin, redirecting");
+        console.log(`[MW] User ${decodedToken.email} is not admin, redirecting`);
         return NextResponse.redirect(new URL("/", request.url));
       }
 
       // 관리자 확인됨, 계속 진행
       return NextResponse.next();
     } catch (error) {
-      console.error("Token verification failed:", error);
-      return NextResponse.redirect(new URL("/", request.url));
+      console.error("[MW] Token verification failed:", error);
+      // 토큰 만료 또는 검증 실패 시, 로그인 페이지로 리디렉션
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("continueUrl", request.nextUrl.pathname);
+      loginUrl.searchParams.set("error", "session-expired");
+      return NextResponse.redirect(loginUrl);
     }
   }
 

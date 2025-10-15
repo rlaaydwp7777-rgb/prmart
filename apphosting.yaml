@@ -5,5 +5,9 @@ runConfig:
   cpu: 2
   memoryMiB: 1024
 buildConfig:
+  fetch:
+    repo: https://github.com/rlaaydwp7777/prmart-ai-assistant
+    branch: main
+  buildCommand: npm install && npm run build
   outputDirectory: .next
   nodeVersion: 20
