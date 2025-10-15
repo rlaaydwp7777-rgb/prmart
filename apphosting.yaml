@@ -1,6 +1,19 @@
 # Settings to manage and configure a Firebase App Hosting backend.
 # https://firebase.google.com/docs/app-hosting/configure
 
+# The "version" field is required.
+version: 1
+
+# Specifies the build process for the backend.
+buildConfig:
+  # The "buildCommand" field is required.
+  buildCommand: npm run build
+  # The "fetch" field is required.
+  fetch:
+    # The "source" field specifies the directory to fetch.
+    source: /
+
+# The "runConfig" field is optional.
 runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
