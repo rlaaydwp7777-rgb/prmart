@@ -1,11 +1,14 @@
 import admin from "firebase-admin";
 
+// Ensure you have the GOOGLE_APPLICATION_CREDENTIALS environment variable set
+// or initialize with a service account for server-side environments.
 if (!admin.apps.length) {
-  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
-  
-  if (!privateKey) {
-    console.error("FIREBASE_ADMIN_PRIVATE_KEY is missing");
-  } else {
+  try {
+    const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+    if (!privateKey) {
+      throw new Error("FIREBASE_ADMIN_PRIVATE_KEY is not set.");
+    }
+    
     admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
@@ -13,6 +16,8 @@ if (!admin.apps.length) {
         clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
       }),
     });
+  } catch (error) {
+    console.error("Firebase Admin initialization error:", error);
   }
 }
 
