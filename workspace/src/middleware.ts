@@ -1,7 +1,7 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { adminAppInstance } from "./src/lib/firebaseAdmin";
+import { adminAppInstance } from "@/lib/firebaseAdmin";
 
 function maskEmail(email?: string) {
   if (!email) return "unknown_email";
