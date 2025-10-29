@@ -1,7 +1,8 @@
+
 // src/app/seller/products/add/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -10,15 +11,15 @@ import { saveProductAction, FormState } from '@/app/actions';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { getCategories } from '@/lib/firebase/services';
 import type { Category } from '@/lib/types';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
 import { useRouter } from 'next/navigation';
 import { Loader2, Wand2 } from 'lucide-react';
 import { generateProductDescription } from '@/ai/flows/generate-product-description';
@@ -56,6 +57,7 @@ export default function AddProductPage() {
   const [isAiGenerating, setIsAiGenerating] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
@@ -75,13 +77,13 @@ export default function AddProductPage() {
   const [state, formAction] = useFormState(saveProductAction, initialState);
 
   useEffect(() => {
-    if (state.message) { // Display toast only when a message is present
-      if (state.success) {
-        toast({ title: "성공", description: state.message });
-        router.push('/seller/products');
-      } else {
-        toast({ title: "오류", description: state.message, variant: "destructive" });
-      }
+    if (!state.message) return;
+    
+    if (state.success) {
+      toast({ title: "성공", description: state.message });
+      router.push('/seller/products');
+    } else {
+      toast({ title: "오류", description: state.message, variant: "destructive" });
     }
   }, [state, router, toast]);
 
@@ -124,12 +126,12 @@ export default function AddProductPage() {
     formData.append('sellerId', user.uid);
     formData.append('author', user.displayName || user.email!);
     formData.append('sellerPhotoUrl', user.photoURL || '');
-    return formAction(formData);
+    formAction(formData);
 };
 
   return (
     <FormProvider {...form}>
-      <form action={wrappedAction} className="space-y-8">
+      <form ref={formRef} action={wrappedAction} className="space-y-8">
         <Card>
           <CardHeader>
             <CardTitle>새 상품 등록</CardTitle>
