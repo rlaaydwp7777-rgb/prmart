@@ -1,53 +1,52 @@
 // src/app/seller/products/add/page.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useFormState } from 'react-dom';
-import { saveProductAction, FormState } from '@/app/actions';
-import { useAuth } from '@/components/auth/AuthProvider';
-import { getCategories } from '@/lib/firebase/services';
-import type { Category } from '@/lib/types';
-import { Button } from '@/components/ui/button";
+import { useState, useEffect } from "react";
+import { useForm, FormProvider } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useFormState } from "react-dom";
+import { saveProductAction, FormState } from "@/app/actions";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { getCategories } from "@/lib/firebase/services";
+import type { Category } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group';
-import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
-import { Loader2, Wand2 } from 'lucide-react';
-import { generateProductDescription } from '@/ai/flows/generate-product-description';
-
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import { Loader2, Wand2 } from "lucide-react";
+import { generateProductDescription } from "@/ai/flows/generate-product-description";
 
 const productSchema = z.object({
   title: z.string().min(5, "제목은 5자 이상이어야 합니다."),
   description: z.string().min(20, "설명은 20자 이상이어야 합니다."),
-  image: z.string().url("유효한 이미지 URL을 입력해주세요.").optional().or(z.literal('')),
-  contentUrl: z.string().url("유효한 콘텐츠 URL을 입력해주세요.").optional().or(z.literal('')),
+  image: z.string().url("유효한 이미지 URL을 입력해주세요.").optional().or(z.literal("")),
+  contentUrl: z.string().url("유효한 콘텐츠 URL을 입력해주세요.").optional().or(z.literal("")),
   category: z.string().min(1, "카테고리를 선택해주세요."),
   price: z.coerce.number().min(0, "가격은 0 이상이어야 합니다."),
   tags: z.string().optional(),
-  visibility: z.enum(['public', 'private', 'partial']),
+  visibility: z.enum(["public", "private", "partial"]),
   sellOnce: z.boolean().default(false),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-const initialState: FormState = { success: false, message: '' };
+const initialState: FormState = { success: false, message: "" };
 
 function SubmitButton() {
-    const { pending } = useFormState();
-    return (
-        <Button type="submit" disabled={pending} size="lg">
-            {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            상품 등록하기
-        </Button>
-    )
+  const { pending } = useFormState();
+  return (
+    <Button type="submit" disabled={pending} size="lg">
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      상품 등록하기
+    </Button>
+  );
 }
 
 export default function AddProductPage() {
@@ -60,14 +59,14 @@ export default function AddProductPage() {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      title: '',
-      description: '',
-      image: '',
-      contentUrl: '',
-      category: '',
+      title: "",
+      description: "",
+      image: "",
+      contentUrl: "",
+      category: "",
       price: 0,
-      tags: '',
-      visibility: 'public',
+      tags: "",
+      visibility: "public",
       sellOnce: false,
     },
   });
@@ -77,7 +76,7 @@ export default function AddProductPage() {
   useEffect(() => {
     if (state.success) {
       toast({ title: "성공", description: state.message });
-      router.push('/seller/products');
+      router.push("/seller/products");
     } else if (state.message && !state.success) {
       toast({ title: "오류", description: state.message, variant: "destructive" });
     }
@@ -88,42 +87,45 @@ export default function AddProductPage() {
   }, []);
 
   const handleGenerateWithAi = async () => {
-    const title = form.getValues('title');
+    const title = form.getValues("title");
     if (!title) {
-        toast({ title: "알림", description: "먼저 상품 제목을 입력해주세요.", variant: "destructive" });
-        return;
+      toast({ title: "알림", description: "먼저 상품 제목을 입력해주세요.", variant: "destructive" });
+      return;
     }
     setIsAiGenerating(true);
     try {
-        const result = await generateProductDescription({ productTitle: title });
-        form.setValue('description', result.productDescription);
-        form.setValue('category', result.category);
-        form.setValue('tags', result.tags.join(', '));
-        form.setValue('price', result.price);
-        toast({ title: "AI 생성 완료", description: "상품 정보가 자동으로 채워졌습니다."});
+      const result = await generateProductDescription({ productTitle: title });
+      form.setValue("description", result.productDescription);
+      form.setValue("category", result.category);
+      form.setValue("tags", result.tags.join(", "));
+      form.setValue("price", result.price);
+      toast({ title: "AI 생성 완료", description: "상품 정보가 자동으로 채워졌습니다." });
     } catch (error) {
-        console.error("AI generation failed", error);
-        toast({ title: "AI 생성 실패", description: "내용 생성 중 오류가 발생했습니다.", variant: "destructive" });
+      console.error("AI generation failed", error);
+      toast({ title: "AI 생성 실패", description: "내용 생성 중 오류가 발생했습니다.", variant: "destructive" });
     } finally {
-        setIsAiGenerating(false);
+      setIsAiGenerating(false);
     }
   };
 
-
   if (userLoading) {
-    return <div className="flex justify-center items-center h-full"><Loader2 className="w-8 h-8 animate-spin" /></div>;
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
   }
 
   const wrappedAction = (formData: FormData) => {
     if (!user) {
-        toast({ title: "오류", description: "로그인이 필요합니다.", variant: "destructive" });
-        return;
+      toast({ title: "오류", description: "로그인이 필요합니다.", variant: "destructive" });
+      return;
     }
-    formData.append('sellerId', user.uid);
-    formData.append('author', user.displayName || user.email!);
-    formData.append('sellerPhotoUrl', user.photoURL || '');
+    formData.append("sellerId", user.uid);
+    formData.append("author", user.displayName || user.email!);
+    formData.append("sellerPhotoUrl", user.photoURL || "");
     return formAction(formData);
-};
+  };
 
   return (
     <FormProvider {...form}>
@@ -145,8 +147,12 @@ export default function AddProductPage() {
                       <Input placeholder="예: SEO 최적화 블로그 포스팅 자동화 프롬프트" {...field} />
                     </FormControl>
                     <Button type="button" variant="outline" onClick={handleGenerateWithAi} disabled={isAiGenerating}>
-                        {isAiGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Wand2 className="mr-2 h-4 w-4" />}
-                        AI로 생성
+                      {isAiGenerating ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Wand2 className="mr-2 h-4 w-4" />
+                      )}
+                      AI로 생성
                     </Button>
                   </div>
                   <FormMessage />
@@ -161,7 +167,11 @@ export default function AddProductPage() {
                 <FormItem>
                   <FormLabel>상세 설명</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="상품에 대해 자세하게 설명해주세요. 주요 기능, 사용법, 기대 효과 등을 포함하면 좋습니다." {...field} rows={8} />
+                    <Textarea
+                      placeholder="상품에 대해 자세하게 설명해주세요. 주요 기능, 사용법, 기대 효과 등을 포함하면 좋습니다."
+                      {...field}
+                      rows={8}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -182,8 +192,10 @@ export default function AddProductPage() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories.map(cat => (
-                          <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.name}>
+                            {cat.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -205,7 +217,7 @@ export default function AddProductPage() {
                 )}
               />
             </div>
-            
+
             <FormField
               control={form.control}
               name="tags"
@@ -219,104 +231,92 @@ export default function AddProductPage() {
                 </FormItem>
               )}
             />
-            
+
             <div className="grid md:grid-cols-2 gap-6">
-                <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>상품 이미지 URL</FormLabel>
-                        <FormControl>
-                            <Input placeholder="https://..." {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="contentUrl"
-                    render={({ field }) => (
-                        <FormItem>
-                        <FormLabel>콘텐츠 다운로드 URL (선택)</FormLabel>
-                        <FormControl>
-                            <Input placeholder="구매자가 다운로드할 파일/링크 URL" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                />
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>상품 이미지 URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="https://..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="contentUrl"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>콘텐츠 다운로드 URL (선택)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="구매자가 다운로드할 파일/링크 URL" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <FormField
-                control={form.control}
-                name="visibility"
-                render={({ field }) => (
-                    <FormItem className="space-y-3">
-                    <FormLabel>공개 범위 설정</FormLabel>
-                    <FormControl>
-                        <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1"
-                        >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                            <RadioGroupItem value="public" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                            전체 공개 (누구나 상세 설명 보기 가능)
-                            </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                            <RadioGroupItem value="partial" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                            부분 공개 (미리보기만 제공)
-                            </FormLabel>
-                        </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                            <FormControl>
-                            <RadioGroupItem value="private" />
-                            </FormControl>
-                            <FormLabel className="font-normal">
-                            비공개 (구매자만 보기 가능)
-                            </FormLabel>
-                        </FormItem>
-                        </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                    </FormItem>
-                )}
+              control={form.control}
+              name="visibility"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>공개 범위 설정</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="public" />
+                        </FormControl>
+                        <FormLabel className="font-normal">전체 공개 (누구나 상세 설명 보기 가능)</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="partial" />
+                        </FormControl>
+                        <FormLabel className="font-normal">부분 공개 (미리보기만 제공)</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="private" />
+                        </FormControl>
+                        <FormLabel className="font-normal">비공개 (구매자만 보기 가능)</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
 
             <FormField
-                control={form.control}
-                name="sellOnce"
-                render={({ field }) => (
-                    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                    <FormControl>
-                        <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        />
-                    </FormControl>
-                    <div className="space-y-1 leading-none">
-                        <FormLabel>
-                        한정 판매 (단 한 명에게만 판매)
-                        </FormLabel>
-                        <p className="text-sm text-muted-foreground">
-                        이 옵션을 선택하면 상품이 한 번 판매된 후 자동으로 판매 중지됩니다.
-                        </p>
-                    </div>
-                    </FormItem>
-                )}
+              control={form.control}
+              name="sellOnce"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                  <FormControl>
+                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>한정 판매 (단 한 명에게만 판매)</FormLabel>
+                    <p className="text-sm text-muted-foreground">
+                      이 옵션을 선택하면 상품이 한 번 판매된 후 자동으로 판매 중지됩니다.
+                    </p>
+                  </div>
+                </FormItem>
+              )}
             />
 
             <SubmitButton />
-
           </CardContent>
         </Card>
       </form>
